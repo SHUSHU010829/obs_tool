@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.time-font {
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+}
