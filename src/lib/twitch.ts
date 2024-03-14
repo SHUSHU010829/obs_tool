@@ -21,7 +21,7 @@ const TwitchChatListener = ({
     ) => {
       if (flags.broadcaster && command === "退訂") {
         if (onUnsubscribe) {
-          onUnsubscribe("退訂.mp4");
+          onUnsubscribe("unSubscribe.mp4");
         }
       }
     };
