@@ -1,4 +1,4 @@
-import Time from '@/components/ui/time';
+import Time from '@/components/time';
 
 export default function Clock() {
 
