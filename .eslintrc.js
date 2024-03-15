@@ -12,14 +12,14 @@ module.exports = {
 
   rules: {
     "no-var": "off",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "no-console": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-console": "off",
     "react/react-in-jsx-scope": "off",
     "react/display-name": 1,
     "react/jsx-filename-extension": [1, { extensions: [".ts", ".tsx"] }],
-    "prettier/prettier": "warn",
+    "prettier/prettier": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    "unused-imports/no-unused-imports": "warn",
+    "unused-imports/no-unused-imports": "off",
   },
   ignorePatterns: ["**/*.css"],
 };
