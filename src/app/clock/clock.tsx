@@ -51,7 +51,7 @@ export default function Clock() {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="py- flex items-center rounded-xl border-4 border-[#354f52] bg-[#f9f7f3] px-10 py-6 shadow-lg">
+      <div className="py- flex items-center rounded-xl border-4 border-[#354f52] bg-[#f9f7f3] px-10 py-6 shadow-lg opacity-80">
         <div className=" clock__circle">
           <div className="clock__rounder"></div>
           <div
@@ -72,16 +72,15 @@ export default function Clock() {
 
         <div className="ml-8">
           <div>
-            <p className="text-base font-bold text-slate-700">
+            <p className="text-lg font-bold text-slate-700">
               {daysOfWeek[currentTime.getDay()]},{" "}
               {monthsOfYear[currentTime.getMonth()]}{" "}
               {formatTime(currentTime.getDate())}
             </p>
           </div>
-          <div className="time-font">
+          <div className="time-font pt-2">
             <p className="text-5xl font-bold text-[#2f3e46]">
               {formatTime(hour % 12 || 12)}
-              {/* TODO 我想要底下這個冒號可以漸漸變淡再漸漸變深 */}
               <span className="animate-fade-in-out pl-1">:</span>
               {formatTime(currentTime.getMinutes())}
               <span className="pl-2 text-base">{amPm}</span>
