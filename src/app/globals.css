@@ -125,16 +125,16 @@
 }
 
 .clock__hour {
-  width: 4px;
-  height: 25px;
+  width: 3px;
+  height: 24px;
   border-radius: 10px;
   background-color: #e07a5f;
   z-index: 2;
 }
 
 .clock__minutes {
-  width: 4px;
-  height: 32px;
+  width: 3px;
+  height: 34px;
   border-radius: 10px;
   background-color: #e07a5f;
   z-index: 2;
@@ -142,7 +142,7 @@
 
 .clock__seconds {
   width: 2px;
-  height: 38px;
+  height: 40px;
   border-radius: 10px;
   background-color: #b7b7a4;
 }
