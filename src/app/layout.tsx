@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "SHU OBS TOOL",
   description: "Made by SHU",
-  other: { robots: 'noindex', googlebot: 'noindex' }
+  other: { robots: "noindex", googlebot: "noindex" },
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TwitchChatListener from "@/lib/twitch";
 import ReactPlayer from "react-player";
 
