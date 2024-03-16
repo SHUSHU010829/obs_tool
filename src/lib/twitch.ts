@@ -23,7 +23,7 @@ const TwitchChatListener = ({
         onPlay("unSubscribe.mp4");
       } else if (command === "媽咪") {
         onPlay("sekiMommy1.mp4");
-      } else if (command === "哭" || message === "kspkspCrycat" || message === "shushu23Cry" ) {
+      } else if (command === "哭" || message === "kspkspcrycat" || message === "shushu23cry" ) {
         onPlay("kspCry.mp4");
       } else if (command === "姐姐" || command === "姊姊") {
         onPlay("kspMiss.mp4");
@@ -31,7 +31,7 @@ const TwitchChatListener = ({
         onPlay("kspWife2.mp4");
       } else if (command === "早安") {
         onPlay("kspMorning1.mp4");
-      } else if (command === "5MA") {
+      } else if (command === "5ma") {
         onPlay("seki5ma.mp4");
       }
     };
