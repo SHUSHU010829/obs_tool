@@ -32,7 +32,7 @@ const TwitchChatListener = ({
       } else if (command === "早安") {
         onPlay("kspMorning1.mp4");
       } else if (command === "5ma") {
-        onPlay("seki5ma.mp4");
+        onPlay("seki5ma1.mp4");
       }
     };
     ComfyJS.Init(channelName);
