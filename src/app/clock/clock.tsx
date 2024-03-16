@@ -71,10 +71,10 @@ export default function Clock() {
 
         <div className="ml-8">
           <div className="flex items-center gap-3">
-            <p className="rounded-xl bg-[#ddbea9] px-3 py-1 text-lg font-bold text-[#ffffff]">
+            <p className="rounded-xl bg-[#ddbea9] px-3 py-1 text-xl font-bold text-[#ffffff]">
               {daysOfWeek[currentTime.getDay()]}
             </p>
-            <p className="text-lg font-bold text-slate-700">
+            <p className="text-xl font-bold text-slate-700">
               {monthsOfYear[currentTime.getMonth()]}{" "}
               {formatTime(currentTime.getDate())}
             </p>
@@ -84,7 +84,7 @@ export default function Clock() {
               {formatTime(hour % 12 || 12)}
               <span className="animate-fade-in-out"> : </span>
               {formatTime(currentTime.getMinutes())}
-              <span className="pl-2 text-base">{amPm}</span>
+              <span className="pl-2 text-xl">{amPm}</span>
             </p>
           </div>
         </div>
