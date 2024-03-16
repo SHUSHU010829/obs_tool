@@ -8,7 +8,7 @@ export default function Chat() {
   const [videoName, setVideoName] = useState("");
   const [playVideo, setPlayVideo] = useState(false);
 
-  const handleUnsubscribe = (name: string) => {
+  const handleVideoPlay = (name: string) => {
     setVideoName(name);
     setPlayVideo(true);
   };
@@ -22,7 +22,7 @@ export default function Chat() {
     <div>
       <TwitchChatListener
         channelName="shushu010829"
-        onUnsubscribe={handleUnsubscribe}
+        onPlay={handleVideoPlay}
       />
       {playVideo && videoName && (
         <ReactPlayer

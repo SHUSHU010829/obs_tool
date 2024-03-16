@@ -6,10 +6,10 @@ var ComfyJS = require("comfy.js");
 
 const TwitchChatListener = ({
   channelName,
-  onUnsubscribe,
+  onPlay,
 }: {
   channelName: string;
-  onUnsubscribe?: (videoName: string) => void;
+  onPlay: (videoName: string) => void;
 }) => {
   useEffect(() => {
     ComfyJS.onCommand = (
@@ -20,13 +20,9 @@ const TwitchChatListener = ({
       extra: any
     ) => {
       if (flags.broadcaster && command === "退訂") {
-        if (onUnsubscribe) {
-          onUnsubscribe("unSubscribe.mp4");
-        }
+        onPlay("unSubscribe.mp4");
       } else if (flags.broadcaster && command === "媽咪") {
-        if (onUnsubscribe) {
-          onUnsubscribe("sekiMommy.mp4");
-        }
+        onPlay("sekiMommy.mp4");
       }
     };
     ComfyJS.Init(channelName);
@@ -34,7 +30,7 @@ const TwitchChatListener = ({
     return () => {
       ComfyJS.Disconnect();
     };
-  }, [channelName, onUnsubscribe]);
+  }, [channelName, onPlay]);
 
   return null;
 };
