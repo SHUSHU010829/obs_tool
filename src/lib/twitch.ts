@@ -20,9 +20,9 @@ const TwitchChatListener = ({
       extra: any
     ) => {
       if (flags.broadcaster && command === "退訂") {
-        onPlay("unSubscribe.mp4");
+        onPlay("unSubscribe1.mp4");
       } else if (flags.broadcaster && command === "媽咪") {
-        onPlay("sekiMommy.mp4");
+        onPlay("sekiMommy1.mp4");
       }
     };
     ComfyJS.Init(channelName);
