@@ -23,6 +23,10 @@ const TwitchChatListener = ({
         if (onUnsubscribe) {
           onUnsubscribe("unSubscribe.mp4");
         }
+      } else if (flags.broadcaster && command === "媽咪") {
+        if (onUnsubscribe) {
+          onUnsubscribe("sekiMommy.mp4");
+        }
       }
     };
     ComfyJS.Init(channelName);
