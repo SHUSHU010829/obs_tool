@@ -31,6 +31,8 @@ const TwitchChatListener = ({
         onPlay("kspWife2.mp4");
       } else if (command === "早安") {
         onPlay("kspMorning1.mp4");
+      } else if (command === "5MA") {
+        onPlay("seki5ma.mp4");
       }
     };
     ComfyJS.Init(channelName);
