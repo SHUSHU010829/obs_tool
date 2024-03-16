@@ -22,7 +22,7 @@ const TwitchChatListener = ({
       if (command === "退訂") {
         onPlay("unSubscribe.mp4");
       } else if (command === "媽咪") {
-        onPlay("sekiMommy.mp4");
+        onPlay("sekiMommy1.mp4");
       } else if (command === "哭" || message === "kspkspCrycat" || message === "shushu23Cry" ) {
         onPlay("kspCry.mp4");
       }  else if (command === "姐姐" || command === "姊姊") {
