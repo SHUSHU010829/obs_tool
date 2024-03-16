@@ -1,4 +1,3 @@
-// twitch.ts
 "use client";
 
 import { useEffect } from "react";
@@ -19,12 +18,15 @@ const TwitchChatListener = ({
       flags: { broadcaster: any },
       extra: any
     ) => {
+      console.log(`[DATA] ${user}: ${command} ${message} [${flags.broadcaster}]`)
       if (flags.broadcaster && command === "退訂") {
         onPlay("unSubscribe.mp4");
       } else if (flags.broadcaster && command === "媽咪") {
         onPlay("sekiMommy.mp4");
       } else if (flags.broadcaster && (command === "哭" || message === "kspkspCrycat" || message === "shushu23Cry" )) {
         onPlay("kspCry.mp4");
+      }  else if (flags.broadcaster && (command === "姐姐" || command === "姊姊")) {
+        onPlay("kspMiss.mp4");
       }
     };
     ComfyJS.Init(channelName);
