@@ -30,7 +30,7 @@ const TwitchChatListener = ({
       } else if (command === "婆") {
         onPlay("kspWife2.mp4");
       } else if (command === "早安") {
-        onPlay("kspMorning.mp4");
+        onPlay("kspMorning1.mp4");
       }
     };
     ComfyJS.Init(channelName);
