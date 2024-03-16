@@ -19,13 +19,13 @@ const TwitchChatListener = ({
       extra: any
     ) => {
       console.log(`[DATA] ${user}: ${command} ${message} [${flags.broadcaster}]`)
-      if (flags.broadcaster && command === "退訂") {
+      if (command === "退訂") {
         onPlay("unSubscribe.mp4");
-      } else if (flags.broadcaster && command === "媽咪") {
+      } else if (command === "媽咪") {
         onPlay("sekiMommy.mp4");
-      } else if (flags.broadcaster && (command === "哭" || message === "kspkspCrycat" || message === "shushu23Cry" )) {
+      } else if (command === "哭" || message === "kspkspCrycat" || message === "shushu23Cry" ) {
         onPlay("kspCry.mp4");
-      }  else if (flags.broadcaster && (command === "姐姐" || command === "姊姊")) {
+      }  else if (command === "姐姐" || command === "姊姊") {
         onPlay("kspMiss.mp4");
       }
     };
