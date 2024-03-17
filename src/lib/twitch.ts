@@ -27,12 +27,14 @@ const TwitchChatListener = ({
         onPlay("kspCry.mp4");
       } else if (command === "姐姐" || command === "姊姊") {
         onPlay("kspMiss.mp4");
-      } else if (command === "婆") {
+      } else if (command === "ks婆") {
         onPlay("kspWife2.mp4");
       } else if (command === "早安") {
         onPlay("kspMorning1.mp4");
       } else if (command === "5ma") {
         onPlay("seki5ma1.mp4");
+      } else if (command === "0") {
+        onPlay("seki0.mp4");
       }
     };
     ComfyJS.Init(channelName);
