@@ -10,6 +10,30 @@ const TwitchChatListener = ({
   channelName: string;
   onPlay: (videoName: string) => void;
 }) => {
+
+  // 這裡是指令
+  const commandToVideoMap = {
+    "退訂": "unSubscribe.mp4",
+    "哭": "kspCry.mp4",
+    "姐姐": "kspMiss.mp4",
+    "姊姊": "kspMiss.mp4",
+    "ks婆": "kspWife2.mp4",
+    "早安": "kspMorning1.mp4",
+    "5ma": "seki5ma1.mp4",
+    "0": "seki01.mp4",
+    "88": "ksp884.mp4",
+    "洗澡": "kspBath1.mp4",
+    "草": "shushuLa.mp4"
+  };
+
+  // 這裡是普通聊天
+  const chatToVideoMap = {
+    "kspkspCrycat": "kspCry.mp4",
+    "哭": "kspCry.mp4",
+    "shush23Cry": "kspCry.mp4",
+    "sekimePien sekimeZero": "seki01.mp4",
+  };
+
   useEffect(() => {
     ComfyJS.onCommand = (
       user: string,
@@ -18,26 +42,8 @@ const TwitchChatListener = ({
       flags: { broadcaster: string },
       extra: any
     ) => {
-      if (command === "退訂") {
-        onPlay("unSubscribe.mp4");
-      } else if (command === "哭") {
-        onPlay("kspCry.mp4");
-      } else if (command === "姐姐" || command === "姊姊") {
-        onPlay("kspMiss.mp4");
-      } else if (command === "ks婆") {
-        onPlay("kspWife2.mp4");
-      } else if (command === "早安") {
-        onPlay("kspMorning1.mp4");
-      } else if (command === "5ma") {
-        onPlay("seki5ma1.mp4");
-      } else if (command === "0") {
-        onPlay("seki01.mp4");
-      } else if (command === "88") {
-        onPlay("ksp884.mp4");
-      } else if (command === "洗澡") {
-        onPlay("kspBath1.mp4");
-      } else if (command === "草") {
-        onPlay("shushuLa.mp4");
+      if (commandToVideoMap[command as keyof typeof commandToVideoMap]) {
+        onPlay(commandToVideoMap[command as keyof typeof commandToVideoMap]);
       }
     };
 
@@ -48,11 +54,8 @@ const TwitchChatListener = ({
       flags: { broadcaster: string },
       extra: any
     ) => {
-      console.log(command)
-      if (command === "kspkspCrycat" || command === "哭" || command === "shush23Cry") {
-        onPlay("kspCry.mp4");
-      } else if (command === "sekimePien sekimeZero") {
-        onPlay("seki01.mp4");
+      if (chatToVideoMap[command as keyof typeof chatToVideoMap]) {
+        onPlay(chatToVideoMap[command as keyof typeof chatToVideoMap]);
       }
     };
 
