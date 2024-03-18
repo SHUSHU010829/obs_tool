@@ -158,6 +158,7 @@
   transform-origin: bottom;
 }
 
+/*=============== CHAT ===============*/
 .account {
   animation-name: fadeIn;
   animation-duration: 1s;
@@ -187,4 +188,9 @@
   to {
     opacity: 0;
   }
+}
+
+/*=============== VIDEO ===============*/
+.square {
+  transform: skewX(-5deg);
 }

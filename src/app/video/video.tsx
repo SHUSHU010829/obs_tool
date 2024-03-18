@@ -19,7 +19,7 @@ export default function Video() {
   };
 
   return (
-    <div>
+    <div className="square">
       <TwitchChatListener channelName="shushu010829" onPlay={handleVideoPlay} />
       {playVideo && videoName && (
         <ReactPlayer
