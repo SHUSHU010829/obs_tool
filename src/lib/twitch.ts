@@ -37,9 +37,7 @@ const TwitchChatListener = ({
         onPlay("seki01.mp4");
       } else if (command === "88") {
         onPlay("ksp88.mp4");
-      } else if (command === "88") {
-        onPlay("ksp88.mp4");
-      } else if (command === "洗澡") {
+      }  else if (command === "洗澡") {
         onPlay("kspBath.mp4");
       }
     };
