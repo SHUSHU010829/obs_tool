@@ -48,9 +48,10 @@ const TwitchChatListener = ({
       flags: { broadcaster: string },
       extra: any
     ) => {
+      console.log(command)
       if (command === "kspkspCrycat" || command === "哭" || command === "shush23Cry") {
         onPlay("kspCry.mp4");
-      } else if (command === "sekimePiensekimeZero") {
+      } else if (command === "sekimePien sekimeZero") {
         onPlay("seki01.mp4");
       }
     };
