@@ -50,6 +50,8 @@ const TwitchChatListener = ({
     ) => {
       if (command === "kspkspCrycat" || command === "哭" || command === "shush23Cry") {
         onPlay("kspCry.mp4");
+      } else if (command === "sekimePiensekimeZero") {
+        onPlay("seki01.mp4");
       }
     };
 
