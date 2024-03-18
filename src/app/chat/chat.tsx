@@ -94,7 +94,7 @@ export default function Chat() {
               <div>{currentAccount.icon}</div>
               <div className="flex items-center gap-1 text-lg">
                 {currentAccount.ifShow && (
-                  <span className="text-base text-[#f5ba92]">@</span>
+                  <span className="text-base text-[#E87D35]">@</span>
                 )}
                 {currentAccount.name}
               </div>
