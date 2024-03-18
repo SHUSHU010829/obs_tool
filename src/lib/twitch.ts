@@ -21,7 +21,7 @@ const TwitchChatListener = ({
       console.log(`[DATA] ${user}: ${command} ${message} [${flags.broadcaster}]`)
       if (command === "退訂") {
         onPlay("unSubscribe.mp4");
-      } else if (command === "哭" || message === "kspkspcrycat" || message === "shushu23cry" ) {
+      } else if (command === "哭" || message === "kspkspcrycat" || message === "哭" ) {
         onPlay("kspCry.mp4");
       } else if (command === "姐姐" || command === "姊姊") {
         onPlay("kspMiss.mp4");
