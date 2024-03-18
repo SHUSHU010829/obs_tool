@@ -12,16 +12,15 @@ const TwitchChatListener = ({
 }) => {
   useEffect(() => {
     ComfyJS.onCommand = (
-      user: any,
+      user: string,
       command: string,
-      message: any,
-      flags: { broadcaster: any },
+      message: string,
+      flags: { broadcaster: string },
       extra: any
     ) => {
-      console.log(`[DATA] ${user}: ${command} ${message} [${flags.broadcaster}]`)
       if (command === "退訂") {
         onPlay("unSubscribe.mp4");
-      } else if (command === "哭" || message === "kspkspcrycat" || message === "哭" ) {
+      } else if (command === "哭") {
         onPlay("kspCry.mp4");
       } else if (command === "姐姐" || command === "姊姊") {
         onPlay("kspMiss.mp4");
@@ -41,6 +40,19 @@ const TwitchChatListener = ({
         onPlay("shushuLa.mp4");
       }
     };
+
+    ComfyJS.onChat = (
+      user: string,
+      command: string,
+      message: string,
+      flags: { broadcaster: string },
+      extra: any
+    ) => {
+      if (message === "kspkspcrycat" || message === "哭" || message === "shush23cry") {
+        onPlay("kspCry.mp4");
+      }
+    };
+
     ComfyJS.Init(channelName);
 
     return () => {
