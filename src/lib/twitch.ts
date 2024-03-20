@@ -23,7 +23,8 @@ const TwitchChatListener = ({
     "0": "seki01.mp4",
     "88": "ksp884.mp4",
     "洗澡": "kspBath1.mp4",
-    "草": "shushuLa.mp4"
+    "草": "shushuLa.mp4",
+    "晚安": 'kspSleep.mp4',
   };
 
   // 這裡是普通聊天
