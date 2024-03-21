@@ -25,7 +25,7 @@ const TwitchChatListener = ({
     "洗澡": "kspBath1.mp4",
     "草": "shushuLa.mp4",
     "晚安": 'kspSleep1.mp4',
-    "kseki": 'sekiLove.mp4',
+    "kseki": 'sekiLove1.mp4',
   };
 
   // 這裡是普通聊天
@@ -34,7 +34,7 @@ const TwitchChatListener = ({
     "哭": "kspCry.mp4",
     "shush23Cry": "kspCry.mp4",
     "sekimePien sekimeZero": "seki01.mp4",
-    "kspkspLove sekimeShy": "sekiLove.mp4",
+    "kspkspLove sekimeShy": "sekiLove1.mp4",
   };
 
   useEffect(() => {
