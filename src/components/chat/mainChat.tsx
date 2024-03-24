@@ -59,45 +59,51 @@ export default function MainChat() {
   const daysOfWeek = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
 
   return (
-    <div className="flex h-[780px] w-[380px] flex-col items-center justify-start rounded-3xl border-4 border-[#6b705c] bg-[#f9f7f3] bg-opacity-70 pt-12 shadow-lg">
-      {/* 月份&週 */}
-      <div className="flex items-center gap-3">
-        <p className="text-xl font-bold text-slate-700">
-          {currentTime.getMonth()}月{currentTime.getDate()}日
-        </p>
-        <p className="text-xl font-bold text-slate-700">
-          {daysOfWeek[currentTime.getDay()]}
-        </p>
+    <div className="flex h-[780px] w-[380px] flex-col items-center rounded-3xl border-4 border-[#6b705c] bg-[#f9f7f3] bg-opacity-70 shadow-lg">
+      <div className="my-3 flex w-32 justify-center gap-10 rounded-full bg-neutral-800 px-3 py-1">
+        <div className="animate-fade-in-out text-red-500">⏺︎</div>
+        <div className="font-medium text-[#f9f7f3]">LIVE</div>
       </div>
-      {/* 時間 */}
-      <div className="time-font pt-2">
-        <p className="text-6xl font-bold text-[#2f3e46]">
-          <span>{formatTime(hour)}</span>
-          <span className="animate-fade-in-out">:</span>
-          <span>{formatTime(currentTime.getMinutes())}</span>
-        </p>
-      </div>
-      <div className="flex justify-between gap-2">
-        {/* 觀眾計數顯示 */}
-        <div className="flex h-16 w-24 items-center justify-center text-xl font-bold text-[#6b705c]">
-          {viewersCount ? (
-            <div className="flex items-center gap-2">
-              <GoPersonFill />
-              {viewersCount}
-            </div>
-          ) : (
-            <div>讀取中</div>
-          )}
+      <div className="flex flex-col items-center justify-start pt-5">
+        {/* 月份&週 */}
+        <div className="flex items-center gap-3">
+          <p className="text-xl font-bold text-slate-700">
+            {currentTime.getMonth()}月{currentTime.getDate()}日
+          </p>
+          <p className="text-xl font-bold text-slate-700">
+            {daysOfWeek[currentTime.getDay()]}
+          </p>
         </div>
-        {/* 社群媒體帳號 */}
-        <div className="flex h-16 w-48 items-center justify-center text-xl font-semibold text-[#6b705c]">
-          <div className={`account flex items-center gap-3 ${fadeClass}`}>
-            <div>{currentAccount.icon}</div>
-            <div className="flex items-center gap-1 text-lg">
-              {currentAccount.ifShow && (
-                <span className="text-base text-[#E87D35]">@</span>
-              )}
-              {currentAccount.name}
+        {/* 時間 */}
+        <div className="time-font pt-2">
+          <p className="text-6xl font-bold text-[#2f3e46]">
+            <span>{formatTime(hour)}</span>
+            <span>:</span>
+            <span>{formatTime(currentTime.getMinutes())}</span>
+          </p>
+        </div>
+        <div className="flex justify-between gap-2">
+          {/* 觀眾計數顯示 */}
+          <div className="flex h-16 w-24 items-center justify-center text-xl font-bold text-[#6b705c]">
+            {viewersCount ? (
+              <div className="flex items-center gap-2">
+                <GoPersonFill />
+                {viewersCount}
+              </div>
+            ) : (
+              <div>讀取中</div>
+            )}
+          </div>
+          {/* 社群媒體帳號 */}
+          <div className="flex h-16 w-48 items-center justify-center text-xl font-semibold text-[#6b705c]">
+            <div className={`account flex items-center gap-3 ${fadeClass}`}>
+              <div>{currentAccount.icon}</div>
+              <div className="flex items-center gap-1 text-lg">
+                {currentAccount.ifShow && (
+                  <span className="text-base text-[#E87D35]">@</span>
+                )}
+                {currentAccount.name}
+              </div>
             </div>
           </div>
         </div>
