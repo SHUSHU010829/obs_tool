@@ -27,6 +27,7 @@ const TwitchChatListener = ({
     "晚安": 'kspSleep1.mp4',
     "kseki": 'sekiLove1.mp4',
     "媽咪": 'sekiMommy.mp4',
+    "蘑菇": 'kspMogu.mp4',
   };
 
   // 這裡是普通聊天
