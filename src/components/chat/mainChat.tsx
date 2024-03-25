@@ -60,8 +60,8 @@ export default function MainChat() {
 
   return (
     <div className="flex h-[780px] w-[380px] flex-col items-center rounded-3xl border-4 border-[#6b705c] bg-[#f9f7f3] bg-opacity-70 shadow-lg">
-      <div className="my-3 flex w-32 justify-center gap-10 rounded-full bg-neutral-800 px-4 py-1">
-        <div className="animate-fade-in-out bg-red-500 w-2 h-3 rounded-full"></div>
+      <div className="my-3 flex w-32 justify-center gap-10 rounded-full bg-neutral-800 px-4 py-1 items-center">
+        <div className="animate-fade-in-out bg-red-500 w-3 h-3 rounded-full"></div>
         <div className="font-medium text-[#f9f7f3]">LIVE</div>
       </div>
       <div className="flex flex-col items-center justify-start pt-5">
