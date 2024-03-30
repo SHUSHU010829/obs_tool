@@ -68,7 +68,7 @@ export default function MainChat() {
         {/* 月份&週 */}
         <div className="flex items-center gap-3">
           <p className="text-xl font-bold text-slate-700">
-            {currentTime.getMonth()}月{currentTime.getDate()}日
+            {currentTime.getMonth() + 1}月{currentTime.getDate()}日
           </p>
           <p className="text-xl font-bold text-slate-700">
             {daysOfWeek[currentTime.getDay()]}
