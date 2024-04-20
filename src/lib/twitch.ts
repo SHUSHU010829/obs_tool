@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+
 interface VideoMap {
-  [key: string]: string;
+  [key: string]: string | string[];
 }
 
 const TwitchChatListener = ({
@@ -13,14 +14,14 @@ const TwitchChatListener = ({
   onPlay: (videoName: string) => void;
 }) => {
   const pointVideoMap: VideoMap = {
-    "888": "ksp884.mp4",
+    "888": ["ksp884.mp4", "ksp888.mp4", "ksp8888.mp4"],
     退訂了: "unSubscribe1.mp4",
     TAT: "kspCry.mp4",
     "0": "seki01.mp4",
     好想姊姊: "kspMiss.mp4",
     婆: "kspWife2.mp4",
     早安: "kspMorning1.mp4",
-    晚安: "kspSleep1.mp4",
+    睡屁睡: "kspSleep1.mp4",
     LALALA: "shushuLa.mp4",
     媽咪: "sekiMommy.mp4",
     洗澡: "kspBath1.mp4",
@@ -51,7 +52,10 @@ const TwitchChatListener = ({
         const messageData = JSON.parse(message.data.message);
         if (messageData.type === "reward-redeemed") {
           const rewardTitle = messageData.data.redemption.reward.title;
-          const videoName = pointVideoMap[rewardTitle];
+          let videoName = pointVideoMap[rewardTitle];
+          if (Array.isArray(videoName)) {
+            videoName = videoName[Math.floor(Math.random() * videoName.length)];
+          }
           if (videoName) {
             onPlay(videoName);
           }
