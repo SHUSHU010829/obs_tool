@@ -7,10 +7,10 @@ interface VideoMap {
 }
 
 const TwitchChatListener = ({
-  channelName,
+  channelId,
   onPlay,
 }: {
-  channelName: string;
+  channelId: string;
   onPlay: (videoName: string) => void;
 }) => {
   const pointVideoMap: VideoMap = {
@@ -26,45 +26,65 @@ const TwitchChatListener = ({
     媽咪: "sekiMommy.mp4",
     洗澡: "kspBath1.mp4",
     "5MA": "seki5ma1.mp4",
-    蘑菇蘑菇: "kspMogu.mp4",
+    蘑菇蘑菇: "kspMogu1.mp4",
   };
 
   useEffect(() => {
     const token = process.env.TWITCH_OAUTH_TOKEN;
-    const socket = new WebSocket("wss://pubsub-edge.twitch.tv");
+    let socket = new WebSocket("wss://pubsub-edge.twitch.tv");
 
-    socket.onopen = function () {
-      socket.send(
-        JSON.stringify({
-          type: "LISTEN",
-          nonce: process.env.SOCKET_NONCE,
-          data: {
-            topics: [`channel-points-channel-v1.720691521`],
-            auth_token: token,
-          },
-        })
-      );
-    };
+    function connect() {
+      socket = new WebSocket("wss://pubsub-edge.twitch.tv");
 
-    socket.onmessage = function (event) {
-      const message = JSON.parse(event.data);
-      if (message.type === "MESSAGE") {
-        const messageData = JSON.parse(message.data.message);
-        if (messageData.type === "reward-redeemed") {
-          const rewardTitle = messageData.data.redemption.reward.title;
-          let videoName = pointVideoMap[rewardTitle];
-          if (Array.isArray(videoName)) {
-            videoName = videoName[Math.floor(Math.random() * videoName.length)];
+      socket.onopen = function () {
+        socket.send(
+          JSON.stringify({
+            type: "LISTEN",
+            nonce: process.env.SOCKET_NONCE,
+            data: {
+              topics: [`channel-points-channel-v1.${channelId}`],
+              auth_token: token,
+            },
+          })
+        );
+        // Send a heartbeat every 30 seconds to keep the connection alive
+        setInterval(() => {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "PING" }));
           }
-          if (videoName) {
-            onPlay(videoName);
+        }, 30000);
+      };
+
+      socket.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        if (message.type === "MESSAGE") {
+          const messageData = JSON.parse(message.data.message);
+          if (messageData.type === "reward-redeemed") {
+            const rewardTitle = messageData.data.redemption.reward.title;
+            let videoName = pointVideoMap[rewardTitle];
+            if (Array.isArray(videoName)) {
+              videoName =
+                videoName[Math.floor(Math.random() * videoName.length)];
+            }
+            if (videoName) {
+              onPlay(videoName);
+            }
           }
         }
-      }
-    };
+      };
 
-    return () => socket.close();
-  }, [channelName, onPlay]);
+      socket.onclose = function () {
+        // Try to reconnect in 5 seconds
+        setTimeout(connect, 5000);
+      };
+    }
+
+    connect();
+
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   return null;
 };
