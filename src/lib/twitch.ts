@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-var ComfyJS = require("comfy.js");
+interface VideoMap {
+  [key: string]: string;
+}
 
 const TwitchChatListener = ({
   channelName,
@@ -10,65 +12,54 @@ const TwitchChatListener = ({
   channelName: string;
   onPlay: (videoName: string) => void;
 }) => {
-
-  // 這裡是指令
-  const commandToVideoMap = {
-    "退訂": "unSubscribe.mp4",
-    "哭": "kspCry.mp4",
-    "姐姐": "kspMiss.mp4",
-    "姊姊": "kspMiss.mp4",
-    "ks婆": "kspWife2.mp4",
-    "早安": "kspMorning1.mp4",
-    "5ma": "seki5ma1.mp4",
+  const pointVideoMap: VideoMap = {
+    "888": "ksp884.mp4",
+    退訂了: "unSubscribe1.mp4",
+    TAT: "kspCry.mp4",
     "0": "seki01.mp4",
-    "88": "ksp884.mp4",
-    "洗澡": "kspBath1.mp4",
-    "草": "shushuLa.mp4",
-    "晚安": 'kspSleep1.mp4',
-    "kseki": 'sekiLove1.mp4',
-    "媽咪": 'sekiMommy.mp4',
-    "蘑菇": 'kspMogu.mp4',
-  };
-
-  // 這裡是普通聊天
-  const chatToVideoMap = {
-    "kspkspCrycat": "kspCry.mp4",
-    "哭": "kspCry.mp4",
-    "shush23Cry": "kspCry.mp4",
-    "sekimePien sekimeZero": "seki01.mp4",
-    "kspkspLove sekimeShy": "sekiLove1.mp4",
+    好想姊姊: "kspMiss.mp4",
+    婆: "kspWife2.mp4",
+    早安: "kspMorning1.mp4",
+    晚安: "kspSleep1.mp4",
+    LALALA: "shushuLa.mp4",
+    媽咪: "sekiMommy.mp4",
+    洗澡: "kspBath1.mp4",
+    "5MA": "seki5ma1.mp4",
+    蘑菇蘑菇: "kspMogu.mp4",
   };
 
   useEffect(() => {
-    ComfyJS.onCommand = (
-      user: string,
-      command: string,
-      message: string,
-      flags: { broadcaster: string },
-      extra: any
-    ) => {
-      if (commandToVideoMap[command as keyof typeof commandToVideoMap]) {
-        onPlay(commandToVideoMap[command as keyof typeof commandToVideoMap]);
+    const token = process.env.TWITCH_OAUTH_TOKEN;
+    const socket = new WebSocket("wss://pubsub-edge.twitch.tv");
+
+    socket.onopen = function () {
+      socket.send(
+        JSON.stringify({
+          type: "LISTEN",
+          nonce: process.env.SOCKET_NONCE,
+          data: {
+            topics: [`channel-points-channel-v1.720691521`],
+            auth_token: token,
+          },
+        })
+      );
+    };
+
+    socket.onmessage = function (event) {
+      const message = JSON.parse(event.data);
+      if (message.type === "MESSAGE") {
+        const messageData = JSON.parse(message.data.message);
+        if (messageData.type === "reward-redeemed") {
+          const rewardTitle = messageData.data.redemption.reward.title;
+          const videoName = pointVideoMap[rewardTitle];
+          if (videoName) {
+            onPlay(videoName);
+          }
+        }
       }
     };
 
-    ComfyJS.onChat = (
-      user: string,
-      command: string,
-      message: string,
-      flags: { broadcaster: string },
-      extra: any
-    ) => {
-      if (chatToVideoMap[command as keyof typeof chatToVideoMap]) {
-        onPlay(chatToVideoMap[command as keyof typeof chatToVideoMap]);
-      }
-    };
-
-    ComfyJS.Init(channelName);
-
-    return () => {
-      ComfyJS.Disconnect();
-    };
+    return () => socket.close();
   }, [channelName, onPlay]);
 
   return null;
