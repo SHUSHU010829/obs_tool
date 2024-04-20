@@ -15,7 +15,7 @@ const TwitchChatListener = ({
 }) => {
   const pointVideoMap: VideoMap = {
     "888": ["ksp884.mp4", "ksp8881.mp4", "ksp88881.mp4"],
-    退訂了: "unSubscribe1.mp4",
+    退訂了: "unSubscribe2.mp4",
     TAT: "kspCry.mp4",
     "0": "seki01.mp4",
     好想姊姊: "kspMiss.mp4",
