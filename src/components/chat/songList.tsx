@@ -1,61 +1,142 @@
 "use client";
 
-import { DotFilledIcon, PlayIcon, ResumeIcon } from "@radix-ui/react-icons";
+import Album from "../album";
+import { useEffect, useState } from "react";
+
+const song = [
+  {
+    title: "LAVA!",
+    artist: "OZI",
+    nowPlaying: false,
+  },
+  {
+    title: "1",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "2",
+    artist: "張碧晨",
+    nowPlaying: true,
+  },
+  {
+    title: "3",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "4",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "5",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "6",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "LAVA!",
+    artist: "OZI",
+    nowPlaying: false,
+  },
+  {
+    title: "7",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "8",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "9",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "10",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "11",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "12",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "LAVA!",
+    artist: "OZI",
+    nowPlaying: false,
+  },
+  {
+    title: "13",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+  {
+    title: "14",
+    artist: "張碧晨",
+    nowPlaying: false,
+  },
+];
 
 export default function SongList() {
-  const songList = [
-    {
-      songName: "籠",
-      nowPlaying: false,
-    },
-    {
-      songName: "慢冷",
-      nowPlaying: false,
-    },
-    {
-      songName: "Beautiful Things",
-      nowPlaying: true,
-    },
-    {
-      songName: "字字句句",
-      nowPlaying: false,
-    },
-    {
-      songName: "再見",
-      nowPlaying: false,
-    },
-    { songName: "Song 6", nowPlaying: false },
-  ];
+  const [currentSet, setCurrentSet] = useState(0);
+  const [fade, setFade] = useState(true);
+  const sets = Math.ceil(song.length / 8);
 
-  const shouldMarquee = songList.length > 5;
-  const tripledSongList = shouldMarquee
-    ? [...songList, ...songList, ...songList]
-    : songList;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrentSet(prevSet => (prevSet + 1) % sets);
+        setFade(true);
+      }, 500); // 等待 500 毫秒後切換歌曲組並恢復透明度
+    }, 6000); // 6秒切換一次
+    return () => clearInterval(interval);
+  }, [sets]);
+
+  const startIndex = currentSet * 8;
+  const currentSongs = song.slice(startIndex, startIndex + 8);
 
   return (
-    <div className="flex h-[300px] w-[480px] flex-col justify-start overflow-hidden rounded-3xl border-4 border-[#93806c] bg-[#f9f7f3] bg-opacity-70 p-8 shadow-lg">
-      <div className="flex flex-col gap-5">
-        <div className="flex items-center justify-end gap-3 text-lg font-bold text-[#5c6064]">
-          <ResumeIcon className="h-5 w-5" />
-          歌單
-        </div>
-        <div
-          className={`flex flex-col gap-2 text-xl font-semibold text-[#2f3e46] ${shouldMarquee ? "marquee" : ""}`}
-          style={
-            shouldMarquee ? { animation: `marquee 15s linear infinite` } : {}
-          }
-        >
-          {tripledSongList.map((song, index) => (
-            <div key={index} className="flex items-center gap-2">
-              {song.nowPlaying ? (
-                <PlayIcon className="h-5 w-5" />
-              ) : (
-                <DotFilledIcon className="h-5 w-5" />
-              )}
-              <div>{song.songName}</div>
-            </div>
-          ))}
-        </div>
+    <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-70 shadow-lg">
+      <Album />
+      {/* NOW PLAYING */}
+      <div className="mt-[-45px] flex flex-col">
+        <p className="text-xl font-bold">雪人</p>
+        <p className="font-semibold text-slate-500">SEKI</p>
+      </div>
+      <div className="w-full px-20 pt-3">
+        <hr className="gradient"></hr>
+      </div>
+      {/* SONG LIST */}
+      <div
+        className={`flex w-full flex-col gap-3 pl-20 pt-4 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
+      >
+        {currentSongs.map((song, index) => (
+          <div className="flex items-center gap-2" key={index}>
+            <p
+              className={`rounded-lg  px-2 font-mono font-semibold text-white ${song.nowPlaying ? "bg-red-700" : "bg-slate-700"}`}
+            >
+              {String(index + startIndex + 1).padStart(2, "0")}
+            </p>
+            <p className="text-lg font-bold">{song.title}</p>
+            <div className="h-[6px] w-[6px] bg-red-700"></div>
+            <p className="font-semibold text-slate-500">{song.artist}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

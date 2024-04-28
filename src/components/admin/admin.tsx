@@ -72,7 +72,7 @@ export default function Admin() {
                 新增歌曲
               </Button>
             </CardContent>
-            <CardFooter className="flex justify-between">
+            <CardFooter className="flex justify-end">
               <Button variant="destructive">清除全部</Button>
             </CardFooter>
           </Card>

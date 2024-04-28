@@ -204,3 +204,159 @@
 .square {
   transform: skewX(-5.5deg);
 }
+
+/*=============== CD ===============*/
+
+hr.gradient {
+  height: 3px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(
+    60deg,
+    hsl(162deg 43% 41%) 0%,
+    hsl(137deg 25% 48%) 11%,
+    hsl(97deg 21% 49%) 20%,
+    hsl(68deg 24% 48%) 29%,
+    hsl(47deg 29% 52%) 37%,
+    hsl(33deg 38% 57%) 45%,
+    hsl(22deg 46% 63%) 53%,
+    hsl(7deg 45% 67%) 61%,
+    hsl(349deg 39% 68%) 68%,
+    hsl(327deg 29% 66%) 75%,
+    hsl(286deg 20% 64%) 82%,
+    hsl(243deg 22% 66%) 90%,
+    hsl(216deg 29% 63%) 100%
+  );
+}
+
+.scale-80 {
+  transform: scale(0.8);
+}
+
+#wrap {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+#album {
+  position: absolute;
+  top: 12.5%;
+  left: 12.5%;
+  height: 50vw;
+  width: 50%;
+  max-height: 75%;
+  max-width: 75vh;
+}
+
+#cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: rgb(34, 193, 195);
+  background: linear-gradient(
+    0deg,
+    rgba(34, 193, 195, 1) 0%,
+    rgba(253, 187, 45, 1) 100%
+  );
+  background-size: 100% 100%;
+  box-shadow:
+    5px 0 20px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 10px 5px rgba(255, 255, 255, 0.2),
+    inset 0 0 4px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+#cover::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  background-image: url("http://i.imgur.com/i0fMWpe.jpg");
+  background-size: 100% 100%;
+  border-radius: 4px;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  content: "";
+}
+
+#cover::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  background-image: url("https://orig06.deviantart.net/0124/f/2013/136/6/7/texture_326_by_sirius_sdz-d65gs3s.jpg");
+  background-size: 100% 100%;
+  border-radius: 4px;
+  mix-blend-mode: screen;
+  opacity: 0.2;
+  content: "";
+}
+
+#vinyl {
+  position: absolute;
+  top: 2.5%;
+  left: 2.5%;
+  z-index: 0;
+  width: 95%;
+  height: 95%;
+  display: block;
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Music-PNG/Gramophone_Vinyl_LP_Record_PNG_Transparent_Clip_Art_Image.png?m=1462983196");
+  background-size: 106% 106%;
+  background-position: center;
+  box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  content: "";
+  animation:
+    spinThat 5s linear infinite,
+    getOut 1s ease-out 1s forwards;
+}
+
+#vinyl::before {
+  position: absolute;
+  top: 2.5%;
+  left: 2.5%;
+  z-index: 10;
+  width: 95%;
+  height: 95%;
+  background-image: url("http://www.designresourcebox.com/ths/diverse/blacktextures/82267467.jpg");
+  background-size: 100% 100%;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  content: "";
+}
+
+#print {
+  position: absolute;
+  top: 33%;
+  left: 33%;
+  height: 34%;
+  width: 34%;
+  box-shadow: inset 0 0 0 5px rgba(150, 150, 150, 0.1);
+  background-image: url("http://assets.teamrock.com/image/14d29742-c6f7-43f6-bbe1-6bf7b3b34c6f?w=800");
+  background-size: cover;
+  border-radius: 50%;
+}
+
+@keyframes getOut {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 50%;
+  }
+}
+
+@keyframes spinThat {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
