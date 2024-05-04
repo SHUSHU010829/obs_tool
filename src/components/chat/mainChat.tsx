@@ -67,10 +67,10 @@ export default function MainChat() {
       <div className="flex flex-col items-center justify-start pt-5">
         {/* 月份&週 */}
         <div className="flex items-center gap-3">
-          <p className="text-xl font-bold text-slate-700">
+          <p className="font-notoSans text-xl font-semibold text-slate-700">
             {currentTime.getMonth() + 1}月{currentTime.getDate()}日
           </p>
-          <p className="text-xl font-bold text-slate-700">
+          <p className="font-notoSans text-xl font-semibold text-slate-700">
             {daysOfWeek[currentTime.getDay()]}
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function MainChat() {
         </div>
         <div className="flex justify-between gap-2">
           {/* 觀眾計數顯示 */}
-          <div className="flex h-16 w-24 items-center justify-center text-xl font-bold text-[#6b705c]">
+          <div className="flex h-16 w-24 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c]">
             {viewersCount ? (
               <div className="flex items-center gap-2">
                 <GoPersonFill />
@@ -95,9 +95,9 @@ export default function MainChat() {
             )}
           </div>
           {/* 社群媒體帳號 */}
-          <div className="flex h-16 w-48 items-center justify-center text-xl font-semibold text-[#6b705c]">
+          <div className="flex h-16 w-48 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c]">
             <div className={`account flex items-center gap-3 ${fadeClass}`}>
-              <div>{currentAccount.icon}</div>
+              <div className="">{currentAccount.icon}</div>
               <div className="flex items-center gap-1 text-lg">
                 {currentAccount.ifShow && (
                   <span className="text-base text-[#E87D35]">@</span>

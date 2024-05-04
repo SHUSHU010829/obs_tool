@@ -40,11 +40,11 @@ export default function SongList({ songs }: { songs: Song[] }) {
     <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-50 shadow-lg">
       <Album />
       {/* NOW PLAYING */}
-      <div className="mt-[-45px] flex flex-col items-center justify-center px-10">
-        <p className="text-2xl font-bold">
+      <div className="mt-[-45px] flex flex-col items-center justify-center px-10 ">
+        <p className="font-notoSans text-2xl font-bold">
           {nowPlayingSong ? nowPlayingSong.title : ""}
         </p>
-        <p className="text-xl font-bold text-slate-500 ">
+        <p className="font-notoSans text-xl font-bold text-slate-500">
           {nowPlayingSong ? nowPlayingSong.artist : ""}
         </p>
       </div>
@@ -56,9 +56,9 @@ export default function SongList({ songs }: { songs: Song[] }) {
         className={`flex w-full flex-col gap-3 px-10 pt-4 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
       >
         {currentSongs.map((song, index) => (
-          <div className="flex items-center gap-2" key={index}>
+          <div className="flex items-center gap-2 font-notoSans" key={index}>
             <p
-              className={`rounded-lg  px-2 font-mono font-semibold text-white ${song.now_playing === 1 ? "bg-red-700" : "bg-slate-700"}`}
+              className={`time-font rounded-lg px-2 font-mono font-semibold text-white ${song.now_playing === 1 ? "bg-red-700" : "bg-slate-700"}`}
             >
               {String(index + startIndex + 1).padStart(2, "0")}
             </p>

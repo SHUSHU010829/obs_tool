@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Noto_Sans_TC } from "next/font/google";
+import { Noto_Sans_TC, Montserrat } from "next/font/google";
 import "./globals.css";
 export const notoSansTC = Noto_Sans_TC({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
   variable: "--font-noto-sans-tc",
+});
+export const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={notoSansTC.className} suppressHydrationWarning={true}>
+      <body
+        className={`${notoSansTC.className} ${montserrat.className} sans`}
+        suppressHydrationWarning={true}
+      >
         {children}
       </body>
     </html>
