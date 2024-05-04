@@ -1,51 +1,96 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "../ui/textarea";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { Switch } from "../ui/switch";
+import {
+  addSong,
+  clearNowPlaying,
+  deleteAllSongs,
+  deleteSong,
+  getSongs,
+  playSong,
+} from "@/api/song";
+import { Label } from "../ui/label";
+
+interface Song {
+  id: number;
+  title: string;
+  artist: string;
+  now_playing: number;
+}
 
 export default function Admin() {
-  const songList = [
-    {
-      songName: "籠",
-      nowPlaying: false,
-    },
-    {
-      songName: "慢冷",
-      nowPlaying: false,
-    },
-    {
-      songName: "Beautiful Things",
-      nowPlaying: true,
-    },
-    {
-      songName: "字字句句",
-      nowPlaying: false,
-    },
-    {
-      songName: "再見",
-      nowPlaying: false,
-    },
-    { songName: "Song 6", nowPlaying: false },
-  ];
+  const [songList, setSongList] = useState<Song[]>();
+  const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getSongs();
+      setSongList(res.data);
+    };
+    fetchData();
+  }, []);
+
+  const handleAddSong = async () => {
+    await addSong(title.trim(), artist.trim());
+    const res = await getSongs();
+    setSongList(res.data);
+    setOpen(false);
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteSong(id);
+    const res = await getSongs();
+    setSongList(res.data);
+  };
+
+  const handleDeleteAll = async () => {
+    await deleteAllSongs();
+    const res = await getSongs();
+    setSongList(res.data);
+  };
+
+  const handlePlay = async (id: number, now_playing: number) => {
+    if (now_playing === 1) {
+      await clearNowPlaying(id);
+    } else {
+      await playSong(id);
+    }
+    const res = await getSongs();
+    setSongList(res.data);
+  };
 
   return (
     <div className="flex h-screen p-12">
-      <Tabs defaultValue="message" className="w-full">
+      <Tabs defaultValue="songList" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="songList">歌單</TabsTrigger>
-          <TabsTrigger value="message">留言板</TabsTrigger>
         </TabsList>
         <TabsContent value="songList">
           <Card>
@@ -53,62 +98,108 @@ export default function Admin() {
               <CardTitle>
                 <div className="flex items-center justify-between">
                   <div>歌單</div>
-                  <Switch id="songList-mode" />
+                  <div className="flex gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive">清除全部</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            確定要刪除歌單嗎？
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>取消</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteAll}>
+                            確定
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </CardTitle>
-              <CardDescription>新增歌曲＆目前播放。</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-              {songList.map((song: any, index: number) => (
-                <div className="flex items-center gap-3" key={index}>
-                  <div className="font-bold">{index + 1}</div>
-                  <Input id={`song-${index}`} defaultValue={song.songName} />
-                  <Button variant="destructive">
-                    <TrashIcon className="h-5 w-5" />
+              {songList && (
+                <>
+                  {songList.map((song: any, index: number) => (
+                    <div className="flex items-center gap-3" key={index}>
+                      <Button
+                        onClick={() => handlePlay(song.id, song.now_playing)}
+                        className={`${song.now_playing === 1 && "bg-orange-400"}`}
+                      >
+                        <div className="w-5 font-bold">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+                      </Button>
+                      <Input
+                        id={`artist-${index}`}
+                        defaultValue={song.artist}
+                        placeholder="歌手"
+                        className="w-[35%]"
+                      />
+                      <Input
+                        id={`title-${index}`}
+                        defaultValue={song.title}
+                        placeholder="歌名"
+                      />
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDelete(song.id)}
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  ))}
+                </>
+              )}
+              <Dialog onOpenChange={setOpen} open={open}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    新增歌曲
                   </Button>
-                </div>
-              ))}
-              <Button variant="secondary" className="w-full">
-                新增歌曲
-              </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>新增歌曲</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <Label htmlFor="name" className="text-nowrap text-right">
+                        歌手
+                      </Label>
+                      <Input
+                        id="artist"
+                        onChange={e => {
+                          setArtist(e.target.value);
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label
+                        htmlFor="username"
+                        className="text-nowrap  text-right"
+                      >
+                        歌名
+                      </Label>
+                      <Input
+                        id="title"
+                        onChange={e => {
+                          setTitle(e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" onClick={handleAddSong}>
+                      確認
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button variant="destructive">清除全部</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value="message">
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <div className="flex items-center justify-between">
-                  <div>留言板</div>
-                  <Switch id="message-mode" />
-                </div>
-              </CardTitle>
-              <CardDescription>設置留言板訊息。</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <RadioGroup defaultValue="delivery">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="delivery" id="r1" />
-                  <Label htmlFor="r1">去拿外送噗噗</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="work" id="r2" />
-                  <Label htmlFor="r2">工作中</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="other" id="r3" />
-                  <Label htmlFor="r3">其他</Label>
-                </div>
-              </RadioGroup>
-              <Textarea placeholder="Type your message here." />
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="destructive">清除</Button>
-              <Button>設置</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
