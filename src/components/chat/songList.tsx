@@ -15,7 +15,7 @@ export default function SongList({ songs }: { songs: Song[] }) {
   const [fade, setFade] = useState(true);
   const [nowPlayingSong, setNowPlayingSong] = useState<Song | null>(null);
 
-  const sets = Math.ceil(songs.length / 8);
+  const sets = Math.ceil(songs.length / 7);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -28,8 +28,8 @@ export default function SongList({ songs }: { songs: Song[] }) {
     return () => clearInterval(interval);
   }, [sets]);
 
-  const startIndex = currentSet * 8;
-  const currentSongs = songs.slice(startIndex, startIndex + 8);
+  const startIndex = currentSet * 7;
+  const currentSongs = songs.slice(startIndex, startIndex + 7);
 
   useEffect(() => {
     const playingSong = songs.find(song => song.now_playing === 1);
@@ -37,14 +37,14 @@ export default function SongList({ songs }: { songs: Song[] }) {
   }, [songs]);
 
   return (
-    <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-60 shadow-lg">
+    <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-50 shadow-lg">
       <Album />
       {/* NOW PLAYING */}
       <div className="mt-[-45px] flex flex-col items-center justify-center px-10">
-        <p className="text-xl font-bold">
+        <p className="text-2xl font-bold">
           {nowPlayingSong ? nowPlayingSong.title : ""}
         </p>
-        <p className="font-semibold text-slate-500">
+        <p className="text-xl font-bold text-slate-500 ">
           {nowPlayingSong ? nowPlayingSong.artist : ""}
         </p>
       </div>
@@ -62,10 +62,10 @@ export default function SongList({ songs }: { songs: Song[] }) {
             >
               {String(index + startIndex + 1).padStart(2, "0")}
             </p>
-            <p className="text-lg font-bold">{song.title}</p>
+            <p className="text-xl font-bold">{song.title}</p>
             <div className="flex items-center gap-2">
               <div className="h-[6px] w-[6px] bg-red-700"></div>
-              <p className="text-nowrap font-semibold text-slate-800">
+              <p className="text-nowrap text-lg font-bold text-slate-800">
                 {song.artist}
               </p>
             </div>
