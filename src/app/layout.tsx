@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC, Montserrat } from "next/font/google";
 import "./globals.css";
-export const notoSansTC = Noto_Sans_TC({
+
+const notoSansTC = Noto_Sans_TC({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
   variable: "--font-noto-sans-tc",
 });
-export const montserrat = Montserrat({
+
+const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-montserrat",
 });
 
