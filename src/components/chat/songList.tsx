@@ -37,7 +37,7 @@ export default function SongList({ songs }: { songs: Song[] }) {
   }, [songs]);
 
   return (
-    <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-80 shadow-lg">
+    <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-70 shadow-lg">
       <Album />
       {/* NOW PLAYING */}
       <div className="mt-[-45px] flex flex-col items-center justify-center px-10 ">
