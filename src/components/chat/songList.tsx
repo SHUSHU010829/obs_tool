@@ -12,11 +12,12 @@ interface Song {
 const Album = lazy(() => import("../album"));
 
 export default function SongList({ songs }: { songs: Song[] }) {
+  const perSongCount = 4;
   const [currentSet, setCurrentSet] = useState(0);
   const [fade, setFade] = useState(true);
   const [nowPlayingSong, setNowPlayingSong] = useState<Song | null>(null);
 
-  const sets = Math.ceil(songs.length / 7);
+  const sets = Math.ceil(songs.length / perSongCount);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,8 +30,8 @@ export default function SongList({ songs }: { songs: Song[] }) {
     return () => clearInterval(interval);
   }, [sets]);
 
-  const startIndex = currentSet * 7;
-  const currentSongs = songs.slice(startIndex, startIndex + 7);
+  const startIndex = currentSet * perSongCount;
+  const currentSongs = songs.slice(startIndex, startIndex + perSongCount);
 
   useEffect(() => {
     const playingSong = songs.find(song => song.now_playing === 1);
@@ -56,7 +57,7 @@ export default function SongList({ songs }: { songs: Song[] }) {
       </div>
       {/* SONG LIST */}
       <div
-        className={`flex w-full flex-col gap-3 px-10 pt-4 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
+        className={`flex w-full flex-col gap-3 px-10 pt-5 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
       >
         {currentSongs.map((song, index) => (
           <div className="flex items-center gap-2 font-notoSans" key={index}>
@@ -65,10 +66,9 @@ export default function SongList({ songs }: { songs: Song[] }) {
             >
               {String(index + startIndex + 1).padStart(2, "0")}
             </p>
-            <p className="text-xl font-bold">{song.title}</p>
-            <div className="flex items-center gap-2">
-              <div className="h-[6px] w-[6px] bg-red-700"></div>
-              <p className="text-nowrap text-lg font-bold text-slate-800">
+            <div>
+              <p className="font-bold">{song.title}</p>
+              <p className="text-nowrap text-sm font-bold text-slate-500">
                 {song.artist}
               </p>
             </div>
