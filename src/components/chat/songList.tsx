@@ -12,7 +12,7 @@ interface Song {
 const Album = lazy(() => import("../album"));
 
 export default function SongList({ songs }: { songs: Song[] }) {
-  const perSongCount = 4;
+  const perSongCount = 5;
   const [currentSet, setCurrentSet] = useState(0);
   const [fade, setFade] = useState(true);
   const [nowPlayingSong, setNowPlayingSong] = useState<Song | null>(null);
@@ -52,12 +52,12 @@ export default function SongList({ songs }: { songs: Song[] }) {
           {nowPlayingSong ? nowPlayingSong.artist : ""}
         </p>
       </div>
-      <div className="w-full px-28 pt-3">
+      <div className="w-full px-28 pt-4">
         <hr className="gradient"></hr>
       </div>
       {/* SONG LIST */}
       <div
-        className={`flex w-full flex-col gap-3 px-10 pt-5 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
+        className={`flex w-full flex-col gap-4 px-10 pt-5 transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
       >
         {currentSongs.map((song, index) => (
           <div className="flex items-center gap-2 font-notoSans" key={index}>
@@ -67,8 +67,8 @@ export default function SongList({ songs }: { songs: Song[] }) {
               {String(index + startIndex + 1).padStart(2, "0")}
             </p>
             <div>
-              <p className="font-bold">{song.title}</p>
-              <p className="text-nowrap text-sm font-bold text-slate-500">
+              <p className=" font-notoSans font-bold">{song.title}</p>
+              <p className=" font-notoSans text-sm font-bold text-slate-500">
                 {song.artist}
               </p>
             </div>

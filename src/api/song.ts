@@ -4,6 +4,7 @@ function generateApiUrl(endpoint: string) {
   return `https://shustream.zeabur.app/songList${endpoint}`;
 }
 
+// 取得歌曲列表
 export async function getSongs() {
   const endpoint = "";
 
@@ -24,6 +25,7 @@ export async function getSongs() {
   }
 }
 
+// 現正播放的歌曲
 export async function playSong(id: number) {
   const endpoint = `/start/${id}`;
 
@@ -44,17 +46,16 @@ export async function playSong(id: number) {
   }
 }
 
-export async function addSong(title: string, artist: string) {
-  const endpoint = "";
+// 清除現正播放的歌曲
+export async function clearNowPlaying(id: number) {
+  const endpoint = `/stop/${id}`;
 
-  const requestData = {
-    title,
-    artist,
-  };
+  const requestData = {};
 
   try {
-    const response = await axios.post(generateApiUrl(endpoint), requestData);
-    console.log("🚀 ~ addSong ~ response:", response);
+    const response = await axios.put(generateApiUrl(endpoint), {
+      params: requestData,
+    });
 
     return response;
   } catch (error: unknown) {
@@ -66,6 +67,29 @@ export async function addSong(title: string, artist: string) {
   }
 }
 
+// 新增歌曲
+export async function addSong(title: string, artist: string) {
+  const endpoint = "";
+
+  const requestData = {
+    title,
+    artist,
+  };
+
+  try {
+    const response = await axios.post(generateApiUrl(endpoint), requestData);
+
+    return response;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw new Error("Error saving data: " + error.message);
+    } else {
+      throw new Error("Unknown error occurred");
+    }
+  }
+}
+
+// 刪除歌曲
 export async function deleteSong(id: number) {
   const endpoint = `/${id}`;
 
@@ -82,6 +106,7 @@ export async function deleteSong(id: number) {
   }
 }
 
+// 刪除所有歌曲
 export async function deleteAllSongs() {
   const endpoint = "";
 
@@ -102,15 +127,17 @@ export async function deleteAllSongs() {
   }
 }
 
-export async function clearNowPlaying(id: number) {
-  const endpoint = `/stop/${id}`;
+// 更新歌曲
+export async function updateSong(id: number, title: string, artist: string) {
+  const endpoint = `/${id}`;
 
-  const requestData = {};
+  const requestData = {
+    title,
+    artist,
+  };
 
   try {
-    const response = await axios.put(generateApiUrl(endpoint), {
-      params: requestData,
-    });
+    const response = await axios.put(generateApiUrl(endpoint), requestData);
 
     return response;
   } catch (error: unknown) {

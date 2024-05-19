@@ -30,6 +30,7 @@ import {
   deleteSong,
   getSongs,
   playSong,
+  updateSong,
 } from "@/api/song";
 import { Label } from "../ui/label";
 
@@ -55,7 +56,18 @@ export default function SongList() {
   }, []);
 
   const handleAddSong = async () => {
-    await addSong(title.trim(), artist.trim());
+    await addSong(title, artist);
+    const res = await getSongs();
+    setSongList(res.data);
+    setOpen(false);
+  };
+
+  const handleUpdate = async (
+    id: number,
+    artistInput: string,
+    titleInput: string
+  ) => {
+    await updateSong(id, titleInput, artistInput);
     const res = await getSongs();
     setSongList(res.data);
     setOpen(false);
@@ -74,6 +86,10 @@ export default function SongList() {
   };
 
   const handlePlay = async (id: number, now_playing: number) => {
+    const currentPlayingSong = songList?.find(song => song.now_playing === 1);
+    if (currentPlayingSong) {
+      await clearNowPlaying(currentPlayingSong.id);
+    }
     if (now_playing === 1) {
       await clearNowPlaying(id);
     } else {
@@ -82,6 +98,7 @@ export default function SongList() {
     const res = await getSongs();
     setSongList(res.data);
   };
+
   return (
     <div>
       <Card>
@@ -126,13 +143,25 @@ export default function SongList() {
                   <Input
                     id={`artist-${index}`}
                     defaultValue={song.artist}
-                    placeholder="歌手"
+                    onInput={e =>
+                      handleUpdate(
+                        song.id,
+                        (e.target as HTMLInputElement).value,
+                        song.title
+                      )
+                    }
                     className="w-[35%]"
                   />
                   <Input
                     id={`title-${index}`}
                     defaultValue={song.title}
-                    placeholder="歌名"
+                    onInput={e =>
+                      handleUpdate(
+                        song.id,
+                        song.artist,
+                        (e.target as HTMLInputElement).value
+                      )
+                    }
                   />
                   <Button
                     variant="destructive"
