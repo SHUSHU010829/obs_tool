@@ -1,7 +1,6 @@
 "use client";
 
-import Album from "../album";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 interface Song {
   id: number;
@@ -9,6 +8,8 @@ interface Song {
   artist: string;
   now_playing: number;
 }
+
+const Album = lazy(() => import("../album"));
 
 export default function SongList({ songs }: { songs: Song[] }) {
   const [currentSet, setCurrentSet] = useState(0);
@@ -38,7 +39,9 @@ export default function SongList({ songs }: { songs: Song[] }) {
 
   return (
     <div className="flex h-[780px] w-[450px] flex-col items-center rounded-3xl border-4 border-[#9ca18e] bg-[#f9f7f3] bg-opacity-70 shadow-lg">
-      <Album />
+      <Suspense fallback={<div></div>}>
+        <Album />
+      </Suspense>
       {/* NOW PLAYING */}
       <div className="mt-[-45px] flex flex-col items-center justify-center px-10 ">
         <p className="font-notoSans text-2xl font-bold">
