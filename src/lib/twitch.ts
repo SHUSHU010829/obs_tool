@@ -27,8 +27,8 @@ const TwitchChatListener = ({
     洗澡: "kspBath1.mp4",
     "5MA": "seki5ma1.mp4",
     蘑菇蘑菇: "kspMogu1.mp4",
-    HI: "hiMary.mp4",
-    我是個廢物: "cryCryCat.mp4",
+    HI: "hiMary1.mp4",
+    我是個廢物: "cryCryCat1.mp4",
   };
 
   useEffect(() => {
