@@ -30,7 +30,7 @@ const TwitchChatListener = ({
     HI: "hiMary1.mp4",
     我是個廢物: "kspDrink.mp4",
     哥哥: "kspBrother.mp4",
-    OMG: "kspOmg.mp4",
+    OMG: "kspOmg1.mp4",
   };
 
   useEffect(() => {
