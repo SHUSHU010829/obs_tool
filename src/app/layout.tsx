@@ -3,16 +3,19 @@ import type { Metadata } from 'next'
 import { Noto_Sans_TC, Montserrat, Titan_One } from 'next/font/google'
 
 const notoSansTC = Noto_Sans_TC({
+  subsets: ['latin'],
   weight: ['300', '400', '500', '700'],
   variable: '--font-noto-sans-tc',
 })
 
 const montserrat = Montserrat({
+  subsets: ['latin'],
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
   variable: '--font-montserrat',
 })
 
 const titanOne = Titan_One({
+  subsets: ['latin'],
   weight: ['400'],
   variable: '--font-titan-one',
 })
