@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Noto_Sans_TC, Montserrat, Titan_One } from 'next/font/google'
+import React from 'react'
 
 const notoSansTC = Noto_Sans_TC({
   subsets: ['latin'],
