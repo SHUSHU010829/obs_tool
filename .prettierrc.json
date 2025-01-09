@@ -1,0 +1,16 @@
+{
+  "tabWidth": 2,
+  "printWidth": 90,
+  "trailingComma": "es5",
+  "endOfLine": "auto",
+  "arrowParens": "avoid",
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "semi": false,
+  "useTabs": false,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports"]
+}
