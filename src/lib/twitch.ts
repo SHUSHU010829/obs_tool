@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 
 interface VideoMap {
   [key: string]: string | string[]
@@ -33,27 +33,9 @@ const TwitchChatListener = ({
     OMG: 'kspOmg.mp4',
   }
 
-  const handleRewardRedemption = useCallback(
-    (messageData: any) => {
-      if (messageData.type === 'reward-redeemed') {
-        const rewardTitle = messageData.data.redemption.reward.title
-        let videoName = pointVideoMap[rewardTitle]
-
-        if (Array.isArray(videoName)) {
-          videoName = videoName[Math.floor(Math.random() * videoName.length)]
-        }
-
-        if (videoName && typeof videoName === 'string') {
-          onPlay(videoName)
-        }
-      }
-    },
-    [onPlay, pointVideoMap]
-  )
-
   useEffect(() => {
     const token = process.env.TWITCH_OAUTH_TOKEN
-    let socket: WebSocket
+    let socket = new WebSocket('wss://pubsub-edge.twitch.tv')
 
     function connect() {
       socket = new WebSocket('wss://pubsub-edge.twitch.tv')
@@ -69,36 +51,43 @@ const TwitchChatListener = ({
             },
           })
         )
-
-        // Send a heartbeat every 30 seconds
-        const heartbeatInterval = setInterval(() => {
+        // Send a heartbeat every 30 seconds to keep the connection alive
+        setInterval(() => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'PING' }))
           }
         }, 30000)
-
-        // Clear interval when socket closes
-        socket.onclose = () => {
-          clearInterval(heartbeatInterval)
-          setTimeout(connect, 5000)
-        }
       }
 
       socket.onmessage = function (event) {
         const message = JSON.parse(event.data)
         if (message.type === 'MESSAGE') {
           const messageData = JSON.parse(message.data.message)
-          handleRewardRedemption(messageData)
+          if (messageData.type === 'reward-redeemed') {
+            const rewardTitle = messageData.data.redemption.reward.title
+            let videoName = pointVideoMap[rewardTitle]
+            if (Array.isArray(videoName)) {
+              videoName = videoName[Math.floor(Math.random() * videoName.length)]
+            }
+            if (videoName) {
+              onPlay(videoName)
+            }
+          }
         }
+      }
+
+      socket.onclose = function () {
+        // Try to reconnect in 5 seconds
+        setTimeout(connect, 5000)
       }
     }
 
     connect()
 
     return () => {
-      socket?.close()
+      socket.close()
     }
-  }, [channelId, handleRewardRedemption])
+  }, [])
 
   return null
 }
