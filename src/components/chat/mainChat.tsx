@@ -3,7 +3,7 @@
 import { getStreams } from '@/api/twitch'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AiFillSmile } from 'react-icons/ai'
 import { BsTwitterX, BsYoutube } from 'react-icons/bs'
 import { GoPersonFill } from 'react-icons/go'
@@ -23,7 +23,8 @@ export default function MainChat() {
     { icon: <AiFillSmile />, name: '謝謝關注', ifShow: false },
   ]
 
-  const handleVideoPlay = (name: SetStateAction<string>) => {
+  const handleVideoPlay = (name: string) => {
+    console.log('🚀 ~ handleVideoPlay ~ name:', name)
     setVideoName(name)
     setPlayVideo(true)
   }
