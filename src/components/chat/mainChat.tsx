@@ -24,7 +24,6 @@ export default function MainChat() {
   ]
 
   const handleVideoPlay = (name: string) => {
-    console.log('🚀 ~ handleVideoPlay ~ name:', name)
     setVideoName(name)
     setPlayVideo(true)
   }
@@ -126,7 +125,7 @@ export default function MainChat() {
       <AnimatePresence>
         {playVideo && videoName && (
           <motion.div
-            className='absolute bottom-0 left-0 w-full'
+            className='absolute bottom-0 left-0 w-full rounded-lg p-5'
             initial={{ y: '100%' }}
             animate={{ y: '0%' }}
             exit={{ y: '100%' }}
@@ -136,21 +135,31 @@ export default function MainChat() {
               damping: 20,
             }}
           >
-            <ReactPlayer
-              url={`/${videoName}`}
-              playing={true}
-              controls={true}
-              onEnded={handleVideoEnd}
-              width='100%'
-              height='100%'
-              config={{
-                file: {
-                  attributes: {
-                    autoPlay: true,
-                  },
-                },
-              }}
-            />
+            <div className='rounded-2xl overflow-hidden shadow-lg bg-black'>
+              <div className='relative pt-[56.25%]'>
+                <ReactPlayer
+                  url={`/${videoName}`}
+                  playing={true}
+                  controls={true}
+                  onEnded={handleVideoEnd}
+                  width='100%'
+                  height='100%'
+                  className='absolute top-0 left-0'
+                  style={{
+                    borderRadius: '1rem',
+                  }}
+                  config={{
+                    file: {
+                      attributes: {
+                        style: {
+                          borderRadius: '1rem',
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
