@@ -85,6 +85,7 @@ interface SevenTVEmote {
 }
 
 const SystemMessage = memo(({ msg }: { msg: ChatMessage }) => {
+  console.log('🚀 ~ SystemMessage ~ msg:', msg)
   const getBgColor = () => {
     switch (msg.type) {
       case 'subscription':
@@ -127,7 +128,6 @@ const SystemMessage = memo(({ msg }: { msg: ChatMessage }) => {
           )}
           {msg.type === 'cheer' && (
             <div className='flex items-center justify-center space-x-2'>
-              {/* TODO bits 根據不同的 bits 顯示不同的圖片 */}
               <img
                 src={`https://d3aqoihi2n8ty8.cloudfront.net/actions/cheer/light/animated/1000/4.gif`}
                 className='w-5 h-5'
@@ -876,11 +876,12 @@ export default function TwitchChat({
               transition={{ duration: 0.2 }}
               className={`w-full`}
             >
-              {msg.type === 'message' ? (
+              <ChatMessageComponent msg={msg} />
+              {/* {msg.type === 'message' ? (
                 <ChatMessageComponent msg={msg} />
               ) : (
                 <SystemMessage msg={msg} />
-              )}
+              )} */}
             </motion.div>
           ))}
         </div>
