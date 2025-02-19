@@ -1,5 +1,6 @@
 'use client'
 
+import TwitchChat from './twitchChat'
 import { getStreams } from '@/api/twitch'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -94,7 +95,7 @@ export default function MainChat() {
               <span>{formatTime(currentTime.getMinutes())}</span>
             </p>
           </div>
-          <div className='flex justify-between gap-2 pt-2'>
+          <div className='flex justify-between gap-2 pt-3'>
             <div className='flex w-24 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c] pt-1'>
               {viewersCount ? (
                 <div className='flex items-center gap-2'>
@@ -102,7 +103,7 @@ export default function MainChat() {
                   {viewersCount}
                 </div>
               ) : (
-                <div>讀取中</div>
+                <div className='text-sm'>⸜(๑˙ᵕ ˙๑)⸝</div>
               )}
             </div>
             <div className='flex w-48 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c]'>
@@ -117,15 +118,21 @@ export default function MainChat() {
               </div>
             </div>
           </div>
+          <TwitchChat
+            channel='shushu010829'
+            channelId='720691521'
+            hideAfter={Infinity}
+            messagesLimit={15}
+            debug={true}
+          />
         </div>
       </div>
-
       <TwitchChatListener channelId='720691521' onPlay={handleVideoPlay} />
 
       <AnimatePresence>
         {playVideo && videoName && (
           <motion.div
-            className='absolute bottom-0 left-0 w-full rounded-lg p-5'
+            className='absolute bottom-0 left-0 w-full rounded-lg p-5 z-50'
             initial={{ y: '100%' }}
             animate={{ y: '0%' }}
             exit={{ y: '100%' }}

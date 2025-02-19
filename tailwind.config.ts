@@ -72,11 +72,23 @@ const config = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.4' },
         },
+        shine: {
+          '0%': {
+            'background-position': '0% 0%',
+          },
+          '50%': {
+            'background-position': '100% 100%',
+          },
+          to: {
+            'background-position': '0% 0%',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-out': 'fade 2s ease-in-out infinite',
+        shine: 'shine var(--duration) infinite linear',
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
@@ -88,7 +100,7 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide')],
 } satisfies Config
 
 export default config

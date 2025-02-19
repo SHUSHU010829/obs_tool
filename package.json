@@ -27,6 +27,7 @@
     "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.1",
+    "@types/tmi.js": "^1.8.6",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "axios": "^1.7.9",
@@ -48,7 +49,9 @@
     "react-icons": "^5.4.0",
     "react-player": "^2.16.0",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwind-scrollbar-hide": "^2.0.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tmi.js": "^1.8.5"
   },
   "devDependencies": {
     "@types/node": "^20.17.12",
