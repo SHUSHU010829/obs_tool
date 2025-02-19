@@ -85,7 +85,6 @@ interface SevenTVEmote {
 }
 
 const SystemMessage = memo(({ msg }: { msg: ChatMessage }) => {
-  console.log('🚀 ~ SystemMessage ~ msg:', msg)
   const getBgColor = () => {
     switch (msg.type) {
       case 'subscription':
@@ -231,7 +230,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           }}
         >
           {renderBadges()}
-          <span className='font-bold text-xs'>{msg.user}</span>
+          <span className='font-bold text-sm font-notoSans'>{msg.user}</span>
         </div>
 
         {/* 訊息內容 */}
@@ -239,7 +238,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           <div className='w-4 overflow-hidden translate-x-[4px] -translate-y-1'>
             <div className='h-3 bg-gray-200 rotate-45 transform origin-bottom-right rounded-sm'></div>
           </div>
-          <div className='relative text-gray-900 rounded-3xl bg-gray-200 pb-2 pt-3 px-3 z-0 flex items-center w-auto max-w-max text-sm'>
+          <div className='relative text-gray-900 font-bold font-notoSans rounded-3xl bg-gray-200 pb-2 pt-2 px-3 z-0 flex items-center w-auto max-w-max'>
             <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
           </div>
         </div>
@@ -447,6 +446,7 @@ export default function TwitchChat({
     clientRef.current = client
 
     const handleMessage = async (channel: string, tags: any, message: string) => {
+      console.log('🚀 ~ handleMessage ~ tags:', tags)
       if (tags.id && processedMessageIds.current.has(tags.id)) {
         return
       }
