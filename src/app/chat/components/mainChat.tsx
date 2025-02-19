@@ -123,7 +123,7 @@ export default function MainChat() {
             channelId='720691521'
             hideAfter={Infinity}
             messagesLimit={15}
-            debug={true}
+            debug={false}
           />
         </div>
       </div>
