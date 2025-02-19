@@ -101,7 +101,7 @@
 /*=============== CLOCK ===============*/
 .time-font {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
+  font-feature-settings: 'tnum';
 }
 
 .clock__circle {
@@ -255,11 +255,7 @@ hr.gradient {
   width: 100%;
   height: 100%;
   background: rgb(34, 193, 195);
-  background: linear-gradient(
-    0deg,
-    rgba(34, 193, 195, 1) 0%,
-    rgba(253, 187, 45, 1) 100%
-  );
+  background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
   background-size: 100% 100%;
   box-shadow:
     5px 0 20px 0 rgba(0, 0, 0, 0.6),
@@ -274,12 +270,12 @@ hr.gradient {
   z-index: 10;
   width: 100%;
   height: 100%;
-  background-image: url("http://i.imgur.com/i0fMWpe.jpg");
+  background-image: url('http://i.imgur.com/i0fMWpe.jpg');
   background-size: 100% 100%;
   border-radius: 4px;
   mix-blend-mode: screen;
   opacity: 0.5;
-  content: "";
+  content: '';
 }
 
 #cover::after {
@@ -289,12 +285,12 @@ hr.gradient {
   z-index: 20;
   width: 100%;
   height: 100%;
-  background-image: url("https://orig06.deviantart.net/0124/f/2013/136/6/7/texture_326_by_sirius_sdz-d65gs3s.jpg");
+  background-image: url('https://orig06.deviantart.net/0124/f/2013/136/6/7/texture_326_by_sirius_sdz-d65gs3s.jpg');
   background-size: 100% 100%;
   border-radius: 4px;
   mix-blend-mode: screen;
   opacity: 0.2;
-  content: "";
+  content: '';
 }
 
 #vinyl {
@@ -305,12 +301,12 @@ hr.gradient {
   width: 95%;
   height: 95%;
   display: block;
-  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Music-PNG/Gramophone_Vinyl_LP_Record_PNG_Transparent_Clip_Art_Image.png?m=1462983196");
+  background-image: url('https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Music-PNG/Gramophone_Vinyl_LP_Record_PNG_Transparent_Clip_Art_Image.png?m=1462983196');
   background-size: 106% 106%;
   background-position: center;
   box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.6);
   border-radius: 50%;
-  content: "";
+  content: '';
   animation:
     spinThat 5s linear infinite,
     getOut 1s ease-out 1s forwards;
@@ -323,12 +319,12 @@ hr.gradient {
   z-index: 10;
   width: 95%;
   height: 95%;
-  background-image: url("http://www.designresourcebox.com/ths/diverse/blacktextures/82267467.jpg");
+  background-image: url('http://www.designresourcebox.com/ths/diverse/blacktextures/82267467.jpg');
   background-size: 100% 100%;
   border-radius: 50%;
   mix-blend-mode: screen;
   opacity: 0.3;
-  content: "";
+  content: '';
 }
 
 #print {
@@ -338,7 +334,7 @@ hr.gradient {
   height: 34%;
   width: 34%;
   box-shadow: inset 0 0 0 5px rgba(150, 150, 150, 0.1);
-  background-image: url("http://assets.teamrock.com/image/14d29742-c6f7-43f6-bbe1-6bf7b3b34c6f?w=800");
+  background-image: url('http://assets.teamrock.com/image/14d29742-c6f7-43f6-bbe1-6bf7b3b34c6f?w=800');
   background-size: cover;
   border-radius: 50%;
 }
