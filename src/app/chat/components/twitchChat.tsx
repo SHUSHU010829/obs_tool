@@ -193,8 +193,8 @@ const formatMessageFragments = (
       // `emote` 計數 +1
       currentEmoteCount += 1
 
-      // **如果 `emote` 數量超過 10，則換行**
-      if (currentEmoteCount > 10) {
+      // **如果 `emote` 數量超過 11，則換行**
+      if (currentEmoteCount > 11) {
         pushBufferToLine()
         lines.push([])
         currentEmoteCount = 1 // 新行的第一個 `emote`
