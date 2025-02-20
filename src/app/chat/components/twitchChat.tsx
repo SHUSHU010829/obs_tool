@@ -164,6 +164,79 @@ async function fetch7TVEmotes(channelId: string): Promise<SevenTVEmote[]> {
   }
 }
 
+const formatMessageFragments = (
+  fragments: { type: 'text' | 'emote'; content: string; provider?: string }[]
+) => {
+  const lines: { type: 'text' | 'emote'; content: string; provider?: string }[][] = [[]]
+  let currentLineLength = 0
+  let currentEmoteCount = 0
+  let buffer: { type: 'text' | 'emote'; content: string; provider?: string }[] = []
+  let lastWasEmote = false
+
+  const pushBufferToLine = () => {
+    if (buffer.length > 0) {
+      lines[lines.length - 1].push(...buffer)
+      buffer = []
+    }
+  }
+
+  fragments.forEach((fragment, index) => {
+    const lastLine = lines[lines.length - 1]
+    const nextFragment = fragments[index + 1] // 看下一個元素是什麼
+
+    if (fragment.type === 'emote') {
+      // 如果上一個也是 emote，則插入空白（但行首不插入）
+      if (lastWasEmote && lastLine.length > 0) {
+        buffer.push({ type: 'text', content: ' ' })
+      }
+
+      // `emote` 計數 +1
+      currentEmoteCount += 1
+
+      // **如果 `emote` 數量超過 10，則換行**
+      if (currentEmoteCount > 10) {
+        pushBufferToLine()
+        lines.push([])
+        currentEmoteCount = 1 // 新行的第一個 `emote`
+      }
+
+      buffer.push(fragment)
+      lastWasEmote = true
+    } else {
+      lastWasEmote = false
+      let textBuffer = ''
+
+      for (const char of fragment.content) {
+        textBuffer += char
+        currentLineLength += char.match(/[A-Za-z0-9]/) ? 1 : 2 // 英文 1，中文 2
+
+        // **如果 `text` 超過 15 個中文字（30 英文字母），則換行**
+        if (currentLineLength >= 30) {
+          // **如果下一個是 `emote`，提前換行，讓 `emote` 跟 `text` 一起**
+          if (nextFragment && nextFragment.type === 'emote') {
+            pushBufferToLine()
+            lines.push([])
+            buffer.push({ type: 'text', content: textBuffer })
+            textBuffer = ''
+            currentLineLength = 0
+          } else {
+            buffer.push({ type: 'text', content: textBuffer })
+            pushBufferToLine()
+            lines.push([])
+            textBuffer = ''
+            currentLineLength = 0
+          }
+        }
+      }
+
+      if (textBuffer) buffer.push({ type: 'text', content: textBuffer })
+    }
+  })
+
+  pushBufferToLine() // 處理剩餘的 buffer
+  return lines
+}
+
 const MessageContent = memo(
   ({
     fragments,
@@ -175,19 +248,31 @@ const MessageContent = memo(
       provider?: string
     }[]
     messageId: string
-  }) => (
-    <>
-      {fragments.map((fragment, index) => (
-        <MessageFragment
-          key={`${messageId}-fragment-${index}`}
-          fragment={fragment}
-          messageId={messageId}
-          index={index}
-        />
-      ))}
-    </>
-  )
+  }) => {
+    const formattedLines = formatMessageFragments(fragments)
+
+    return (
+      <>
+        {formattedLines.map((line, lineIndex) => (
+          <div
+            key={`${messageId}-line-${lineIndex}`}
+            className='flex flex-wrap items-center'
+          >
+            {line.map((fragment, index) => (
+              <MessageFragment
+                key={`${messageId}-fragment-${lineIndex}-${index}`}
+                fragment={fragment}
+                messageId={messageId}
+                index={index}
+              />
+            ))}
+          </div>
+        ))}
+      </>
+    )
+  }
 )
+
 MessageContent.displayName = 'MessageContent'
 
 const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
@@ -238,7 +323,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           <div className='w-4 overflow-hidden translate-x-[4px] -translate-y-1'>
             <div className='h-3 bg-gray-200 rotate-45 transform origin-bottom-right rounded-sm'></div>
           </div>
-          <div className='relative text-gray-900 font-bold font-notoSans rounded-3xl bg-gray-200 pb-2 pt-2 px-3 z-0 flex items-center w-auto max-w-max'>
+          <div className='relative text-gray-900 font-bold font-notoSans rounded-xl bg-gray-200 p-2 z-0 flex items-center w-auto max-w-[270px] ml-1'>
             <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
           </div>
         </div>
@@ -446,7 +531,6 @@ export default function TwitchChat({
     clientRef.current = client
 
     const handleMessage = async (channel: string, tags: any, message: string) => {
-      console.log('🚀 ~ handleMessage ~ tags:', tags)
       if (tags.id && processedMessageIds.current.has(tags.id)) {
         return
       }
@@ -864,7 +948,7 @@ export default function TwitchChat({
     <div className=''>
       <div className='relative h-[540px] w-[300px] pt-4'>
         <div
-          className='flex flex-col space-y-3 overflow-y-auto max-h-[540px] scrollbar-hide p-1'
+          className='flex flex-col space-y-3 overflow-y-auto max-h-[560px] scrollbar-hide p-1'
           ref={chatContainerRef} // 參考滾動容器
         >
           {messages.map(msg => (
