@@ -3,152 +3,11 @@
 import TwitchChatDebug from './debug'
 import { EmoteCache } from './emoteCache'
 import MessageFragment from './messageFragment'
+import { BadgeSet, BadgeVersion, ChatMessage, ParsedEmote, SevenTVEmote } from './type'
 import { getChannelBadges, getGlobalBadges } from '@/api/twitch'
-import { ShineBorder } from '@/components/ui/shine-border'
 import { motion } from 'framer-motion'
 import { useEffect, useState, memo, useCallback, useRef } from 'react'
 import tmi from 'tmi.js'
-
-interface ParsedEmote {
-  id: string
-  name: string
-  imageUrl: string
-  start: number
-  end: number
-  provider: 'twitch' | '7tv' | 'bttv' | 'ffz'
-}
-
-interface BadgeVersion {
-  id: string
-  image_url_1x: string
-  image_url_2x: string
-  image_url_4x: string
-  title: string
-  description: string
-  click_action: string
-  click_url: string | null
-}
-
-interface BadgeSet {
-  set_id: string
-  versions: BadgeVersion[]
-}
-
-interface ChatMessage {
-  user: string
-  type: 'message' | 'subscription' | 'cheer' | 'announcement'
-  bits?: number
-  subPlan?: 'Prime' | '1000' | '2000' | '3000'
-  subMonths?: number
-  subGifter?: string
-  systemMsg?: string
-
-  message: string
-  badges: Record<string, string | undefined>
-  emotes: Record<string, string[]> | null | undefined
-  sevenTVEmotes?: any
-  parsedEmotes: ParsedEmote[]
-  messageFragments: { type: 'text' | 'emote'; content: string; provider?: string }[]
-  isSubscriber: boolean
-  isMod: boolean
-  id: string
-  role: 'broadcaster' | 'mod' | 'vip' | 'subscriber' | 'noRole'
-  timestamp: number
-  channelBadges?: BadgeSet[] // 完整的徽章資料
-}
-
-interface SevenTVEmote {
-  id: string
-  name: string
-  flags: number
-  timestamp: number
-  actor_id: string
-  data: {
-    id: string
-    name: string
-    flags: number
-    lifecycle: number
-    state: string[]
-    listed: boolean
-    animated: boolean
-    owner: {
-      id: string
-      username: string
-      display_name: string
-      avatar_url: string
-      style: {
-        color: number
-      }
-      roles: string[]
-    }
-  }
-}
-
-const SystemMessage = memo(({ msg }: { msg: ChatMessage }) => {
-  const getBgColor = () => {
-    switch (msg.type) {
-      case 'subscription':
-        return 'bg-stone-100'
-      case 'cheer':
-        return 'bg-stone-100'
-      default:
-        return 'bg-stone-100'
-    }
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <ShineBorder
-        className={`rounded-lg ${getBgColor()}`}
-        color={['#A07CFE', '#FE8FB5', '#FFBE7B']}
-      >
-        <div className='text-sm font-medium'>
-          {msg.type === 'subscription' && (
-            <div className='flex items-center justify-center space-x-2'>
-              <div>
-                {msg.subGifter ? (
-                  <div>
-                    {msg.subGifter} 贈送了一個訂閱給
-                    <br /> {msg.user}！
-                  </div>
-                ) : (
-                  `${msg.user} ${
-                    msg.subMonths && msg.subMonths > 1
-                      ? `續訂了 ${msg.subMonths} 個月！`
-                      : '訂閱了頻道！'
-                  }`
-                )}
-              </div>
-            </div>
-          )}
-          {msg.type === 'cheer' && (
-            <div className='flex items-center justify-center space-x-2'>
-              <img
-                src={`https://d3aqoihi2n8ty8.cloudfront.net/actions/cheer/light/animated/1000/4.gif`}
-                className='w-5 h-5'
-                alt='Bits Badge'
-              />
-              <span>
-                {msg.user} 丟了 {msg.bits} 小顆粒！
-              </span>
-            </div>
-          )}
-        </div>
-        {msg.message && (
-          <div className='mt-2 text-sm'>
-            <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
-          </div>
-        )}
-      </ShineBorder>
-    </motion.div>
-  )
-})
-
-SystemMessage.displayName = 'SystemMessage'
 
 async function fetch7TVEmotes(channelId: string): Promise<SevenTVEmote[]> {
   try {
@@ -168,10 +27,7 @@ const formatMessageFragments = (
   fragments: { type: 'text' | 'emote'; content: string; provider?: string }[]
 ) => {
   const lines: { type: 'text' | 'emote'; content: string; provider?: string }[][] = [[]]
-  let currentLineLength = 0
-  let currentEmoteCount = 0
   let buffer: { type: 'text' | 'emote'; content: string; provider?: string }[] = []
-  let lastWasEmote = false
 
   const pushBufferToLine = () => {
     if (buffer.length > 0) {
@@ -180,56 +36,12 @@ const formatMessageFragments = (
     }
   }
 
-  fragments.forEach((fragment, index) => {
-    const lastLine = lines[lines.length - 1]
-    const nextFragment = fragments[index + 1] // 看下一個元素是什麼
-
+  fragments.forEach(fragment => {
     if (fragment.type === 'emote') {
-      // 如果上一個也是 emote，則插入空白（但行首不插入）
-      if (lastWasEmote && lastLine.length > 0) {
-        buffer.push({ type: 'text', content: ' ' })
-      }
-
-      // `emote` 計數 +1
-      currentEmoteCount += 1
-
-      // **如果 `emote` 數量超過 11，則換行**
-      if (currentEmoteCount > 11) {
-        pushBufferToLine()
-        lines.push([])
-        currentEmoteCount = 1 // 新行的第一個 `emote`
-      }
-
-      buffer.push(fragment)
-      lastWasEmote = true
+      pushBufferToLine()
+      lines[lines.length - 1].push(fragment)
     } else {
-      lastWasEmote = false
-      let textBuffer = ''
-
-      for (const char of fragment.content) {
-        textBuffer += char
-        currentLineLength += char.match(/[A-Za-z0-9]/) ? 1 : 2 // 英文 1，中文 2
-
-        // **如果 `text` 超過 15 個中文字（30 英文字母），則換行**
-        if (currentLineLength >= 30) {
-          // **如果下一個是 `emote`，提前換行，讓 `emote` 跟 `text` 一起**
-          if (nextFragment && nextFragment.type === 'emote') {
-            pushBufferToLine()
-            lines.push([])
-            buffer.push({ type: 'text', content: textBuffer })
-            textBuffer = ''
-            currentLineLength = 0
-          } else {
-            buffer.push({ type: 'text', content: textBuffer })
-            pushBufferToLine()
-            lines.push([])
-            textBuffer = ''
-            currentLineLength = 0
-          }
-        }
-      }
-
-      if (textBuffer) buffer.push({ type: 'text', content: textBuffer })
+      buffer.push(fragment)
     }
   })
 
@@ -275,6 +87,7 @@ const MessageContent = memo(
 
 MessageContent.displayName = 'MessageContent'
 
+// 聊天室本身樣式
 const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const renderBadges = () => {
     if (!msg.channelBadges || msg.channelBadges.length === 0) return null
@@ -285,10 +98,10 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           badgeSet.versions.map((version, versionIndex) => (
             <img
               key={`badge-${badgeSet.set_id}-${version.id}-${badgeIndex}-${versionIndex}`}
-              src={version.image_url_2x || version.image_url_1x} // 確保使用正確的 URL
+              src={version.image_url_2x || version.image_url_1x}
               alt={version.title}
               title={version.title}
-              className='h-4 w-4' // 稍微調整大小，確保可見
+              className='h-4 w-4'
               loading='lazy'
             />
           ))
@@ -842,7 +655,7 @@ export default function TwitchChat({
         months: months,
       }
 
-      const mockUserstate = {
+      const mockUserState = {
         badges: { subscriber: '0' },
         'display-name': username,
         id: `test-sub-${Date.now()}`,
@@ -854,7 +667,7 @@ export default function TwitchChat({
         type: 'subscription',
         user: username,
         message,
-        badges: mockUserstate.badges || {},
+        badges: mockUserState.badges || {},
         emotes: null,
         parsedEmotes: [],
         messageFragments: message
@@ -862,7 +675,7 @@ export default function TwitchChat({
           : [],
         isSubscriber: true,
         isMod: false,
-        id: mockUserstate.id,
+        id: mockUserState.id,
         role: 'subscriber',
         timestamp: Date.now(),
         subPlan: mockMethods.plan as any,
@@ -876,7 +689,7 @@ export default function TwitchChat({
 
   const handleTestCheer = useCallback(
     (username: string, bits: number, message: string) => {
-      const mockUserstate = {
+      const mockUserState = {
         bits,
         badges: { bits: '1000' },
         'display-name': username,
@@ -889,13 +702,13 @@ export default function TwitchChat({
         type: 'cheer',
         user: username,
         message,
-        badges: mockUserstate.badges || {},
+        badges: mockUserState.badges || {},
         emotes: null,
         parsedEmotes: [],
         messageFragments: parseMessageWithEmotes(message, null).messageFragments,
         isSubscriber: true,
         isMod: false,
-        id: mockUserstate.id,
+        id: mockUserState.id,
         role: 'subscriber',
         timestamp: Date.now(),
         bits,
@@ -913,10 +726,10 @@ export default function TwitchChat({
         months: 1,
       }
 
-      const mockUserstate = {
+      const mockUserState = {
         badges: { subscriber: '0' },
         'display-name': gifter,
-        id: `test-giftsub-${Date.now()}`,
+        id: `test-giftSub-${Date.now()}`,
         mod: false,
         subscriber: true,
       }
@@ -925,13 +738,13 @@ export default function TwitchChat({
         type: 'subscription',
         user: recipient,
         message: '',
-        badges: mockUserstate.badges || {},
+        badges: mockUserState.badges || {},
         emotes: null,
         parsedEmotes: [],
         messageFragments: [],
         isSubscriber: true,
         isMod: false,
-        id: mockUserstate.id,
+        id: mockUserState.id,
         role: 'subscriber',
         timestamp: Date.now(),
         subPlan: mockMethods.plan as any,
@@ -961,11 +774,7 @@ export default function TwitchChat({
               className={`w-full`}
             >
               <ChatMessageComponent msg={msg} />
-              {/* {msg.type === 'message' ? (
-                <ChatMessageComponent msg={msg} />
-              ) : (
-                <SystemMessage msg={msg} />
-              )} */}
+              <div className='py-2'></div>
             </motion.div>
           ))}
         </div>
