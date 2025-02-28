@@ -759,9 +759,9 @@ export default function TwitchChat({
 
   return (
     <div className=''>
-      <div className='relative h-[540px] w-[300px] pt-4'>
+      <div className='relative h-[530px] w-[300px] pt-4'>
         <div
-          className='flex flex-col space-y-3 overflow-y-auto max-h-[560px] scrollbar-hide p-1'
+          className='flex flex-col space-y-3 overflow-y-auto max-h-[530px] scrollbar-hide p-1'
           ref={chatContainerRef} // 參考滾動容器
         >
           {messages.map(msg => (
@@ -774,7 +774,6 @@ export default function TwitchChat({
               className={`w-full`}
             >
               <ChatMessageComponent msg={msg} />
-              <div className='py-2'></div>
             </motion.div>
           ))}
         </div>
