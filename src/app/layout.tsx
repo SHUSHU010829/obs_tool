@@ -1,6 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Noto_Sans_TC, Montserrat, Titan_One } from 'next/font/google'
+import { Noto_Sans_TC, Montserrat, Titan_One, Poppins } from 'next/font/google'
 import React from 'react'
 
 const notoSansTC = Noto_Sans_TC({
@@ -21,6 +21,12 @@ const titanOne = Titan_One({
   variable: '--font-titan-one',
 })
 
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-poppins',
+})
+
 export const metadata: Metadata = {
   title: 'SHU OBS TOOL',
   description: 'Made by SHU',
@@ -35,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${notoSansTC.variable} ${montserrat.variable} ${titanOne.variable} sans `}
+        className={`${notoSansTC.variable} ${montserrat.variable} ${titanOne.variable} ${poppins.variable} sans `}
         suppressHydrationWarning={true}
       >
         {children}

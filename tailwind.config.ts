@@ -97,6 +97,7 @@ const config = {
         montserrat: ['var(--font-montserrat)'],
         notoSans: ['var(--font-noto-sans-tc)'],
         titanOne: ['var(--font-titan-one)'],
+        poppins: ['var(--font-poppins)'],
       },
     },
   },
