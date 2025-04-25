@@ -546,6 +546,7 @@ export default function TwitchChat({
       return () => clearInterval(interval)
     }
   }, [hideAfter])
+
   const handleTwitchMessage = useCallback(
     async (channel: string, tags: any, message: string) => {
       if (tags.id && processedMessageIds.current.has(tags.id)) {
