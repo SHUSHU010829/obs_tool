@@ -53,11 +53,33 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        /* E-ink S91 Theme Colors */
+        eink: {
+          bg: {
+            primary: 'var(--eink-bg-primary)',
+            secondary: 'var(--eink-bg-secondary)',
+          },
+          text: {
+            primary: 'var(--eink-text-primary)',
+            secondary: 'var(--eink-text-secondary)',
+            muted: 'var(--eink-text-muted)',
+          },
+          border: {
+            strong: 'var(--eink-border-strong)',
+            subtle: 'var(--eink-border-subtle)',
+          },
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        eink: '2px',
+      },
+      borderWidth: {
+        eink: '1px',
+        'eink-medium': '2px',
+        'eink-strong': '3px',
       },
       keyframes: {
         'accordion-down': {
@@ -98,6 +120,24 @@ const config = {
         notoSans: ['var(--font-noto-sans-tc)'],
         titanOne: ['var(--font-titan-one)'],
         poppins: ['var(--font-poppins)'],
+        /* E-ink Fonts */
+        'eink-serif': ['Merriweather', 'Georgia', 'serif'],
+        'eink-sans': ['Inter', 'sans-serif'],
+      },
+      maxWidth: {
+        'eink-content': '720px',
+        'eink-wide': '960px',
+      },
+      spacing: {
+        'eink-section-mobile': '48px',
+        'eink-section-desktop': '72px',
+      },
+      transitionTimingFunction: {
+        eink: 'steps(4)',
+      },
+      transitionDuration: {
+        'eink-fast': '500ms',
+        'eink-normal': '1000ms',
       },
     },
   },
