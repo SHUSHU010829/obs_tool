@@ -34,8 +34,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Song {
   id: number
-  title: string
-  artist: string
+  song_title: string
+  singer: string
   now_playing: number
   status: number
   sort_order: number
@@ -256,8 +256,8 @@ export default function SongList() {
                 {/* Artist Input */}
                 <input
                   type="text"
-                  defaultValue={song.artist}
-                  onBlur={e => handleUpdate(song.id, e.target.value, song.title)}
+                  defaultValue={song.singer}
+                  onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
                   className={`eink-input w-full ${
                     song.now_playing === 1
                       ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
@@ -269,8 +269,8 @@ export default function SongList() {
                 {/* Title Input */}
                 <input
                   type="text"
-                  defaultValue={song.title}
-                  onBlur={e => handleUpdate(song.id, song.artist, e.target.value)}
+                  defaultValue={song.song_title}
+                  onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
                   className={`eink-input w-full ${
                     song.now_playing === 1
                       ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
@@ -366,8 +366,8 @@ export default function SongList() {
           <div className="flex items-center gap-3">
             <span className="eink-badge eink-badge-active">播放中</span>
             <span className="font-eink-serif text-sm">
-              {songList.find(song => song.now_playing === 1)?.artist} -{' '}
-              {songList.find(song => song.now_playing === 1)?.title}
+              {songList.find(song => song.now_playing === 1)?.singer} -{' '}
+              {songList.find(song => song.now_playing === 1)?.song_title}
             </span>
           </div>
         </div>
