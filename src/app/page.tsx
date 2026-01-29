@@ -4,6 +4,7 @@ import MessageBoard from '@/components/admin/messageBoard'
 import SongBook from '@/components/admin/songBook'
 import SongList from '@/components/admin/songList'
 import { useState } from 'react'
+import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 type NavSection = 'songs' | 'messages'
 type SongTab = 'songList' | 'songBook'
@@ -11,11 +12,81 @@ type SongTab = 'songList' | 'songBook'
 export default function Home() {
   const [activeSection, setActiveSection] = useState<NavSection>('songs')
   const [activeSongTab, setActiveSongTab] = useState<SongTab>('songList')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <div className="eink-admin flex min-h-screen">
-      {/* Sidebar Navigation */}
-      <aside className="eink-sidebar w-64 flex-shrink-0">
+    <div className="eink-admin flex min-h-screen flex-col md:flex-row">
+      {/* Mobile Header */}
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[var(--eink-border-strong)] bg-[var(--eink-bg-secondary)] p-4 md:hidden">
+        <h1 className="font-eink-sans text-lg font-bold tracking-tight">OBS 後台管理</h1>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="flex h-10 w-10 items-center justify-center rounded-eink border border-[var(--eink-border-strong)]"
+        >
+          {mobileMenuOpen ? (
+            <Cross1Icon className="h-5 w-5" />
+          ) : (
+            <HamburgerMenuIcon className="h-5 w-5" />
+          )}
+        </button>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 top-[57px] z-40 bg-[var(--eink-bg-secondary)] md:hidden">
+          <nav className="flex flex-col">
+            <div className="border-b border-[var(--eink-border-subtle)] px-4 py-3">
+              <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+                歌曲管理
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setActiveSection('songs')
+                setActiveSongTab('songList')
+                setMobileMenuOpen(false)
+              }}
+              className={`eink-nav-item w-full text-left ${
+                activeSection === 'songs' && activeSongTab === 'songList' ? 'active' : ''
+              }`}
+            >
+              歌單 Playlist
+            </button>
+            <button
+              onClick={() => {
+                setActiveSection('songs')
+                setActiveSongTab('songBook')
+                setMobileMenuOpen(false)
+              }}
+              className={`eink-nav-item w-full text-left ${
+                activeSection === 'songs' && activeSongTab === 'songBook' ? 'active' : ''
+              }`}
+            >
+              歌本 Song Book
+            </button>
+
+            <div className="border-b border-[var(--eink-border-subtle)] px-4 py-3">
+              <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+                互動功能
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setActiveSection('messages')
+                setMobileMenuOpen(false)
+              }}
+              className={`eink-nav-item w-full text-left ${
+                activeSection === 'messages' ? 'active' : ''
+              }`}
+            >
+              留言板 Messages
+            </button>
+          </nav>
+        </div>
+      )}
+
+      {/* Desktop Sidebar Navigation */}
+      <aside className="eink-sidebar relative hidden w-64 flex-shrink-0 md:block">
         <div className="border-b border-[var(--eink-border-strong)] p-6">
           <h1 className="font-eink-sans text-xl font-bold tracking-tight">
             OBS 後台管理
@@ -79,7 +150,7 @@ export default function Home() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-8">
         <div className="mx-auto max-w-4xl">
           {activeSection === 'songs' && (
             <>
