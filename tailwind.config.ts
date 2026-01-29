@@ -136,8 +136,8 @@ const config = {
         eink: 'steps(4)',
       },
       transitionDuration: {
-        'eink-fast': '200ms',
-        'eink-normal': '500ms',
+        'eink-fast': '100ms',
+        'eink-normal': '250ms',
       },
     },
   },

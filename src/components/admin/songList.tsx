@@ -191,8 +191,8 @@ export default function SongList() {
 
       {/* Card Content */}
       <div className="eink-card-content">
-        {/* Table Header */}
-        <div className="mb-4 grid grid-cols-[40px_60px_1fr_2fr_60px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
+        {/* Table Header - Desktop Only */}
+        <div className="mb-4 hidden border-b border-[var(--eink-border-strong)] pb-3 md:grid md:grid-cols-[40px_60px_1fr_2fr_60px] md:gap-4">
           <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
             排序
           </span>
@@ -221,7 +221,7 @@ export default function SongList() {
                 onDragEnd={handleDragEnd}
                 onDragOver={e => handleDragOver(e, index)}
                 onDragLeave={handleDragLeave}
-                className={`grid grid-cols-[40px_60px_1fr_2fr_60px] items-center gap-4 rounded-eink border p-3 transition-all duration-eink-fast ease-eink ${
+                className={`flex flex-col gap-3 rounded-eink border p-3 transition-all duration-eink-fast ease-eink md:grid md:grid-cols-[40px_60px_1fr_2fr_60px] md:items-center md:gap-4 ${
                   song.now_playing === 1
                     ? 'border-[var(--eink-border-strong)] bg-[var(--eink-text-primary)] text-[var(--eink-bg-secondary)]'
                     : dragOverIndex === index
@@ -229,68 +229,97 @@ export default function SongList() {
                       : 'border-[var(--eink-border-subtle)] hover:border-[var(--eink-border-strong)]'
                 }`}
               >
-                {/* Drag Handle */}
-                <div
-                  className={`flex h-10 w-10 cursor-grab items-center justify-center rounded-eink transition-colors active:cursor-grabbing ${
-                    song.now_playing === 1
-                      ? 'text-[var(--eink-bg-secondary)]'
-                      : 'text-[var(--eink-text-muted)] hover:text-[var(--eink-text-primary)]'
-                  }`}
-                >
-                  <DragHandleDots2Icon className="h-5 w-5" />
+                {/* Mobile: Top Row with Index, Drag Handle, Archive */}
+                <div className="flex items-center justify-between md:contents">
+                  {/* Drag Handle */}
+                  <div
+                    className={`flex h-10 w-10 cursor-grab items-center justify-center rounded-eink transition-colors active:cursor-grabbing ${
+                      song.now_playing === 1
+                        ? 'text-[var(--eink-bg-secondary)]'
+                        : 'text-[var(--eink-text-muted)] hover:text-[var(--eink-text-primary)]'
+                    }`}
+                  >
+                    <DragHandleDots2Icon className="h-5 w-5" />
+                  </div>
+
+                  {/* Index Button */}
+                  <button
+                    onClick={() => handlePlay(song.id, song.now_playing)}
+                    className={`flex h-10 w-10 items-center justify-center rounded-eink border font-eink-sans text-sm font-bold transition-all duration-eink-fast ease-eink ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] bg-[var(--eink-bg-secondary)] text-[var(--eink-text-primary)]'
+                        : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
+                    }`}
+                    title={song.now_playing === 1 ? '停止播放' : '開始播放'}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </button>
+
+                  {/* Artist Input - Hidden on mobile in this row */}
+                  <input
+                    type="text"
+                    defaultValue={song.singer}
+                    onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
+                    className={`eink-input hidden w-full md:block ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
+                        : ''
+                    }`}
+                    placeholder="歌手名稱"
+                  />
+
+                  {/* Title Input - Hidden on mobile in this row */}
+                  <input
+                    type="text"
+                    defaultValue={song.song_title}
+                    onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
+                    className={`eink-input hidden w-full md:block ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
+                        : ''
+                    }`}
+                    placeholder="歌曲名稱"
+                  />
+
+                  {/* Archive Button */}
+                  <button
+                    onClick={() => handleArchive(song.id)}
+                    className={`flex h-10 w-10 items-center justify-center rounded-eink border transition-all duration-eink-fast ease-eink ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] text-[var(--eink-bg-secondary)] hover:bg-[var(--eink-bg-secondary)] hover:text-[var(--eink-text-primary)]'
+                        : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
+                    }`}
+                    title="歸檔歌曲"
+                  >
+                    <ArchiveIcon className="h-4 w-4" />
+                  </button>
                 </div>
 
-                {/* Index Button */}
-                <button
-                  onClick={() => handlePlay(song.id, song.now_playing)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-eink border font-eink-sans text-sm font-bold transition-all duration-eink-fast ease-eink ${
-                    song.now_playing === 1
-                      ? 'border-[var(--eink-bg-secondary)] bg-[var(--eink-bg-secondary)] text-[var(--eink-text-primary)]'
-                      : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
-                  }`}
-                  title={song.now_playing === 1 ? '停止播放' : '開始播放'}
-                >
-                  {String(index + 1).padStart(2, '0')}
-                </button>
-
-                {/* Artist Input */}
-                <input
-                  type="text"
-                  defaultValue={song.singer}
-                  onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
-                  className={`eink-input w-full ${
-                    song.now_playing === 1
-                      ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                      : ''
-                  }`}
-                  placeholder="歌手名稱"
-                />
-
-                {/* Title Input */}
-                <input
-                  type="text"
-                  defaultValue={song.song_title}
-                  onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
-                  className={`eink-input w-full ${
-                    song.now_playing === 1
-                      ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                      : ''
-                  }`}
-                  placeholder="歌曲名稱"
-                />
-
-                {/* Archive Button */}
-                <button
-                  onClick={() => handleArchive(song.id)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-eink border transition-all duration-eink-fast ease-eink ${
-                    song.now_playing === 1
-                      ? 'border-[var(--eink-bg-secondary)] text-[var(--eink-bg-secondary)] hover:bg-[var(--eink-bg-secondary)] hover:text-[var(--eink-text-primary)]'
-                      : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
-                  }`}
-                  title="歸檔歌曲"
-                >
-                  <ArchiveIcon className="h-4 w-4" />
-                </button>
+                {/* Mobile: Input Fields */}
+                <div className="flex flex-col gap-2 md:hidden">
+                  <input
+                    type="text"
+                    defaultValue={song.singer}
+                    onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
+                    className={`eink-input w-full ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
+                        : ''
+                    }`}
+                    placeholder="歌手名稱"
+                  />
+                  <input
+                    type="text"
+                    defaultValue={song.song_title}
+                    onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
+                    className={`eink-input w-full ${
+                      song.now_playing === 1
+                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
+                        : ''
+                    }`}
+                    placeholder="歌曲名稱"
+                  />
+                </div>
               </div>
             ))}
           </div>

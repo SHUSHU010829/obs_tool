@@ -34,8 +34,8 @@ import {
 
 interface HistorySong {
   id: number
-  title: string
-  artist: string
+  song_title: string
+  singer: string
   now_playing: number
   status: number
   sort_order: number
@@ -99,7 +99,7 @@ export default function SongBook() {
             </div>
             <div>
               <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
-                {historySongs.filter(s => s.artist).length}
+                {historySongs.filter(s => s.singer).length}
               </p>
               <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
                 可恢復歌曲
@@ -153,8 +153,8 @@ export default function SongBook() {
         </div>
 
         <div className="eink-card-content">
-          {/* Table Header */}
-          <div className="mb-4 grid grid-cols-[1fr_2fr_120px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
+          {/* Table Header - Desktop Only */}
+          <div className="mb-4 hidden border-b border-[var(--eink-border-strong)] pb-3 md:grid md:grid-cols-[1fr_2fr_120px] md:gap-4">
             <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
               歌手
             </span>
@@ -172,18 +172,22 @@ export default function SongBook() {
               {historySongs.map(song => (
                 <div
                   key={song.id}
-                  className="grid grid-cols-[1fr_2fr_120px] items-center gap-4 rounded-eink border border-[var(--eink-border-subtle)] p-4 transition-all duration-eink-fast ease-eink hover:border-[var(--eink-border-strong)]"
+                  className="flex flex-col gap-3 rounded-eink border border-[var(--eink-border-subtle)] p-4 transition-all duration-eink-fast ease-eink hover:border-[var(--eink-border-strong)] md:grid md:grid-cols-[1fr_2fr_120px] md:items-center md:gap-4"
                 >
-                  <div>
-                    <span className="font-eink-serif text-sm text-[var(--eink-text-primary)]">
-                      {song.artist || '—'}
-                    </span>
+                  {/* Mobile: Song Info */}
+                  <div className="md:contents">
+                    <div>
+                      <span className="font-eink-serif text-sm text-[var(--eink-text-primary)]">
+                        {song.singer || '—'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-eink-serif text-sm text-[var(--eink-text-secondary)]">
+                        {song.song_title || '—'}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-eink-serif text-sm text-[var(--eink-text-secondary)]">
-                      {song.title || '—'}
-                    </span>
-                  </div>
+                  {/* Action Buttons */}
                   <div className="flex gap-2">
                     {/* Restore Button */}
                     <button
@@ -244,7 +248,7 @@ export default function SongBook() {
                     歌手
                   </p>
                   <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
-                    {selectedSong.artist || '未知'}
+                    {selectedSong.singer || '未知'}
                   </p>
                 </div>
                 <div>
@@ -252,7 +256,7 @@ export default function SongBook() {
                     歌名
                   </p>
                   <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
-                    {selectedSong.title || '未知'}
+                    {selectedSong.song_title || '未知'}
                   </p>
                 </div>
               </div>
@@ -283,7 +287,7 @@ export default function SongBook() {
                         確定要永久刪除這首歌曲嗎？
                       </AlertDialogTitle>
                       <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
-                        「{selectedSong.artist} - {selectedSong.title}」將被永久刪除，此操作無法復原。
+                        「{selectedSong.singer} - {selectedSong.song_title}」將被永久刪除，此操作無法復原。
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-2">
