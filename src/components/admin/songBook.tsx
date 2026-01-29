@@ -1,13 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   AlertDialog,
@@ -20,333 +19,334 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { TrashIcon, Pencil1Icon } from '@radix-ui/react-icons'
+import {
+  TrashIcon,
+  ResetIcon,
+  ArchiveIcon,
+  CounterClockwiseClockIcon,
+} from '@radix-ui/react-icons'
+import {
+  getHistorySongs,
+  restoreSong,
+  hardDeleteSong,
+  hardDeleteAllSongs,
+} from '@/api/song'
 
-interface SongType {
+interface HistorySong {
   id: number
-  name: string
-  description: string
-  songCount: number
+  title: string
+  artist: string
+  now_playing: number
+  status: number
+  sort_order: number
+  created_at?: string
 }
 
-// Mock data for song types - replace with API calls when backend is ready
-const initialSongTypes: SongType[] = [
-  { id: 1, name: '流行', description: '流行音樂、當紅歌曲', songCount: 24 },
-  { id: 2, name: '經典', description: '經典老歌、懷舊金曲', songCount: 18 },
-  { id: 3, name: '動漫', description: '動漫主題曲、角色歌', songCount: 32 },
-  { id: 4, name: '西洋', description: '英文歌曲、西洋流行', songCount: 15 },
-  { id: 5, name: '原創', description: '原創歌曲、創作曲', songCount: 8 },
-]
-
 export default function SongBook() {
-  const [songTypes, setSongTypes] = useState<SongType[]>(initialSongTypes)
-  const [open, setOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [editingType, setEditingType] = useState<SongType | null>(null)
-  const [newTypeName, setNewTypeName] = useState('')
-  const [newTypeDescription, setNewTypeDescription] = useState('')
+  const [historySongs, setHistorySongs] = useState<HistorySong[]>([])
+  const [selectedSong, setSelectedSong] = useState<HistorySong | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
-  const handleAddType = () => {
-    if (!newTypeName.trim()) return
-    const newType: SongType = {
-      id: Date.now(),
-      name: newTypeName,
-      description: newTypeDescription,
-      songCount: 0,
+  const fetchHistory = useCallback(async () => {
+    try {
+      const res = await getHistorySongs()
+      setHistorySongs(res.data || [])
+    } catch (error) {
+      console.error('Failed to fetch history:', error)
+      setHistorySongs([])
     }
-    setSongTypes([...songTypes, newType])
-    setOpen(false)
-    setNewTypeName('')
-    setNewTypeDescription('')
+  }, [])
+
+  useEffect(() => {
+    fetchHistory()
+  }, [fetchHistory])
+
+  const handleRestore = async (id: number) => {
+    await restoreSong(id)
+    await fetchHistory()
   }
 
-  const handleEditType = () => {
-    if (!editingType || !newTypeName.trim()) return
-    setSongTypes(
-      songTypes.map(type =>
-        type.id === editingType.id
-          ? { ...type, name: newTypeName, description: newTypeDescription }
-          : type
-      )
-    )
-    setEditOpen(false)
-    setEditingType(null)
-    setNewTypeName('')
-    setNewTypeDescription('')
+  const handleHardDelete = async (id: number) => {
+    await hardDeleteSong(id)
+    await fetchHistory()
+    setDetailOpen(false)
+    setSelectedSong(null)
   }
 
-  const handleDeleteType = (id: number) => {
-    setSongTypes(songTypes.filter(type => type.id !== id))
+  const handleHardDeleteAll = async () => {
+    await hardDeleteAllSongs()
+    await fetchHistory()
   }
 
-  const openEditDialog = (type: SongType) => {
-    setEditingType(type)
-    setNewTypeName(type.name)
-    setNewTypeDescription(type.description)
-    setEditOpen(true)
+  const openDetailDialog = (song: HistorySong) => {
+    setSelectedSong(song)
+    setDetailOpen(true)
   }
 
   return (
     <div className="space-y-6">
-      {/* Song Types Card */}
+      {/* Statistics Card */}
+      <div className="eink-card">
+        <div className="eink-card-content py-4">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="border-r border-[var(--eink-border-subtle)] pr-6">
+              <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
+                {historySongs.length}
+              </p>
+              <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
+                歷史歌曲
+              </p>
+            </div>
+            <div>
+              <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
+                {historySongs.filter(s => s.artist).length}
+              </p>
+              <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
+                可恢復歌曲
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* History Songs Card */}
       <div className="eink-card">
         <div className="eink-card-header flex items-center justify-between">
           <div>
-            <h3 className="eink-card-title">歌曲類型</h3>
+            <h3 className="eink-card-title flex items-center gap-2">
+              <CounterClockwiseClockIcon className="h-5 w-5" />
+              歷史紀錄
+            </h3>
             <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-              管理歌曲分類，方便整理歌本
+              已歸檔的歌曲，可恢復至播放清單或永久刪除
             </p>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <button className="eink-button eink-button-primary">+ 新增類型</button>
-            </DialogTrigger>
-            <DialogContent className="eink-card border-[var(--eink-border-strong)] sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="font-eink-sans text-lg font-semibold">
-                  新增歌曲類型
-                </DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <label
-                    htmlFor="typeName"
-                    className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-                  >
-                    類型名稱
-                  </label>
-                  <input
-                    id="typeName"
-                    type="text"
-                    value={newTypeName}
-                    onChange={e => setNewTypeName(e.target.value)}
-                    className="eink-input w-full"
-                    placeholder="例如：流行、經典、動漫"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label
-                    htmlFor="typeDescription"
-                    className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-                  >
-                    描述
-                  </label>
-                  <textarea
-                    id="typeDescription"
-                    value={newTypeDescription}
-                    onChange={e => setNewTypeDescription(e.target.value)}
-                    className="eink-input min-h-[80px] w-full resize-none"
-                    placeholder="簡短描述此類型包含的歌曲"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <button
-                  type="submit"
-                  onClick={handleAddType}
-                  className="eink-button eink-button-primary"
-                  disabled={!newTypeName.trim()}
-                >
-                  確認新增
+          {historySongs.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="eink-button eink-button-destructive flex items-center gap-2">
+                  <TrashIcon className="h-4 w-4" />
+                  清空歷史
                 </button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="eink-card border-[var(--eink-border-strong)]">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-eink-sans text-lg font-semibold">
+                    確定要永久刪除所有歷史歌曲嗎？
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
+                    此操作無法復原，所有歷史紀錄將被永久刪除。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="gap-2">
+                  <AlertDialogCancel className="eink-button">取消</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="eink-button eink-button-primary"
+                    onClick={handleHardDeleteAll}
+                  >
+                    確定刪除
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         <div className="eink-card-content">
           {/* Table Header */}
-          <div className="mb-4 grid grid-cols-[1fr_2fr_100px_100px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
+          <div className="mb-4 grid grid-cols-[1fr_2fr_120px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
             <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-              類型名稱
+              歌手
             </span>
             <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-              描述
-            </span>
-            <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-              歌曲數
+              歌名
             </span>
             <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
               操作
             </span>
           </div>
 
-          {/* Song Types List */}
-          {songTypes.length > 0 ? (
+          {/* History Songs List */}
+          {historySongs.length > 0 ? (
             <div className="flex flex-col gap-3">
-              {songTypes.map(type => (
+              {historySongs.map(song => (
                 <div
-                  key={type.id}
-                  className="grid grid-cols-[1fr_2fr_100px_100px] items-center gap-4 rounded-eink border border-[var(--eink-border-subtle)] p-4 transition-all duration-eink-fast ease-eink hover:border-[var(--eink-border-strong)]"
+                  key={song.id}
+                  className="grid grid-cols-[1fr_2fr_120px] items-center gap-4 rounded-eink border border-[var(--eink-border-subtle)] p-4 transition-all duration-eink-fast ease-eink hover:border-[var(--eink-border-strong)]"
                 >
                   <div>
-                    <span className="font-eink-sans text-base font-medium text-[var(--eink-text-primary)]">
-                      {type.name}
+                    <span className="font-eink-serif text-sm text-[var(--eink-text-primary)]">
+                      {song.artist || '—'}
                     </span>
                   </div>
                   <div>
                     <span className="font-eink-serif text-sm text-[var(--eink-text-secondary)]">
-                      {type.description || '—'}
+                      {song.title || '—'}
                     </span>
                   </div>
-                  <div>
-                    <span className="eink-badge">{type.songCount} 首</span>
-                  </div>
                   <div className="flex gap-2">
+                    {/* Restore Button */}
                     <button
-                      onClick={() => openEditDialog(type)}
+                      onClick={() => handleRestore(song.id)}
                       className="flex h-10 w-10 items-center justify-center rounded-eink border border-[var(--eink-border-strong)] transition-all duration-eink-fast ease-eink hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]"
-                      title="編輯類型"
+                      title="恢復至播放清單"
                     >
-                      <Pencil1Icon className="h-4 w-4" />
+                      <ResetIcon className="h-4 w-4" />
                     </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button
-                          className="flex h-10 w-10 items-center justify-center rounded-eink border border-[var(--eink-border-strong)] transition-all duration-eink-fast ease-eink hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]"
-                          title="刪除類型"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="eink-card border-[var(--eink-border-strong)]">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="font-eink-sans text-lg font-semibold">
-                            確定要刪除「{type.name}」類型嗎？
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
-                            此操作將移除此分類，但不會刪除已歸類的歌曲。
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="gap-2">
-                          <AlertDialogCancel className="eink-button">取消</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="eink-button eink-button-primary"
-                            onClick={() => handleDeleteType(type.id)}
-                          >
-                            確定刪除
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {/* Detail/Delete Button */}
+                    <button
+                      onClick={() => openDetailDialog(song)}
+                      className="flex h-10 w-10 items-center justify-center rounded-eink border border-[var(--eink-border-strong)] transition-all duration-eink-fast ease-eink hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]"
+                      title="查看詳情 / 永久刪除"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
+              <ArchiveIcon className="mb-4 h-12 w-12 text-[var(--eink-text-muted)]" />
               <p className="font-eink-serif text-lg text-[var(--eink-text-muted)]">
-                尚無歌曲類型
+                目前沒有歷史紀錄
               </p>
               <p className="mt-2 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-                點擊上方按鈕新增第一個類型
+                從播放清單歸檔的歌曲會顯示在這裡
               </p>
             </div>
           )}
         </div>
 
-        {/* Summary Footer */}
-        <div className="border-t border-[var(--eink-border-strong)] p-4">
-          <div className="flex items-center justify-between">
-            <span className="font-eink-serif text-sm text-[var(--eink-text-muted)]">
-              共 {songTypes.length} 種類型
-            </span>
-            <span className="font-eink-serif text-sm text-[var(--eink-text-muted)]">
-              共 {songTypes.reduce((acc, type) => acc + type.songCount, 0)} 首歌曲
-            </span>
+        {/* Footer */}
+        {historySongs.length > 0 && (
+          <div className="border-t border-[var(--eink-border-strong)] p-4">
+            <p className="font-eink-serif text-sm text-[var(--eink-text-muted)]">
+              共 {historySongs.length} 首歷史歌曲
+            </p>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      {/* Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="eink-card border-[var(--eink-border-strong)] sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="font-eink-sans text-lg font-semibold">
-              編輯歌曲類型
+              歌曲詳情
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label
-                htmlFor="editTypeName"
-                className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-              >
-                類型名稱
-              </label>
-              <input
-                id="editTypeName"
-                type="text"
-                value={newTypeName}
-                onChange={e => setNewTypeName(e.target.value)}
-                className="eink-input w-full"
-                placeholder="例如：流行、經典、動漫"
-              />
+          {selectedSong && (
+            <div className="grid gap-4 py-4">
+              <div className="rounded-eink border border-[var(--eink-border-subtle)] bg-[var(--eink-bg-primary)] p-4">
+                <div className="mb-3">
+                  <p className="font-eink-sans text-xs font-medium uppercase tracking-wider text-[var(--eink-text-muted)]">
+                    歌手
+                  </p>
+                  <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
+                    {selectedSong.artist || '未知'}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-eink-sans text-xs font-medium uppercase tracking-wider text-[var(--eink-text-muted)]">
+                    歌名
+                  </p>
+                  <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
+                    {selectedSong.title || '未知'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    handleRestore(selectedSong.id)
+                    setDetailOpen(false)
+                    setSelectedSong(null)
+                  }}
+                  className="eink-button flex w-full items-center justify-center gap-2"
+                >
+                  <ResetIcon className="h-4 w-4" />
+                  恢復至播放清單
+                </button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="eink-button eink-button-destructive flex w-full items-center justify-center gap-2">
+                      <TrashIcon className="h-4 w-4" />
+                      永久刪除
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="eink-card border-[var(--eink-border-strong)]">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="font-eink-sans text-lg font-semibold">
+                        確定要永久刪除這首歌曲嗎？
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
+                        「{selectedSong.artist} - {selectedSong.title}」將被永久刪除，此操作無法復原。
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-2">
+                      <AlertDialogCancel className="eink-button">取消</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="eink-button eink-button-primary"
+                        onClick={() => handleHardDelete(selectedSong.id)}
+                      >
+                        確定刪除
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
-            <div className="grid gap-2">
-              <label
-                htmlFor="editTypeDescription"
-                className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-              >
-                描述
-              </label>
-              <textarea
-                id="editTypeDescription"
-                value={newTypeDescription}
-                onChange={e => setNewTypeDescription(e.target.value)}
-                className="eink-input min-h-[80px] w-full resize-none"
-                placeholder="簡短描述此類型包含的歌曲"
-              />
-            </div>
-          </div>
+          )}
           <DialogFooter>
             <button
-              type="submit"
-              onClick={handleEditType}
-              className="eink-button eink-button-primary"
-              disabled={!newTypeName.trim()}
+              onClick={() => {
+                setDetailOpen(false)
+                setSelectedSong(null)
+              }}
+              className="eink-button"
             >
-              儲存變更
+              關閉
             </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Statistics Card */}
+      {/* Info Card */}
       <div className="eink-card">
         <div className="eink-card-header">
-          <h3 className="eink-card-title">歌本統計</h3>
+          <h3 className="eink-card-title">說明</h3>
         </div>
         <div className="eink-card-content">
-          <div className="grid grid-cols-3 gap-6">
-            <div className="border-r border-[var(--eink-border-subtle)] pr-6">
-              <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
-                {songTypes.length}
-              </p>
-              <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-                歌曲類型
-              </p>
+          <div className="space-y-4 font-eink-serif text-sm text-[var(--eink-text-secondary)]">
+            <div className="flex items-start gap-3">
+              <ArchiveIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--eink-text-muted)]" />
+              <div>
+                <p className="font-medium text-[var(--eink-text-primary)]">歸檔功能</p>
+                <p className="mt-1">
+                  在播放清單中點擊歸檔按鈕，歌曲會移至歷史紀錄，不會真正刪除。
+                </p>
+              </div>
             </div>
-            <div className="border-r border-[var(--eink-border-subtle)] pr-6">
-              <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
-                {songTypes.reduce((acc, type) => acc + type.songCount, 0)}
-              </p>
-              <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-                總歌曲數
-              </p>
+            <div className="flex items-start gap-3">
+              <ResetIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--eink-text-muted)]" />
+              <div>
+                <p className="font-medium text-[var(--eink-text-primary)]">恢復功能</p>
+                <p className="mt-1">
+                  點擊恢復按鈕，歌曲會重新加入播放清單的末端。
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
-                {songTypes.length > 0
-                  ? Math.round(
-                      songTypes.reduce((acc, type) => acc + type.songCount, 0) /
-                        songTypes.length
-                    )
-                  : 0}
-              </p>
-              <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-                平均每類型
-              </p>
+            <div className="flex items-start gap-3">
+              <TrashIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--eink-text-muted)]" />
+              <div>
+                <p className="font-medium text-[var(--eink-text-primary)]">永久刪除</p>
+                <p className="mt-1">
+                  永久刪除會將歌曲從資料庫中完全移除，無法恢復。
+                </p>
+              </div>
             </div>
           </div>
         </div>

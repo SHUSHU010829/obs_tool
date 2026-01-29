@@ -2,10 +2,11 @@
 
 import {
   addSong,
+  batchUpdateSortOrder,
   clearNowPlaying,
   deleteAllSongs,
   deleteSong,
-  getSongs,
+  getActiveSongs,
   playSong,
   updateSong,
 } from '@/api/song'
@@ -28,34 +29,39 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { TrashIcon } from '@radix-ui/react-icons'
-import { useEffect, useState } from 'react'
+import { ArchiveIcon, DragHandleDots2Icon, TrashIcon } from '@radix-ui/react-icons'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Song {
   id: number
   title: string
   artist: string
   now_playing: number
+  status: number
+  sort_order: number
 }
 
 export default function SongList() {
-  const [songList, setSongList] = useState<Song[]>()
+  const [songList, setSongList] = useState<Song[]>([])
   const [title, setTitle] = useState('')
   const [artist, setArtist] = useState('')
   const [open, setOpen] = useState(false)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const dragNodeRef = useRef<HTMLDivElement | null>(null)
+
+  const fetchSongs = useCallback(async () => {
+    const res = await getActiveSongs()
+    setSongList(res.data || [])
+  }, [])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getSongs()
-      setSongList(res.data)
-    }
-    fetchData()
-  }, [])
+    fetchSongs()
+  }, [fetchSongs])
 
   const handleAddSong = async () => {
     await addSong(title, artist)
-    const res = await getSongs()
-    setSongList(res.data)
+    await fetchSongs()
     setOpen(false)
     setTitle('')
     setArtist('')
@@ -63,20 +69,17 @@ export default function SongList() {
 
   const handleUpdate = async (id: number, artistInput: string, titleInput: string) => {
     await updateSong(id, titleInput, artistInput)
-    const res = await getSongs()
-    setSongList(res.data)
+    await fetchSongs()
   }
 
-  const handleDelete = async (id: number) => {
+  const handleArchive = async (id: number) => {
     await deleteSong(id)
-    const res = await getSongs()
-    setSongList(res.data)
+    await fetchSongs()
   }
 
-  const handleDeleteAll = async () => {
+  const handleArchiveAll = async () => {
     await deleteAllSongs()
-    const res = await getSongs()
-    setSongList(res.data)
+    await fetchSongs()
   }
 
   const handlePlay = async (id: number, now_playing: number) => {
@@ -89,8 +92,62 @@ export default function SongList() {
     } else {
       await playSong(id)
     }
-    const res = await getSongs()
-    setSongList(res.data)
+    await fetchSongs()
+  }
+
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedIndex(index)
+    dragNodeRef.current = e.currentTarget as HTMLDivElement
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', index.toString())
+
+    // Add dragging class after a small delay for visual feedback
+    setTimeout(() => {
+      if (dragNodeRef.current) {
+        dragNodeRef.current.style.opacity = '0.5'
+      }
+    }, 0)
+  }
+
+  const handleDragEnd = async () => {
+    if (dragNodeRef.current) {
+      dragNodeRef.current.style.opacity = '1'
+    }
+
+    if (draggedIndex !== null && dragOverIndex !== null && draggedIndex !== dragOverIndex) {
+      const newList = [...songList]
+      const [draggedItem] = newList.splice(draggedIndex, 1)
+      newList.splice(dragOverIndex, 0, draggedItem)
+
+      // Update local state immediately for smooth UX
+      setSongList(newList)
+
+      // Prepare batch update data
+      const sortData = newList.map((song, index) => ({
+        id: song.id,
+        sort_order: index,
+      }))
+
+      // Send batch update to server
+      await batchUpdateSortOrder(sortData)
+    }
+
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+    dragNodeRef.current = null
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index)
+    }
+  }
+
+  const handleDragLeave = () => {
+    // Only clear if we're leaving the container entirely
   }
 
   return (
@@ -100,26 +157,32 @@ export default function SongList() {
         <div>
           <h3 className="eink-card-title">播放清單</h3>
           <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
-            共 {songList?.length || 0} 首歌曲
+            共 {songList?.length || 0} 首歌曲（可拖曳排序）
           </p>
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="eink-button eink-button-destructive">清除全部</button>
+            <button className="eink-button eink-button-destructive flex items-center gap-2">
+              <ArchiveIcon className="h-4 w-4" />
+              全部歸檔
+            </button>
           </AlertDialogTrigger>
           <AlertDialogContent className="eink-card border-[var(--eink-border-strong)]">
             <AlertDialogHeader>
               <AlertDialogTitle className="font-eink-sans text-lg font-semibold">
-                確定要刪除歌單嗎？
+                確定要歸檔所有歌曲嗎？
               </AlertDialogTitle>
               <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
-                此操作將刪除所有歌曲，且無法復原。
+                所有歌曲將移至歷史紀錄，您可以在「歌本」頁面中恢復。
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-2">
               <AlertDialogCancel className="eink-button">取消</AlertDialogCancel>
-              <AlertDialogAction className="eink-button eink-button-primary" onClick={handleDeleteAll}>
-                確定刪除
+              <AlertDialogAction
+                className="eink-button eink-button-primary"
+                onClick={handleArchiveAll}
+              >
+                確定歸檔
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -129,7 +192,10 @@ export default function SongList() {
       {/* Card Content */}
       <div className="eink-card-content">
         {/* Table Header */}
-        <div className="mb-4 grid grid-cols-[60px_1fr_2fr_60px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
+        <div className="mb-4 grid grid-cols-[40px_60px_1fr_2fr_60px] gap-4 border-b border-[var(--eink-border-strong)] pb-3">
+          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+            排序
+          </span>
           <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
             序號
           </span>
@@ -150,12 +216,30 @@ export default function SongList() {
             {songList.map((song, index) => (
               <div
                 key={song.id}
-                className={`grid grid-cols-[60px_1fr_2fr_60px] items-center gap-4 rounded-eink border border-[var(--eink-border-subtle)] p-3 transition-all duration-eink-fast ease-eink ${
+                draggable
+                onDragStart={e => handleDragStart(e, index)}
+                onDragEnd={handleDragEnd}
+                onDragOver={e => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                className={`grid grid-cols-[40px_60px_1fr_2fr_60px] items-center gap-4 rounded-eink border p-3 transition-all duration-eink-fast ease-eink ${
                   song.now_playing === 1
                     ? 'border-[var(--eink-border-strong)] bg-[var(--eink-text-primary)] text-[var(--eink-bg-secondary)]'
-                    : 'hover:border-[var(--eink-border-strong)]'
+                    : dragOverIndex === index
+                      ? 'border-[var(--eink-border-strong)] bg-[var(--eink-bg-primary)]'
+                      : 'border-[var(--eink-border-subtle)] hover:border-[var(--eink-border-strong)]'
                 }`}
               >
+                {/* Drag Handle */}
+                <div
+                  className={`flex h-10 w-10 cursor-grab items-center justify-center rounded-eink transition-colors active:cursor-grabbing ${
+                    song.now_playing === 1
+                      ? 'text-[var(--eink-bg-secondary)]'
+                      : 'text-[var(--eink-text-muted)] hover:text-[var(--eink-text-primary)]'
+                  }`}
+                >
+                  <DragHandleDots2Icon className="h-5 w-5" />
+                </div>
+
                 {/* Index Button */}
                 <button
                   onClick={() => handlePlay(song.id, song.now_playing)}
@@ -195,26 +279,24 @@ export default function SongList() {
                   placeholder="歌曲名稱"
                 />
 
-                {/* Delete Button */}
+                {/* Archive Button */}
                 <button
-                  onClick={() => handleDelete(song.id)}
+                  onClick={() => handleArchive(song.id)}
                   className={`flex h-10 w-10 items-center justify-center rounded-eink border transition-all duration-eink-fast ease-eink ${
                     song.now_playing === 1
                       ? 'border-[var(--eink-bg-secondary)] text-[var(--eink-bg-secondary)] hover:bg-[var(--eink-bg-secondary)] hover:text-[var(--eink-text-primary)]'
                       : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
                   }`}
-                  title="刪除歌曲"
+                  title="歸檔歌曲"
                 >
-                  <TrashIcon className="h-4 w-4" />
+                  <ArchiveIcon className="h-4 w-4" />
                 </button>
               </div>
             ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="font-eink-serif text-lg text-[var(--eink-text-muted)]">
-              目前沒有歌曲
-            </p>
+            <p className="font-eink-serif text-lg text-[var(--eink-text-muted)]">目前沒有歌曲</p>
             <p className="mt-2 font-eink-serif text-sm text-[var(--eink-text-muted)]">
               點擊下方按鈕新增第一首歌曲
             </p>
@@ -228,9 +310,7 @@ export default function SongList() {
           </DialogTrigger>
           <DialogContent className="eink-card border-[var(--eink-border-strong)] sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle className="font-eink-sans text-lg font-semibold">
-                新增歌曲
-              </DialogTitle>
+              <DialogTitle className="font-eink-sans text-lg font-semibold">新增歌曲</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
