@@ -34,8 +34,8 @@ import {
 
 interface HistorySong {
   id: number
-  title: string
-  artist: string
+  song_title: string
+  singer: string
   now_playing: number
   status: number
   sort_order: number
@@ -99,7 +99,7 @@ export default function SongBook() {
             </div>
             <div>
               <p className="font-eink-sans text-3xl font-bold text-[var(--eink-text-primary)]">
-                {historySongs.filter(s => s.artist).length}
+                {historySongs.filter(s => s.singer).length}
               </p>
               <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
                 可恢復歌曲
@@ -176,12 +176,12 @@ export default function SongBook() {
                 >
                   <div>
                     <span className="font-eink-serif text-sm text-[var(--eink-text-primary)]">
-                      {song.artist || '—'}
+                      {song.singer || '—'}
                     </span>
                   </div>
                   <div>
                     <span className="font-eink-serif text-sm text-[var(--eink-text-secondary)]">
-                      {song.title || '—'}
+                      {song.song_title || '—'}
                     </span>
                   </div>
                   <div className="flex gap-2">
@@ -244,7 +244,7 @@ export default function SongBook() {
                     歌手
                   </p>
                   <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
-                    {selectedSong.artist || '未知'}
+                    {selectedSong.singer || '未知'}
                   </p>
                 </div>
                 <div>
@@ -252,7 +252,7 @@ export default function SongBook() {
                     歌名
                   </p>
                   <p className="mt-1 font-eink-serif text-lg text-[var(--eink-text-primary)]">
-                    {selectedSong.title || '未知'}
+                    {selectedSong.song_title || '未知'}
                   </p>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function SongBook() {
                         確定要永久刪除這首歌曲嗎？
                       </AlertDialogTitle>
                       <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
-                        「{selectedSong.artist} - {selectedSong.title}」將被永久刪除，此操作無法復原。
+                        「{selectedSong.singer} - {selectedSong.song_title}」將被永久刪除，此操作無法復原。
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-2">
