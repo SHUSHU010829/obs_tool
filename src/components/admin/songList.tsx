@@ -29,8 +29,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { ArchiveIcon, DragHandleDots2Icon, TrashIcon } from '@radix-ui/react-icons'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArchiveIcon, DragHandleDots2Icon } from '@radix-ui/react-icons'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Song {
   id: number

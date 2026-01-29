@@ -6,6 +6,26 @@ interface VideoMap {
   [key: string]: string | string[]
 }
 
+const pointVideoMap: VideoMap = {
+  '888': ['ksp884.mp4', 'ksp8881.mp4', 'ksp88881.mp4'],
+  退訂了: 'shuunSubscribe.mp4',
+  TAT: 'kspCry.mp4',
+  '0': 'seki01.mp4',
+  好想姊姊: 'kspMiss.mp4',
+  婆: 'kspWife2.mp4',
+  早安: 'kspMorning1.mp4',
+  睡屁睡: 'kspSleep1.mp4',
+  LALALA: 'shushuLa.mp4',
+  媽咪: 'sekiMommy.mp4',
+  洗澡: 'kspBath1.mp4',
+  '5MA': 'seki5ma1.mp4',
+  蘑菇蘑菇: 'kspMogu1.mp4',
+  HI: 'hiMary1.mp4',
+  我是個廢物: 'kspDrink.mp4',
+  哥哥: 'kspBrother.mp4',
+  OMG: 'kspOmg.mp4',
+}
+
 const TwitchChatListener = ({
   channelId,
   onPlay,
@@ -13,26 +33,6 @@ const TwitchChatListener = ({
   channelId: string
   onPlay: (videoName: string) => void
 }) => {
-  const pointVideoMap: VideoMap = {
-    '888': ['ksp884.mp4', 'ksp8881.mp4', 'ksp88881.mp4'],
-    退訂了: 'shuunSubscribe.mp4',
-    TAT: 'kspCry.mp4',
-    '0': 'seki01.mp4',
-    好想姊姊: 'kspMiss.mp4',
-    婆: 'kspWife2.mp4',
-    早安: 'kspMorning1.mp4',
-    睡屁睡: 'kspSleep1.mp4',
-    LALALA: 'shushuLa.mp4',
-    媽咪: 'sekiMommy.mp4',
-    洗澡: 'kspBath1.mp4',
-    '5MA': 'seki5ma1.mp4',
-    蘑菇蘑菇: 'kspMogu1.mp4',
-    HI: 'hiMary1.mp4',
-    我是個廢物: 'kspDrink.mp4',
-    哥哥: 'kspBrother.mp4',
-    OMG: 'kspOmg.mp4',
-  }
-
   useEffect(() => {
     const token = process.env.TWITCH_OAUTH_TOKEN
     let socket = new WebSocket('wss://pubsub-edge.twitch.tv')
@@ -87,7 +87,7 @@ const TwitchChatListener = ({
     return () => {
       socket.close()
     }
-  }, [])
+  }, [channelId, onPlay])
 
   return null
 }
