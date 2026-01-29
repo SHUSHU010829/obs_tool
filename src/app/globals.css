@@ -1,68 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* E-ink S91 Theme - Strict Grayscale */
+    --background: 0 0% 96%;
+    --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 0 0% 90%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 0% 20%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 0 0% 0%;
+    --input: 0 0% 80%;
+    --ring: 0 0% 0%;
 
-    --radius: 0.5rem;
+    --radius: 2px;
+
+    /* E-ink specific tokens */
+    --eink-border-strong: #000000;
+    --eink-border-subtle: #CCCCCC;
+    --eink-text-primary: #000000;
+    --eink-text-secondary: #333333;
+    --eink-text-muted: #666666;
+    --eink-bg-primary: #F5F5F5;
+    --eink-bg-secondary: #FFFFFF;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 96%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 0% 80%;
+    --destructive-foreground: 0 0% 8%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 96%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 96%;
+
+    --eink-border-strong: #FFFFFF;
+    --eink-border-subtle: #444444;
+    --eink-text-primary: #F5F5F5;
+    --eink-text-secondary: #CCCCCC;
+    --eink-text-muted: #999999;
+    --eink-bg-primary: #0A0A0A;
+    --eink-bg-secondary: #1A1A1A;
   }
 }
 
@@ -73,7 +93,228 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Merriweather', Georgia, serif;
   }
+}
+
+/* E-ink Admin Dashboard Styles */
+.eink-admin {
+  font-family: 'Merriweather', Georgia, serif;
+  background-color: var(--eink-bg-primary);
+  min-height: 100vh;
+}
+
+.eink-sidebar {
+  background-color: var(--eink-bg-secondary);
+  border-right: 1px solid var(--eink-border-strong);
+}
+
+.eink-nav-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--eink-border-subtle);
+  cursor: pointer;
+  transition: background-color 0.5s steps(4);
+}
+
+.eink-nav-item:hover {
+  background-color: var(--eink-bg-primary);
+}
+
+.eink-nav-item.active {
+  background-color: var(--eink-text-primary);
+  color: var(--eink-bg-secondary);
+}
+
+.eink-card {
+  background-color: var(--eink-bg-secondary);
+  border: 1px solid var(--eink-border-strong);
+  border-radius: 2px;
+}
+
+.eink-card-header {
+  border-bottom: 1px solid var(--eink-border-strong);
+  padding: 16px 20px;
+}
+
+.eink-card-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--eink-text-primary);
+}
+
+.eink-card-content {
+  padding: 20px;
+}
+
+.eink-button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border: 1px solid var(--eink-border-strong);
+  border-radius: 2px;
+  background-color: var(--eink-bg-secondary);
+  color: var(--eink-text-primary);
+  cursor: pointer;
+  transition: all 0.5s steps(4);
+  min-height: 44px;
+}
+
+.eink-button:hover {
+  background-color: var(--eink-text-primary);
+  color: var(--eink-bg-secondary);
+}
+
+.eink-button:focus-visible {
+  outline: 2px solid var(--eink-border-strong);
+  outline-offset: 2px;
+}
+
+.eink-button-primary {
+  background-color: var(--eink-text-primary);
+  color: var(--eink-bg-secondary);
+}
+
+.eink-button-primary:hover {
+  background-color: var(--eink-text-secondary);
+}
+
+.eink-button-destructive {
+  border-color: var(--eink-text-primary);
+}
+
+.eink-button-destructive:hover {
+  background-color: var(--eink-text-primary);
+  color: var(--eink-bg-secondary);
+}
+
+.eink-input {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--eink-border-strong);
+  border-radius: 2px;
+  background-color: var(--eink-bg-secondary);
+  color: var(--eink-text-primary);
+  min-height: 44px;
+}
+
+.eink-input:focus {
+  outline: 2px solid var(--eink-border-strong);
+  outline-offset: 1px;
+}
+
+.eink-input::placeholder {
+  color: var(--eink-text-muted);
+}
+
+.eink-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.eink-table th,
+.eink-table td {
+  border: 1px solid var(--eink-border-strong);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.eink-table th {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  background-color: var(--eink-bg-primary);
+}
+
+.eink-table tr:hover {
+  background-color: var(--eink-bg-primary);
+}
+
+.eink-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border: 1px solid var(--eink-border-strong);
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.eink-badge-active {
+  background-color: var(--eink-text-primary);
+  color: var(--eink-bg-secondary);
+}
+
+.eink-section-title {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 38px;
+  color: var(--eink-text-primary);
+  margin-bottom: 8px;
+}
+
+.eink-section-subtitle {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 14px;
+  color: var(--eink-text-muted);
+  line-height: 22px;
+}
+
+.eink-divider {
+  border: none;
+  border-top: 1px solid var(--eink-border-strong);
+  margin: 24px 0;
+}
+
+.eink-message-card {
+  border: 1px solid var(--eink-border-strong);
+  border-radius: 2px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background-color: var(--eink-bg-secondary);
+}
+
+.eink-message-time {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--eink-text-muted);
+  margin-bottom: 8px;
+}
+
+.eink-message-content {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 16px;
+  line-height: 28px;
+  color: var(--eink-text-primary);
+}
+
+.eink-message-reply {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--eink-text-secondary);
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--eink-border-subtle);
+}
+
+/* E-ink stepped animation */
+@keyframes eink-refresh {
+  0% { opacity: 1; }
+  25% { opacity: 0.7; }
+  50% { opacity: 0.4; }
+  75% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.eink-refresh {
+  animation: eink-refresh 1s steps(4);
 }
 
 @keyframes slow-spin {

@@ -1,27 +1,144 @@
-import MessageBoard from "@/components/admin/messageBoard";
-import SongBook from "@/components/admin/songBook";
-import SongList from "@/components/admin/songList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+'use client'
+
+import MessageBoard from '@/components/admin/messageBoard'
+import SongBook from '@/components/admin/songBook'
+import SongList from '@/components/admin/songList'
+import { useState } from 'react'
+
+type NavSection = 'songs' | 'messages'
+type SongTab = 'songList' | 'songBook'
 
 export default function Home() {
+  const [activeSection, setActiveSection] = useState<NavSection>('songs')
+  const [activeSongTab, setActiveSongTab] = useState<SongTab>('songList')
+
   return (
-    <div className="flex h-screen p-12">
-      <Tabs defaultValue="songList" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="songList">歌單</TabsTrigger>
-          <TabsTrigger value="songBook">歌本</TabsTrigger>
-          <TabsTrigger value="messageBoard">留言板</TabsTrigger>
-        </TabsList>
-        <TabsContent value="songList">
-          <SongList />
-        </TabsContent>
-        <TabsContent value="songBook">
-          <SongBook />
-        </TabsContent>
-        <TabsContent value="messageBoard">
-          <MessageBoard />
-        </TabsContent>
-      </Tabs>
+    <div className="eink-admin flex min-h-screen">
+      {/* Sidebar Navigation */}
+      <aside className="eink-sidebar w-64 flex-shrink-0">
+        <div className="border-b border-[var(--eink-border-strong)] p-6">
+          <h1 className="font-eink-sans text-xl font-bold tracking-tight">
+            OBS 後台管理
+          </h1>
+          <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
+            Dashboard
+          </p>
+        </div>
+
+        <nav className="py-4">
+          <div className="px-4 pb-2">
+            <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+              歌曲管理
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setActiveSection('songs')
+              setActiveSongTab('songList')
+            }}
+            className={`eink-nav-item w-full text-left ${
+              activeSection === 'songs' && activeSongTab === 'songList' ? 'active' : ''
+            }`}
+          >
+            歌單 Playlist
+          </button>
+          <button
+            onClick={() => {
+              setActiveSection('songs')
+              setActiveSongTab('songBook')
+            }}
+            className={`eink-nav-item w-full text-left ${
+              activeSection === 'songs' && activeSongTab === 'songBook' ? 'active' : ''
+            }`}
+          >
+            歌本 Song Book
+          </button>
+
+          <div className="mt-6 px-4 pb-2">
+            <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+              互動功能
+            </span>
+          </div>
+          <button
+            onClick={() => setActiveSection('messages')}
+            className={`eink-nav-item w-full text-left ${
+              activeSection === 'messages' ? 'active' : ''
+            }`}
+          >
+            留言板 Messages
+          </button>
+        </nav>
+
+        {/* Footer Info */}
+        <div className="absolute bottom-0 w-64 border-t border-[var(--eink-border-subtle)] p-4">
+          <p className="font-eink-sans text-xs text-[var(--eink-text-muted)]">
+            E-ink Style Dashboard
+          </p>
+          <p className="font-eink-sans text-xs text-[var(--eink-text-muted)]">v1.0.0</p>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-8">
+        <div className="mx-auto max-w-4xl">
+          {activeSection === 'songs' && (
+            <>
+              {/* Section Header */}
+              <header className="mb-8">
+                <h2 className="eink-section-title">
+                  {activeSongTab === 'songList' ? '歌單管理' : '歌本管理'}
+                </h2>
+                <p className="eink-section-subtitle">
+                  {activeSongTab === 'songList'
+                    ? '管理目前的播放歌單，可新增、編輯或刪除歌曲'
+                    : '管理歌曲類型與分類'}
+                </p>
+              </header>
+
+              {/* Song Section Tabs */}
+              <div className="mb-6 flex border-b border-[var(--eink-border-strong)]">
+                <button
+                  onClick={() => setActiveSongTab('songList')}
+                  className={`font-eink-sans border-b-2 px-6 py-3 text-sm font-medium transition-all duration-eink-fast ease-eink ${
+                    activeSongTab === 'songList'
+                      ? 'border-[var(--eink-border-strong)] text-[var(--eink-text-primary)]'
+                      : 'border-transparent text-[var(--eink-text-muted)] hover:text-[var(--eink-text-secondary)]'
+                  }`}
+                >
+                  歌單
+                </button>
+                <button
+                  onClick={() => setActiveSongTab('songBook')}
+                  className={`font-eink-sans border-b-2 px-6 py-3 text-sm font-medium transition-all duration-eink-fast ease-eink ${
+                    activeSongTab === 'songBook'
+                      ? 'border-[var(--eink-border-strong)] text-[var(--eink-text-primary)]'
+                      : 'border-transparent text-[var(--eink-text-muted)] hover:text-[var(--eink-text-secondary)]'
+                  }`}
+                >
+                  歌本
+                </button>
+              </div>
+
+              {/* Song Content */}
+              {activeSongTab === 'songList' && <SongList />}
+              {activeSongTab === 'songBook' && <SongBook />}
+            </>
+          )}
+
+          {activeSection === 'messages' && (
+            <>
+              {/* Section Header */}
+              <header className="mb-8">
+                <h2 className="eink-section-title">留言板</h2>
+                <p className="eink-section-subtitle">查看並管理觀眾留言與回覆</p>
+              </header>
+
+              {/* Message Board Content */}
+              <MessageBoard />
+            </>
+          )}
+        </div>
+      </main>
     </div>
-  );
+  )
 }
