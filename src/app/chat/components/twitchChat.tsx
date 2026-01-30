@@ -123,7 +123,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           }}
         >
           {renderBadges()}
-          <span className='font-bold text-sm font-notoSans text-slate-700'>{msg.user}</span>
+          <span className='font-extrabold text-sm font-notoSans text-slate-800'>{msg.user}</span>
         </div>
 
         {/* 訊息內容 */}
@@ -136,7 +136,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
               }}
             ></div>
           </div>
-          <div className='glass-bubble relative text-slate-800 font-semibold font-notoSans rounded-2xl py-2 px-3 z-0 flex items-center w-auto max-w-[280px] ml-1'>
+          <div className='glass-bubble relative text-slate-900 font-medium font-notoSans rounded-2xl py-2 px-3 z-0 flex items-center w-auto max-w-[280px] ml-1'>
             <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
           </div>
         </div>

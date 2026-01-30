@@ -82,24 +82,24 @@ export default function MainChat() {
           <div className='flex justify-center mb-4'>
             <div className='glass-dark flex items-center gap-2 rounded-full px-4 py-1.5'>
               <div className='h-2 w-2 animate-fade-in-out rounded-full bg-red-400'></div>
-              <span className='text-xs font-medium text-white/80'>LIVE</span>
+              <span className='text-xs font-bold text-white/90'>LIVE</span>
             </div>
           </div>
 
           {/* 日期 */}
           <div className='flex items-center justify-center gap-2 mb-2'>
-            <p className='font-notoSans text-lg font-medium text-white/90'>
+            <p className='font-notoSans text-lg font-semibold text-white/95'>
               {currentTime.getMonth() + 1}月{currentTime.getDate()}日
             </p>
-            <span className='text-white/50'>•</span>
-            <p className='font-notoSans text-lg font-medium text-white/90'>
+            <span className='text-white/60 font-bold'>•</span>
+            <p className='font-notoSans text-lg font-semibold text-white/95'>
               {daysOfWeek[currentTime.getDay()]}
             </p>
           </div>
 
           {/* 時間 */}
           <div className='text-center font-titanOne'>
-            <p className='text-6xl font-bold text-white drop-shadow-lg'>
+            <p className='text-6xl font-extrabold text-white drop-shadow-lg'>
               <span>{formatTime(hour)}</span>
               <span className='mx-1 opacity-70'>:</span>
               <span>{formatTime(currentTime.getMinutes())}</span>
@@ -110,8 +110,8 @@ export default function MainChat() {
           {viewersCount && (
             <div className='flex justify-center mt-3'>
               <div className='glass-tag flex items-center gap-2 rounded-full px-4 py-1'>
-                <GoPersonFill className='text-slate-600' />
-                <span className='font-notoSans text-sm font-semibold text-slate-700'>
+                <GoPersonFill className='text-slate-700' />
+                <span className='font-notoSans text-sm font-bold text-slate-800'>
                   {viewersCount}
                 </span>
               </div>
