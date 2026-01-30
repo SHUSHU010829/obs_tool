@@ -5,7 +5,7 @@ import { EmoteCache } from './emoteCache'
 import MessageFragment from './messageFragment'
 import { BadgeSet, BadgeVersion, ChatMessage, ParsedEmote, SevenTVEmote } from './type'
 import { getChannelBadges, getGlobalBadges } from '@/api/twitch'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState, memo, useCallback, useRef } from 'react'
 import tmi from 'tmi.js'
 
@@ -111,12 +111,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className='w-full flex flex-col space-y-1'
-    >
+    <div className='w-full flex flex-col space-y-1'>
       <div className='w-fit relative flex flex-col items-start'>
         {/* 徽章與人名 */}
         <div
@@ -141,7 +136,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 })
 
@@ -168,10 +163,17 @@ export default function TwitchChat({
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null)
 
-  // 自動滾動到底部
+  // 自動滾動到底部（使用 requestAnimationFrame 確保平滑）
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+      requestAnimationFrame(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTo({
+            top: chatContainerRef.current.scrollHeight,
+            behavior: 'smooth',
+          })
+        }
+      })
     }
   }
 
@@ -763,20 +765,29 @@ export default function TwitchChat({
       <div className='relative h-[530px] w-[300px] pt-4'>
         <div
           className='flex flex-col space-y-3 overflow-y-auto max-h-[530px] scrollbar-hide p-1'
-          ref={chatContainerRef} // 參考滾動容器
+          ref={chatContainerRef}
+          style={{ scrollBehavior: 'smooth' }}
         >
-          {messages.map(msg => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className={`w-full`}
-            >
-              <ChatMessageComponent msg={msg} />
-            </motion.div>
-          ))}
+          <AnimatePresence initial={false} mode='popLayout'>
+            {messages.map(msg => (
+              <motion.div
+                key={msg.id}
+                layout
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  duration: 0.15,
+                  ease: [0.25, 0.1, 0.25, 1],
+                  layout: { duration: 0.2, ease: 'easeOut' },
+                }}
+                className='w-full'
+                style={{ willChange: 'transform, opacity' }}
+              >
+                <ChatMessageComponent msg={msg} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
       {debug && (
