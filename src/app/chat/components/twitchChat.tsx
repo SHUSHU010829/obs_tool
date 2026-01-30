@@ -115,23 +115,28 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
       <div className='w-fit relative flex flex-col items-start'>
         {/* 徽章與人名 */}
         <div
-          className='flex items-center space-x-2 rounded-3xl bg-[#bdc3ad] py-1 px-2 z-10 relative w-auto max-w-max'
+          className='glass-tag flex items-center space-x-2 rounded-full py-1 px-3 z-10 relative w-auto max-w-max'
           style={{
-            transform: 'rotate(-4deg)',
+            transform: 'rotate(-3deg)',
             transformOrigin: 'left',
-            bottom: '-6px', // 讓這個區塊稍微覆蓋訊息框
+            bottom: '-4px',
           }}
         >
           {renderBadges()}
-          <span className='font-bold text-sm font-notoSans'>{msg.user}</span>
+          <span className='font-bold text-sm font-notoSans text-slate-700'>{msg.user}</span>
         </div>
 
         {/* 訊息內容 */}
-        <div className='flex items-center translate-x-[-10px]'>
-          <div className='w-4 overflow-hidden translate-x-[4px] -translate-y-1'>
-            <div className='h-3 bg-gray-200 rotate-45 transform origin-bottom-right rounded-sm'></div>
+        <div className='flex items-center translate-x-[-8px]'>
+          <div className='w-3 overflow-hidden translate-x-[3px] -translate-y-1'>
+            <div
+              className='h-2.5 rotate-45 transform origin-bottom-right rounded-sm'
+              style={{
+                background: 'rgba(255, 255, 255, 0.75)',
+              }}
+            ></div>
           </div>
-          <div className='relative text-gray-900 font-bold font-notoSans rounded-xl bg-gray-200 p-2 z-0 flex items-center w-auto max-w-[270px] ml-1'>
+          <div className='glass-bubble relative text-slate-800 font-semibold font-notoSans rounded-2xl py-2 px-3 z-0 flex items-center w-auto max-w-[280px] ml-1'>
             <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
           </div>
         </div>
@@ -761,10 +766,10 @@ export default function TwitchChat({
   )
 
   return (
-    <div className=''>
-      <div className='relative h-[530px] w-[300px] pt-4'>
+    <div className='h-full w-full'>
+      <div className='relative h-full w-full'>
         <div
-          className='flex flex-col space-y-3 overflow-y-auto max-h-[530px] scrollbar-hide p-1'
+          className='flex flex-col space-y-3 overflow-y-auto h-full scrollbar-hide px-2 py-1'
           ref={chatContainerRef}
           style={{ scrollBehavior: 'smooth' }}
         >
