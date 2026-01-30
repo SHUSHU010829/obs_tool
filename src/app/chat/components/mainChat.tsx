@@ -75,49 +75,52 @@ export default function MainChat() {
 
   return (
     <div className='relative'>
-      <div className='flex h-[780px] w-[380px] flex-col items-center rounded-3xl border-4 border-[#6b705c] bg-[#f9f7f3] bg-opacity-70 shadow-lg'>
-        <div className='my-3 flex w-32 items-center justify-between rounded-full bg-neutral-700 px-4 py-1'>
-          <div className='h-2 w-2 my-1 animate-fade-in-out rounded-full bg-red-500'></div>
-        </div>
-        <div className='flex flex-col items-center justify-start pt-2'>
-          <div className='flex items-center gap-2'>
-            <p className='font-notoSans text-xl font-semibold text-slate-700'>
+      <div className='glass-card flex h-[720px] w-[360px] flex-col items-center rounded-3xl overflow-hidden'>
+        {/* 頂部時間區塊 */}
+        <div className='w-full pt-6 pb-4 px-6'>
+          {/* 直播指示燈 */}
+          <div className='flex justify-center mb-4'>
+            <div className='glass-dark flex items-center gap-2 rounded-full px-4 py-1.5'>
+              <div className='h-2 w-2 animate-fade-in-out rounded-full bg-red-400'></div>
+              <span className='text-xs font-bold text-white/90'>LIVE</span>
+            </div>
+          </div>
+
+          {/* 日期 */}
+          <div className='flex items-center justify-center gap-2 mb-2'>
+            <p className='font-notoSans text-lg font-semibold text-white/95'>
               {currentTime.getMonth() + 1}月{currentTime.getDate()}日
             </p>
-            <p className='font-notoSans text-xl font-semibold text-slate-700'>
+            <span className='text-white/60 font-bold'>•</span>
+            <p className='font-notoSans text-lg font-semibold text-white/95'>
               {daysOfWeek[currentTime.getDay()]}
             </p>
           </div>
-          <div className='pt-1 font-titanOne'>
-            <p className='text-6xl font-bold text-[#2f3e46]'>
+
+          {/* 時間 */}
+          <div className='text-center font-titanOne'>
+            <p className='text-6xl font-extrabold text-white drop-shadow-lg'>
               <span>{formatTime(hour)}</span>
-              <span> : </span>
+              <span className='mx-1 opacity-70'>:</span>
               <span>{formatTime(currentTime.getMinutes())}</span>
             </p>
           </div>
-          <div className='flex justify-between gap-2 pt-3'>
-            <div className='flex w-24 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c] pt-1'>
-              {viewersCount ? (
-                <div className='flex items-center gap-2'>
-                  <GoPersonFill />
+
+          {/* 觀眾數 */}
+          {viewersCount && (
+            <div className='flex justify-center mt-3'>
+              <div className='glass-tag flex items-center gap-2 rounded-full px-4 py-1'>
+                <GoPersonFill className='text-slate-700' />
+                <span className='font-notoSans text-sm font-bold text-slate-800'>
                   {viewersCount}
-                </div>
-              ) : (
-                <div className='text-sm'>⸜(๑˙ᵕ ˙๑)⸝</div>
-              )}
-            </div>
-            <div className='flex w-48 items-center justify-center font-notoSans text-xl font-semibold text-[#6b705c]'>
-              <div className={`account flex items-center gap-3 ${fadeClass}`}>
-                <div className='mt-1'>{currentAccount.icon}</div>
-                <div className='flex items-center gap-1 text-lg'>
-                  {currentAccount.ifShow && (
-                    <span className='text-base text-[#E87D35]'>@</span>
-                  )}
-                  {currentAccount.name}
-                </div>
+                </span>
               </div>
             </div>
-          </div>
+          )}
+        </div>
+
+        {/* 聊天區塊 */}
+        <div className='flex-1 w-full px-4 pb-4'>
           <TwitchChat
             channel='shushu010829'
             channelId='720691521'
