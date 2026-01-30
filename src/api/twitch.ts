@@ -1,12 +1,17 @@
 import axios from 'axios'
+import { getAuthorizationHeader } from '@/lib/twitchTokenManager'
 
-export async function getStreams() {
-  const config = {
+async function getTwitchConfig() {
+  return {
     headers: {
-      Authorization: process.env.TWITCH_ACCESS_TOKEN,
+      Authorization: await getAuthorizationHeader(),
       'Client-Id': process.env.TWITCH_CLIENT_ID,
     },
   }
+}
+
+export async function getStreams() {
+  const config = await getTwitchConfig()
 
   try {
     const response = await axios.get(
@@ -24,18 +29,18 @@ export async function getStreams() {
 }
 
 export async function getChannelBadges(broadcaster_id: string) {
-  const config = {
-    headers: {
-      Authorization: process.env.TWITCH_ACCESS_TOKEN,
-      'Client-Id': process.env.TWITCH_CLIENT_ID,
-    },
-    params: {
-      broadcaster_id: broadcaster_id.toString(),
-    },
+  const config = await getTwitchConfig()
+  config.headers = {
+    ...config.headers,
   }
 
   try {
-    const response = await axios.get('https://api.twitch.tv/helix/chat/badges', config)
+    const response = await axios.get('https://api.twitch.tv/helix/chat/badges', {
+      ...config,
+      params: {
+        broadcaster_id: broadcaster_id.toString(),
+      },
+    })
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -47,12 +52,7 @@ export async function getChannelBadges(broadcaster_id: string) {
 }
 
 export async function getGlobalBadges() {
-  const config = {
-    headers: {
-      Authorization: process.env.TWITCH_ACCESS_TOKEN,
-      'Client-Id': process.env.TWITCH_CLIENT_ID,
-    },
-  }
+  const config = await getTwitchConfig()
 
   try {
     const response = await axios.get(
