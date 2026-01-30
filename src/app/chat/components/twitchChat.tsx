@@ -93,7 +93,7 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
     if (!msg.channelBadges || msg.channelBadges.length === 0) return null
 
     return (
-      <div className='flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded px-1.5 py-1'>
+      <div className='flex items-center gap-1 glass-bubble rounded-xl px-1.5 py-1'>
         {msg.channelBadges.map((badgeSet, badgeIndex) =>
           badgeSet.versions.map((version, versionIndex) => (
             <img
