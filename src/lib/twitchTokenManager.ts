@@ -45,7 +45,12 @@ async function fetchNewToken(): Promise<TokenData> {
     }
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      throw new Error('Failed to fetch Twitch token: ' + error.message)
+      const status = error.response?.status
+      const data = error.response?.data
+      console.error('[TwitchTokenManager] Error:', status, data)
+      throw new Error(
+        `Failed to fetch Twitch token: ${status} - ${JSON.stringify(data) || error.message}`
+      )
     }
     throw new Error('Unknown error occurred while fetching Twitch token')
   }
