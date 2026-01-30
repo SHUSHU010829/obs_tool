@@ -1,7 +1,7 @@
 'use client'
 
 import TwitchChat from './twitchChat'
-import { getStreams } from '@/api/twitch'
+import { getStreams } from '@/api/twitchClient'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
