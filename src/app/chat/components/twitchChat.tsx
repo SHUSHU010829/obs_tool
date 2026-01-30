@@ -96,14 +96,18 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
       <div className='flex items-center space-x-1'>
         {msg.channelBadges.map((badgeSet, badgeIndex) =>
           badgeSet.versions.map((version, versionIndex) => (
-            <img
+            <div
               key={`badge-${badgeSet.set_id}-${version.id}-${badgeIndex}-${versionIndex}`}
-              src={version.image_url_2x || version.image_url_1x}
-              alt={version.title}
-              title={version.title}
-              className='h-4 w-4'
-              loading='lazy'
-            />
+              className='bg-white/20 backdrop-blur-sm rounded p-0.5'
+            >
+              <img
+                src={version.image_url_2x || version.image_url_1x}
+                alt={version.title}
+                title={version.title}
+                className='h-4 w-4'
+                loading='lazy'
+              />
+            </div>
           ))
         )}
       </div>
