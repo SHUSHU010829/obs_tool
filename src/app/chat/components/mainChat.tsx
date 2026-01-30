@@ -71,29 +71,21 @@ export default function MainChat() {
 
   const formatTime = (time: number) => (time < 10 ? `0${time}` : time)
   const hour = currentTime.getHours()
-  const daysOfWeek = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+
+  // 英文日期格式化
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const formattedDate = `${daysOfWeek[currentTime.getDay()]} ${months[currentTime.getMonth()]} ${currentTime.getDate()}`
 
   return (
     <div className='relative'>
       <div className='glass-card flex h-[720px] w-[360px] flex-col items-center rounded-3xl overflow-hidden'>
         {/* 頂部時間區塊 */}
-        <div className='w-full pt-6 pb-4 px-6'>
-          {/* 直播指示燈 */}
-          <div className='flex justify-center mb-4'>
-            <div className='glass-dark flex items-center gap-2 rounded-full px-4 py-1.5'>
-              <div className='h-2 w-2 animate-fade-in-out rounded-full bg-red-400'></div>
-              <span className='text-xs font-bold text-white/90'>LIVE</span>
-            </div>
-          </div>
-
+        <div className='w-full pt-8 pb-4 px-6'>
           {/* 日期 */}
-          <div className='flex items-center justify-center gap-2 mb-2'>
+          <div className='flex items-center justify-center mb-2'>
             <p className='font-notoSans text-lg font-semibold text-white/95'>
-              {currentTime.getMonth() + 1}月{currentTime.getDate()}日
-            </p>
-            <span className='text-white/60 font-bold'>•</span>
-            <p className='font-notoSans text-lg font-semibold text-white/95'>
-              {daysOfWeek[currentTime.getDay()]}
+              {formattedDate}
             </p>
           </div>
 

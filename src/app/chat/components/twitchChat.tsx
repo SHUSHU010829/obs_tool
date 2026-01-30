@@ -96,14 +96,18 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
       <div className='flex items-center space-x-1'>
         {msg.channelBadges.map((badgeSet, badgeIndex) =>
           badgeSet.versions.map((version, versionIndex) => (
-            <img
+            <div
               key={`badge-${badgeSet.set_id}-${version.id}-${badgeIndex}-${versionIndex}`}
-              src={version.image_url_2x || version.image_url_1x}
-              alt={version.title}
-              title={version.title}
-              className='h-4 w-4'
-              loading='lazy'
-            />
+              className='bg-white/20 backdrop-blur-sm rounded p-0.5'
+            >
+              <img
+                src={version.image_url_2x || version.image_url_1x}
+                alt={version.title}
+                title={version.title}
+                className='h-4 w-4'
+                loading='lazy'
+              />
+            </div>
           ))
         )}
       </div>
@@ -111,35 +115,16 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
   }
 
   return (
-    <div className='w-full flex flex-col space-y-1'>
-      <div className='w-fit relative flex flex-col items-start'>
-        {/* 徽章與人名 */}
-        <div
-          className='glass-tag flex items-center space-x-2 rounded-full py-1 px-3 z-10 relative w-auto max-w-max'
-          style={{
-            transform: 'rotate(-3deg)',
-            transformOrigin: 'left',
-            bottom: '-4px',
-          }}
-        >
-          {renderBadges()}
-          <span className='font-extrabold text-sm font-notoSans text-slate-800'>{msg.user}</span>
-        </div>
+    <div className='w-full flex flex-col'>
+      {/* 用戶名稱 */}
+      <div className='flex items-center space-x-2 mb-1'>
+        {renderBadges()}
+        <span className='font-bold text-sm font-notoSans text-white drop-shadow-md'>{msg.user}</span>
+      </div>
 
-        {/* 訊息內容 */}
-        <div className='flex items-center translate-x-[-8px]'>
-          <div className='w-3 overflow-hidden translate-x-[3px] -translate-y-1'>
-            <div
-              className='h-2.5 rotate-45 transform origin-bottom-right rounded-sm'
-              style={{
-                background: 'rgba(255, 255, 255, 0.75)',
-              }}
-            ></div>
-          </div>
-          <div className='glass-bubble relative text-slate-900 font-medium font-notoSans rounded-2xl py-2 px-3 z-0 flex items-center w-auto max-w-[280px] ml-1'>
-            <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
-          </div>
-        </div>
+      {/* 訊息內容 */}
+      <div className='glass-bubble text-slate-900 font-medium font-notoSans rounded-xl py-2 px-3 w-fit max-w-[300px]'>
+        <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
       </div>
     </div>
   )
