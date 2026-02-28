@@ -79,7 +79,7 @@ export default function MainChat() {
 
   return (
     <div className='relative'>
-      <div className='glass-card flex h-[720px] w-[360px] flex-col items-center rounded-3xl overflow-hidden'>
+      <div className='glass-card flex h-[680px] w-[360px] flex-col items-center rounded-3xl overflow-hidden'>
         {/* 頂部時間區塊 */}
         <div className='w-full pt-8 pb-4 px-6'>
           {/* 日期 */}

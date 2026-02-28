@@ -750,7 +750,7 @@ export default function TwitchChat({
     <div className='h-full w-full'>
       <div className='relative h-full w-full'>
         <div
-          className='flex flex-col space-y-3 overflow-y-auto h-full scrollbar-hide px-2 py-1'
+          className='flex flex-col space-y-3 overflow-y-auto h-full scrollbar-hide px-2 pt-1 pb-4'
           ref={chatContainerRef}
           style={{ scrollBehavior: 'smooth' }}
         >
