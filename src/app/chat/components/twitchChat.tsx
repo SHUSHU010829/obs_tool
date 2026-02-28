@@ -147,25 +147,6 @@ export default function TwitchChat({
   const clientRef = useRef<tmi.Client | null>(null)
   const processedMessageIds = useRef(new Set<string>())
 
-  const chatContainerRef = useRef<HTMLDivElement | null>(null)
-
-  // 自動滾動到底部（使用 requestAnimationFrame 確保平滑）
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      requestAnimationFrame(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTo({
-            top: chatContainerRef.current.scrollHeight,
-            behavior: 'smooth',
-          })
-        }
-      })
-    }
-  }
-
-  useEffect(() => {
-    scrollToBottom() // 新訊息加入時滾動到底部
-  }, [messages])
 
   useEffect(() => {
     let isSubscribed = true
@@ -747,34 +728,28 @@ export default function TwitchChat({
   )
 
   return (
-    <div className='h-full w-full'>
-      <div className='relative h-full w-full'>
-        <div
-          className='flex flex-col space-y-3 overflow-y-auto h-full scrollbar-hide px-2 pt-1 pb-4'
-          ref={chatContainerRef}
-          style={{ scrollBehavior: 'smooth' }}
-        >
-          <AnimatePresence initial={false} mode='popLayout'>
-            {messages.map(msg => (
-              <motion.div
-                key={msg.id}
-                layout
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{
-                  duration: 0.15,
-                  ease: [0.25, 0.1, 0.25, 1],
-                  layout: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='w-full'
-                style={{ willChange: 'transform, opacity' }}
-              >
-                <ChatMessageComponent msg={msg} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+    <div className='h-full w-full flex flex-col justify-end overflow-hidden'>
+      <div className='flex flex-col space-y-3 px-2 pt-1 pb-4'>
+        <AnimatePresence initial={false} mode='popLayout'>
+          {messages.map(msg => (
+            <motion.div
+              key={msg.id}
+              layout
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{
+                duration: 0.15,
+                ease: [0.25, 0.1, 0.25, 1],
+                layout: { duration: 0.2, ease: 'easeOut' },
+              }}
+              className='w-full'
+              style={{ willChange: 'transform, opacity' }}
+            >
+              <ChatMessageComponent msg={msg} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
       {debug && (
         <TwitchChatDebug
