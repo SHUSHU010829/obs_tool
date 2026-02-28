@@ -728,8 +728,8 @@ export default function TwitchChat({
   )
 
   return (
-    <div className='h-full w-full flex flex-col justify-end overflow-hidden'>
-      <div className='flex flex-col space-y-3 px-2 pt-1 pb-4'>
+    <div className='relative h-full w-full overflow-hidden'>
+      <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-3 px-2 pb-4'>
         <AnimatePresence initial={false} mode='popLayout'>
           {messages.map(msg => (
             <motion.div
