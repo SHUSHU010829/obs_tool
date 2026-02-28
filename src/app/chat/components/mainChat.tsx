@@ -1,18 +1,18 @@
 'use client'
 
 import TwitchChat from './twitchChat'
-import { getStreams } from '@/api/twitchClient'
+// import { getStreams } from '@/api/twitchClient'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { AiFillSmile } from 'react-icons/ai'
 import { BsTwitterX, BsYoutube } from 'react-icons/bs'
-import { GoPersonFill } from 'react-icons/go'
+// import { GoPersonFill } from 'react-icons/go'
 import ReactPlayer from 'react-player'
 
 export default function MainChat() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [viewersCount, setViewersCount] = useState()
+  // const [viewersCount, setViewersCount] = useState()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fadeClass, setFadeClass] = useState('')
   const [videoName, setVideoName] = useState('')
@@ -40,18 +40,18 @@ export default function MainChat() {
     }
     const intervalId = setInterval(updateTime, 1000)
 
-    const fetchStreamData = async () => {
-      const data = await getStreams()
-      if (data.data[0]) {
-        setViewersCount(data.data[0].viewer_count)
-      }
-    }
-    fetchStreamData()
-    const streamIntervalId = setInterval(fetchStreamData, 20000)
+    // const fetchStreamData = async () => {
+    //   const data = await getStreams()
+    //   if (data.data[0]) {
+    //     setViewersCount(data.data[0].viewer_count)
+    //   }
+    // }
+    // fetchStreamData()
+    // const streamIntervalId = setInterval(fetchStreamData, 20000)
 
     return () => {
       clearInterval(intervalId)
-      clearInterval(streamIntervalId)
+      // clearInterval(streamIntervalId)
     }
   }, [])
 
@@ -99,7 +99,7 @@ export default function MainChat() {
           </div>
 
           {/* 觀眾數 */}
-          {viewersCount && (
+          {/* {viewersCount && (
             <div className='flex justify-center mt-3'>
               <div className='glass-tag flex items-center gap-2 rounded-full px-4 py-1'>
                 <GoPersonFill className='text-slate-700' />
@@ -108,7 +108,7 @@ export default function MainChat() {
                 </span>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* 聊天區塊 */}
