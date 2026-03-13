@@ -63,7 +63,7 @@ export default function SongList({ songs }: { songs: Song[] }) {
       {/* Now Playing */}
       <div className="flex flex-col items-center px-4 pt-3 pb-2">
         <Suspense fallback={<div></div>}>
-          <Album />
+          <Album isPlaying={currentSong?.now_playing ?? false} />
         </Suspense>
         <div className="mt-2 flex flex-col items-center w-full text-center">
           <p
