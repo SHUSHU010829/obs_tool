@@ -34,6 +34,7 @@ export interface ChatMessage {
   raidViewers?: number
   raidFrom?: string
   isFirstMessage?: boolean
+  color?: string
   systemMsg?: string
 
   message: string

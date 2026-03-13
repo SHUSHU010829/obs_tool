@@ -652,30 +652,98 @@ hr.gradient {
 /* ===== Chat UI Redesign ===== */
 
 .chat-container {
-  background: #0A0F0C;
+  background: rgba(10, 20, 14, 0.95);
   border: 1px solid rgba(0, 255, 135, 0.16);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 135, 0.06),
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(0, 255, 135, 0.08);
+}
+
+/* LIVE indicator dot */
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.8); }
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FF4444;
+  box-shadow: 0 0 7px #FF4444;
+  flex-shrink: 0;
+  animation: pulse-red 1.6s ease-in-out infinite;
 }
 
 /* Regular message */
 .chat-msg {
-  border-left: 3px solid transparent;
-  padding: 6px 10px;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  border-left: 2px solid transparent;
+  padding: 5px 14px;
+  transition: background 0.12s;
 }
 
 .chat-msg:hover {
-  background: rgba(0, 255, 135, 0.05);
+  background: rgba(0, 255, 135, 0.035);
 }
 
 /* @mention message */
 .chat-msg--mention {
   border-left-color: #00FF87;
-  background: rgba(0, 255, 135, 0.08);
+  background: rgba(0, 255, 135, 0.05);
 }
 
 /* First-time chatter */
 .chat-msg--first {
-  border-left-color: #3B82F6;
+  border-left-color: #60C8FF;
+  background: rgba(96, 200, 255, 0.035);
+}
+
+/* First chat label */
+.first-chat-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #60C8FF;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Message meta row */
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.msg-colon {
+  color: rgba(180, 230, 200, 0.5);
+  font-size: 12px;
+}
+
+.msg-ts {
+  margin-left: auto;
+  font-size: 9px;
+  color: rgba(180, 230, 200, 0.5);
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+.msg-username {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  flex-shrink: 0;
+}
+
+.msg-text {
+  font-size: 12.5px;
+  color: #d4f5e2;
+  line-height: 1.55;
+  padding-left: 2px;
+  word-break: break-word;
 }
 
 /* ===== Text Badge System ===== */
@@ -683,200 +751,305 @@ hr.gradient {
 .chat-badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
+  justify-content: center;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.05em;
-  line-height: 1.4;
+  padding: 1.5px 5px;
   text-transform: uppercase;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .badge-broadcaster {
-  background: rgba(239, 68, 68, 0.2);
-  color: #EF4444;
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(255, 68, 68, 0.16);
+  color: #FF6B6B;
+  border: 1px solid rgba(255, 68, 68, 0.32);
 }
 
 .badge-mod {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22C55E;
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: rgba(0, 255, 135, 0.12);
+  color: #00FF87;
+  border: 1px solid rgba(0, 255, 135, 0.28);
 }
 
 .badge-vip {
-  background: rgba(168, 85, 247, 0.2);
-  color: #A855F7;
-  border: 1px solid rgba(168, 85, 247, 0.4);
+  background: rgba(255, 107, 255, 0.12);
+  color: #FF6BFF;
+  border: 1px solid rgba(255, 107, 255, 0.28);
 }
 
 .badge-sub {
-  background: rgba(234, 179, 8, 0.2);
-  color: #EAB308;
-  border: 1px solid rgba(234, 179, 8, 0.4);
+  background: rgba(255, 209, 102, 0.1);
+  color: #FFD166;
+  border: 1px solid rgba(255, 209, 102, 0.26);
 }
 
-.badge-sub-t2 {
-  background: rgba(234, 179, 8, 0.12);
-  color: #EAB308;
-  border: 1px solid rgba(234, 179, 8, 0.25);
-}
-
-.badge-sub-t3 {
-  background: rgba(234, 179, 8, 0.08);
-  color: #D4A017;
-  border: 1px solid rgba(234, 179, 8, 0.18);
+.badge-sub-tier {
+  background: rgba(255, 209, 102, 0.07);
+  color: #FFD166;
+  border: 1px solid rgba(255, 209, 102, 0.18);
+  font-size: 7.5px;
 }
 
 /* ===== Event Cards ===== */
 
 .event-card {
-  border-radius: 8px;
-  padding: 0;
+  margin: 8px 10px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  border: 1px solid transparent;
   position: relative;
+  overflow: hidden;
 }
 
-.event-card-inner {
-  padding: 10px 12px;
-}
-
-/* Top gradient bar */
+/* Centered 1px gradient glow line at top */
 .event-card::before {
   content: '';
-  display: block;
-  height: 3px;
-  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  border-radius: 1px;
+  opacity: 0.5;
 }
 
-/* Sub - gold */
+/* Sub / Resub — gold */
 .event-card--sub {
-  background: rgba(234, 179, 8, 0.08);
-  border: 1px solid rgba(234, 179, 8, 0.2);
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.09) 0%, rgba(0, 15, 8, 0.5) 100%);
+  border-color: rgba(255, 209, 102, 0.26);
+  box-shadow: 0 2px 18px rgba(255, 209, 102, 0.2);
 }
-.event-card--sub::before {
-  background: linear-gradient(90deg, #EAB308, #FDE047);
-}
-
-/* Resub - gold */
-.event-card--resub {
-  background: rgba(234, 179, 8, 0.08);
-  border: 1px solid rgba(234, 179, 8, 0.2);
-}
+.event-card--sub::before,
 .event-card--resub::before {
-  background: linear-gradient(90deg, #EAB308, #FDE047);
+  background: linear-gradient(90deg, transparent, #FFD166, transparent);
 }
 
-/* Gift Sub - green */
+.event-card--resub {
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.09) 0%, rgba(0, 15, 8, 0.5) 100%);
+  border-color: rgba(255, 209, 102, 0.26);
+  box-shadow: 0 2px 18px rgba(255, 209, 102, 0.2);
+}
+
+/* Gift Sub — green */
 .event-card--giftsub {
-  background: rgba(0, 255, 135, 0.08);
-  border: 1px solid rgba(0, 255, 135, 0.2);
+  background: linear-gradient(135deg, rgba(0, 255, 135, 0.07) 0%, rgba(0, 15, 8, 0.5) 100%);
+  border-color: rgba(0, 255, 135, 0.2);
+  box-shadow: 0 2px 16px rgba(0, 255, 135, 0.15);
 }
 .event-card--giftsub::before {
-  background: linear-gradient(90deg, #00FF87, #4ADE80);
+  background: linear-gradient(90deg, transparent, #00FF87, transparent);
 }
 
-/* Cheer/Bits - blue */
+/* Cheer/Bits — blue */
 .event-card--cheer {
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(96, 200, 255, 0.08) 0%, rgba(0, 8, 18, 0.5) 100%);
+  border-color: rgba(96, 200, 255, 0.22);
+  box-shadow: 0 2px 16px rgba(96, 200, 255, 0.16);
 }
 .event-card--cheer::before {
-  background: linear-gradient(90deg, #3B82F6, #60A5FA);
+  background: linear-gradient(90deg, transparent, #60C8FF, transparent);
 }
 
-/* Raid - purple */
+/* Raid — purple */
 .event-card--raid {
-  background: rgba(168, 85, 247, 0.08);
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.09) 0%, rgba(5, 0, 15, 0.5) 100%);
+  border-color: rgba(192, 132, 252, 0.26);
+  box-shadow: 0 2px 18px rgba(192, 132, 252, 0.18);
 }
 .event-card--raid::before {
-  background: linear-gradient(90deg, #A855F7, #C084FC);
+  background: linear-gradient(90deg, transparent, #C084FC, transparent);
 }
 
 /* Event type tag row */
 .event-type-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  min-width: 0;
 }
 
 .tag-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 12px;
-  flex-shrink: 0;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .tag-label {
   flex: 1;
   min-width: 0;
-  font-size: 12px;
-  font-weight: 600;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Tag icon colors per type */
 .event-card--sub .tag-icon,
 .event-card--resub .tag-icon {
-  background: rgba(234, 179, 8, 0.25);
-  color: #EAB308;
+  background: rgba(255, 209, 102, 0.14);
+  color: #FFD166;
+  border: 1px solid rgba(255, 209, 102, 0.28);
+}
+.event-card--sub .event-type-tag,
+.event-card--resub .event-type-tag {
+  color: #FFD166;
 }
 
 .event-card--giftsub .tag-icon {
-  background: rgba(0, 255, 135, 0.25);
+  background: rgba(0, 255, 135, 0.12);
+  color: #00FF87;
+  border: 1px solid rgba(0, 255, 135, 0.25);
+}
+.event-card--giftsub .event-type-tag {
   color: #00FF87;
 }
 
 .event-card--cheer .tag-icon {
-  background: rgba(59, 130, 246, 0.25);
-  color: #3B82F6;
+  background: rgba(96, 200, 255, 0.1);
+  color: #60C8FF;
+  border: 1px solid rgba(96, 200, 255, 0.24);
+}
+.event-card--cheer .event-type-tag {
+  color: #60C8FF;
 }
 
 .event-card--raid .tag-icon {
-  background: rgba(168, 85, 247, 0.25);
-  color: #A855F7;
+  background: rgba(192, 132, 252, 0.12);
+  color: #C084FC;
+  border: 1px solid rgba(192, 132, 252, 0.28);
+}
+.event-card--raid .event-type-tag {
+  color: #C084FC;
+}
+
+/* Sub months tag */
+.sub-months-tag {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(255, 209, 102, 0.6);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+/* Gift count pill */
+.gift-count-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: rgba(0, 255, 135, 0.1);
+  border: 1px solid rgba(0, 255, 135, 0.22);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #00FF87;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Bits amount block */
+.bits-amount-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.bits-big-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #60C8FF;
+  line-height: 1;
+}
+
+.bits-unit {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(96, 200, 255, 0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .event-body {
-  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.event-username {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.event-detail {
+  font-size: 11px;
+  color: rgba(180, 230, 200, 0.5);
+  line-height: 1.5;
 }
 
 .event-msg-quote {
-  margin-top: 6px;
-  padding: 6px 10px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border-left: 2px solid rgba(255, 255, 255, 0.15);
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  margin-top: 8px;
+  padding: 6px 9px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  color: #d4f5e2;
+  line-height: 1.55;
+  font-style: italic;
+  border-left: 2px solid;
+  word-break: break-word;
 }
 
-/* LIVE indicator dot */
-@keyframes livePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+.event-card--sub .event-msg-quote,
+.event-card--resub .event-msg-quote {
+  border-left-color: rgba(255, 209, 102, 0.3);
 }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #EF4444;
-  animation: livePulse 1.5s ease-in-out infinite;
+.event-card--cheer .event-msg-quote {
+  border-left-color: rgba(96, 200, 255, 0.28);
 }
 
-/* First chat label */
-.first-chat-label {
-  font-size: 9px;
+/* Raid num block */
+.raid-num-block {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.raid-big-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #3B82F6;
+  color: #C084FC;
+  line-height: 1;
+}
+
+.raid-num-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: rgba(192, 132, 252, 0.5);
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }

@@ -6,7 +6,7 @@ import MessageFragment from './messageFragment'
 import { BadgeSet, BadgeVersion, ChatMessage, ParsedEmote, SevenTVEmote } from './type'
 import { getChannelBadges, getGlobalBadges } from '@/api/twitchClient'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState, memo, useCallback, useRef } from 'react'
+import React, { useEffect, useState, memo, useCallback, useRef } from 'react'
 import tmi from 'tmi.js'
 
 async function fetch7TVEmotes(channelId: string): Promise<SevenTVEmote[]> {
@@ -87,31 +87,28 @@ const MessageContent = memo(
 
 MessageContent.displayName = 'MessageContent'
 
-// Badge text component
-const RoleBadge = memo(({ role, subPlan }: { role: string; subPlan?: string }) => {
-  const badgeConfig: Record<string, { className: string; label: string }> = {
-    broadcaster: { className: 'badge-broadcaster', label: 'HOST' },
-    mod: { className: 'badge-mod', label: 'MOD' },
-    vip: { className: 'badge-vip', label: 'VIP' },
-    subscriber: { className: 'badge-sub', label: 'SUB' },
+// Render multiple text badges from raw tags.badges
+function renderBadges(badges: Record<string, string | undefined>) {
+  const items: React.ReactNode[] = []
+
+  if (badges.broadcaster)
+    items.push(<span key='bc' className='chat-badge badge-broadcaster font-spaceMono'>實況主</span>)
+  if (badges.moderator)
+    items.push(<span key='mod' className='chat-badge badge-mod font-spaceMono'>MOD</span>)
+  if (badges.vip)
+    items.push(<span key='vip' className='chat-badge badge-vip font-spaceMono'>VIP</span>)
+
+  const subVal = badges.subscriber ?? badges.founder
+  if (subVal !== undefined) {
+    items.push(<span key='sub' className='chat-badge badge-sub font-spaceMono'>Sub</span>)
+    if (subVal === '2000')
+      items.push(<span key='t2' className='chat-badge badge-sub-tier font-spaceMono'>T2</span>)
+    if (subVal === '3000')
+      items.push(<span key='t3' className='chat-badge badge-sub-tier font-spaceMono'>T3</span>)
   }
 
-  const config = badgeConfig[role]
-  if (!config) return null
-
-  // Sub tier variants
-  let className = config.className
-  if (role === 'subscriber' && subPlan === '2000') className = 'badge-sub-t2'
-  if (role === 'subscriber' && subPlan === '3000') className = 'badge-sub-t3'
-
-  return (
-    <span className={`chat-badge ${className} font-spaceMono`}>
-      {config.label}
-    </span>
-  )
-})
-
-RoleBadge.displayName = 'RoleBadge'
+  return items
+}
 
 // Regular chat message component
 const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
@@ -129,26 +126,24 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const time = new Date(msg.timestamp)
   const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
 
+  const usernameColor = msg.color || '#00FF87'
+
   return (
     <div className={containerClass}>
-      {/* First chat label */}
       {isFirst && (
-        <div className='first-chat-label font-spaceMono mb-1'>FIRST CHAT</div>
+        <div className='first-chat-label font-spaceMono' style={{ marginBottom: 2 }}>FIRST CHAT</div>
       )}
 
-      {/* Username row */}
-      <div className='flex items-center gap-2 mb-1'>
-        <RoleBadge role={msg.role} subPlan={msg.subPlan} />
-        <span className='font-spaceMono text-sm font-bold' style={{ color: '#00FF87' }}>
+      <div className='msg-meta'>
+        {renderBadges(msg.badges)}
+        <span className='msg-username font-spaceMono' style={{ color: usernameColor }}>
           {msg.user}
         </span>
-        <span className='font-spaceMono text-[10px]' style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {timeStr}
-        </span>
+        <span className='msg-colon'>:</span>
+        <span className='msg-ts font-spaceMono'>{timeStr}</span>
       </div>
 
-      {/* Message content */}
-      <div className='font-notoSans text-sm text-white/90'>
+      <div className='msg-text font-notoSans'>
         <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
       </div>
     </div>
@@ -157,69 +152,91 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
 
 ChatMessageComponent.displayName = 'ChatMessageComponent'
 
+// Sub plan display helper
+function subPlanLabel(plan?: string): string {
+  if (plan === '2000') return 'Tier 2'
+  if (plan === '3000') return 'Tier 3'
+  if (plan === 'Prime') return 'Prime'
+  return 'Tier 1'
+}
+
 // Event card component for special events
 const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const typeConfig: Record<string, { cardClass: string; tagIcon: string; label: string }> = {
-    subscription: { cardClass: 'event-card--sub', tagIcon: 'S', label: 'NEW SUB' },
-    resub: { cardClass: 'event-card--resub', tagIcon: 'R', label: 'RESUB' },
-    giftsub: { cardClass: 'event-card--giftsub', tagIcon: 'G', label: 'GIFT SUB' },
-    cheer: { cardClass: 'event-card--cheer', tagIcon: 'B', label: 'BITS' },
-    raid: { cardClass: 'event-card--raid', tagIcon: '!', label: 'RAID' },
+    subscription: { cardClass: 'event-card--sub',    tagIcon: 'S', label: 'New Subscriber' },
+    resub:        { cardClass: 'event-card--resub',  tagIcon: 'R', label: 'Resub' },
+    giftsub:      { cardClass: 'event-card--giftsub', tagIcon: 'G', label: 'Gift Sub' },
+    cheer:        { cardClass: 'event-card--cheer',  tagIcon: 'B', label: 'Cheer' },
+    raid:         { cardClass: 'event-card--raid',   tagIcon: '!', label: 'Incoming Raid' },
   }
 
   const config = typeConfig[msg.type] || typeConfig.subscription
-
-  // Right badge content
-  let rightBadge: string | null = null
-  if (msg.type === 'resub' && msg.subMonths) {
-    rightBadge = `${msg.subMonths}mo`
-  } else if (msg.type === 'giftsub' && msg.giftCount) {
-    rightBadge = `x${msg.giftCount}`
-  } else if (msg.type === 'cheer' && msg.bits) {
-    rightBadge = `${msg.bits}`
-  }
+  const tier = subPlanLabel(msg.subPlan)
 
   return (
     <div className={`event-card ${config.cardClass}`}>
-      <div className='event-card-inner'>
-        {/* Type tag row */}
-        <div className='event-type-tag'>
-          <div className='tag-icon font-spaceMono'>{config.tagIcon}</div>
-          <div className='tag-label font-spaceMono text-white/80'>{config.label}</div>
-          {rightBadge && (
-            <span className='font-spaceMono text-xs font-bold text-white/70'>
-              {rightBadge}
-            </span>
-          )}
-        </div>
+      {/* Type tag row */}
+      <div className='event-type-tag'>
+        <span className='tag-icon'>{config.tagIcon}</span>
+        <span className='tag-label'>{config.label}</span>
 
-        {/* Event body */}
-        <div className='event-body'>
-          {msg.type === 'raid' ? (
-            <>
-              <div className='font-spaceMono text-lg font-bold' style={{ color: '#A855F7' }}>
-                {msg.raidFrom || msg.user}
-              </div>
-              {msg.raidViewers != null && (
-                <div className='font-spaceMono text-sm text-white/50'>
-                  {msg.raidViewers} viewers
-                </div>
-              )}
-            </>
-          ) : (
-            <div className='font-spaceMono text-sm font-bold' style={{ color: '#00FF87' }}>
-              {msg.user}
-            </div>
-          )}
-        </div>
-
-        {/* Quote block for messages */}
-        {msg.message && msg.messageFragments.length > 0 && (
-          <div className='event-msg-quote font-notoSans'>
-            <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
-          </div>
+        {/* Right-side badge per type */}
+        {(msg.type === 'subscription' || msg.type === 'resub') && msg.subMonths != null && (
+          <span className='sub-months-tag'>第 {msg.subMonths} 個月</span>
+        )}
+        {msg.type === 'giftsub' && (
+          <span className='gift-count-pill'>x {msg.giftCount ?? 1}</span>
+        )}
+        {msg.type === 'cheer' && msg.bits != null && (
+          <span className='bits-amount-block'>
+            <span className='bits-big-num'>{msg.bits}</span>
+            <span className='bits-unit'>bits</span>
+          </span>
         )}
       </div>
+
+      {/* Event body */}
+      <div className='event-body'>
+        {msg.type === 'raid' ? (
+          <>
+            <span className='event-username'>{msg.raidFrom || msg.user}</span>
+            <span className='event-detail'>帶著觀眾突襲</span>
+          </>
+        ) : msg.type === 'subscription' ? (
+          <>
+            <span className='event-username'>{msg.user}</span>
+            <span className='event-detail'>訂閱了頻道 · {tier}</span>
+          </>
+        ) : msg.type === 'resub' ? (
+          <>
+            <span className='event-username'>{msg.user}</span>
+            <span className='event-detail'>連續訂閱 {msg.subMonths} 個月 · {tier}</span>
+          </>
+        ) : msg.type === 'giftsub' ? (
+          <>
+            <span className='event-username'>{msg.user}</span>
+            <span className='event-detail'>送出 {msg.giftCount ?? 1} 個 {tier} 訂閱給社群</span>
+          </>
+        ) : (
+          // cheer
+          <span className='event-username'>{msg.user}</span>
+        )}
+      </div>
+
+      {/* Raid viewer count */}
+      {msg.type === 'raid' && msg.raidViewers != null && (
+        <div className='raid-num-block'>
+          <span className='raid-big-num'>{msg.raidViewers}</span>
+          <span className='raid-num-label'>Raiders</span>
+        </div>
+      )}
+
+      {/* Message quote */}
+      {msg.message && msg.messageFragments.length > 0 && (
+        <div className='event-msg-quote font-notoSans'>
+          <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
+        </div>
+      )}
     </div>
   )
 })
@@ -497,6 +514,7 @@ export default function TwitchChat({
         timestamp: Date.now(),
         channelBadges,
         isFirstMessage: tags['first-msg'] === true || tags['first-msg'] === '1',
+        color: tags.color || undefined,
       }
 
       setMessages(prev => {
