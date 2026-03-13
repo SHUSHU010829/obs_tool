@@ -1,7 +1,11 @@
 import axios from 'axios'
 
+const SONG_LIST_BASE_URL = 'https://shustream.zeabur.app/songList'
+
+export const SONG_LIST_STREAM_URL = `${SONG_LIST_BASE_URL}/stream`
+
 function generateApiUrl(endpoint: string) {
-  return `https://shustream.zeabur.app/songList${endpoint}`
+  return `${SONG_LIST_BASE_URL}${endpoint}`
 }
 
 // ============================================
