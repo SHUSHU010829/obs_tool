@@ -40,8 +40,7 @@ export default function SongList({ songs }: { songs: Song[] }) {
 
   return (
     <div
-      className="chat-container flex w-[320px] flex-col overflow-hidden"
-      style={{ background: 'transparent' }}
+      className="chat-container flex h-[680px] w-[320px] flex-col overflow-hidden"
     >
       {/* Header */}
       <div
