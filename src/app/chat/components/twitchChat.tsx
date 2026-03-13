@@ -200,7 +200,7 @@ const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
         {msg.type === 'raid' ? (
           <>
             <span className='event-username'>{msg.raidFrom || msg.user}</span>
-            <span className='event-detail'>帶著觀眾突襲</span>
+            <span className='event-detail'>大駕光臨！</span>
           </>
         ) : msg.type === 'subscription' ? (
           <>
