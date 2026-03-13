@@ -3,7 +3,7 @@
 import MessageBoard from '@/components/admin/messageBoard'
 import SongBook from '@/components/admin/songBook'
 import SongList from '@/components/admin/songList'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 type NavSection = 'songs' | 'messages'
@@ -13,6 +13,20 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<NavSection>('songs')
   const [activeSongTab, setActiveSongTab] = useState<SongTab>('songList')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [debugMode, setDebugMode] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('obs-debug-mode')
+    if (stored === 'true') setDebugMode(true)
+  }, [])
+
+  const toggleDebugMode = () => {
+    setDebugMode(prev => {
+      const next = !prev
+      localStorage.setItem('obs-debug-mode', String(next))
+      return next
+    })
+  }
 
   return (
     <div className="eink-admin flex min-h-screen flex-col md:flex-row">
@@ -81,6 +95,18 @@ export default function Home() {
             >
               留言板 Messages
             </button>
+
+            <div className="border-b border-[var(--eink-border-subtle)] px-4 py-3">
+              <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
+                開發工具
+              </span>
+            </div>
+            <button
+              onClick={toggleDebugMode}
+              className={`eink-nav-item w-full text-left ${debugMode ? 'active' : ''}`}
+            >
+              {debugMode ? 'Debug Mode ON' : 'Debug Mode OFF'}
+            </button>
           </nav>
         </div>
       )}
@@ -142,6 +168,16 @@ export default function Home() {
 
         {/* Footer Info */}
         <div className="absolute bottom-0 w-64 border-t border-[var(--eink-border-subtle)] p-4">
+          <button
+            onClick={toggleDebugMode}
+            className={`mb-3 w-full rounded-eink border px-3 py-2 font-eink-sans text-xs font-medium transition-all duration-eink-fast ease-eink ${
+              debugMode
+                ? 'border-[var(--eink-border-strong)] bg-[var(--eink-text-primary)] text-[var(--eink-bg-primary)]'
+                : 'border-[var(--eink-border-subtle)] text-[var(--eink-text-muted)] hover:border-[var(--eink-border-strong)]'
+            }`}
+          >
+            {debugMode ? 'Debug Mode ON' : 'Debug Mode OFF'}
+          </button>
           <p className="font-eink-sans text-xs text-[var(--eink-text-muted)]">
             E-ink Style Dashboard
           </p>

@@ -10,6 +10,20 @@ export default function MainChat() {
   const [videoName, setVideoName] = useState('')
   const [playVideo, setPlayVideo] = useState(false)
   const [viewerCount, setViewerCount] = useState<number | null>(null)
+  const [debugMode, setDebugMode] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('obs-debug-mode')
+    setDebugMode(stored === 'true')
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'obs-debug-mode') {
+        setDebugMode(e.newValue === 'true')
+      }
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
 
   useEffect(() => {
     const fetchViewerCount = async () => {
@@ -74,7 +88,7 @@ export default function MainChat() {
             channelId='720691521'
             hideAfter={Infinity}
             messagesLimit={15}
-            debug={false}
+            debug={debugMode}
           />
         </div>
       </div>
