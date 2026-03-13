@@ -62,7 +62,7 @@ const TwitchChatDebug = ({
   }, [username, message, onSimulateFirstMessage])
 
   return (
-    <Card className='w-[300px] my-32'>
+    <Card className='fixed top-4 right-4 w-[300px] z-50 max-h-[90vh] overflow-y-auto'>
       <CardContent className='space-y-4 pt-4'>
         <div className='space-y-2'>
           <Label>使用者名稱</Label>
