@@ -45,7 +45,7 @@ const formatMessageFragments = (
     }
   })
 
-  pushBufferToLine() // 處理剩餘的 buffer
+  pushBufferToLine()
   return lines
 }
 
@@ -87,39 +87,68 @@ const MessageContent = memo(
 
 MessageContent.displayName = 'MessageContent'
 
-// 聊天室本身樣式
-const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
-  const renderBadges = () => {
-    if (!msg.channelBadges || msg.channelBadges.length === 0) return null
-
-    return (
-      <div className='flex items-center gap-1 glass-bubble rounded-xl px-1.5 py-1'>
-        {msg.channelBadges.map((badgeSet, badgeIndex) =>
-          badgeSet.versions.map((version, versionIndex) => (
-            <img
-              key={`badge-${badgeSet.set_id}-${version.id}-${badgeIndex}-${versionIndex}`}
-              src={version.image_url_2x || version.image_url_1x}
-              alt={version.title}
-              title={version.title}
-              className='h-4 w-4'
-              loading='lazy'
-            />
-          ))
-        )}
-      </div>
-    )
+// Badge text component
+const RoleBadge = memo(({ role, subPlan }: { role: string; subPlan?: string }) => {
+  const badgeConfig: Record<string, { className: string; label: string }> = {
+    broadcaster: { className: 'badge-broadcaster', label: 'HOST' },
+    mod: { className: 'badge-mod', label: 'MOD' },
+    vip: { className: 'badge-vip', label: 'VIP' },
+    subscriber: { className: 'badge-sub', label: 'SUB' },
   }
 
+  const config = badgeConfig[role]
+  if (!config) return null
+
+  // Sub tier variants
+  let className = config.className
+  if (role === 'subscriber' && subPlan === '2000') className = 'badge-sub-t2'
+  if (role === 'subscriber' && subPlan === '3000') className = 'badge-sub-t3'
+
   return (
-    <div className='w-full flex flex-col'>
-      {/* 用戶名稱 */}
-      <div className='flex items-center space-x-2 mb-1'>
-        {renderBadges()}
-        <span className='font-bold text-sm font-notoSans text-white drop-shadow-md'>{msg.user}</span>
+    <span className={`chat-badge ${className} font-spaceMono`}>
+      {config.label}
+    </span>
+  )
+})
+
+RoleBadge.displayName = 'RoleBadge'
+
+// Regular chat message component
+const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
+  const isMention = msg.message.includes('@')
+  const isFirst = msg.isFirstMessage
+
+  const containerClass = [
+    'chat-msg',
+    isMention && 'chat-msg--mention',
+    isFirst && 'chat-msg--first',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const time = new Date(msg.timestamp)
+  const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
+
+  return (
+    <div className={containerClass}>
+      {/* First chat label */}
+      {isFirst && (
+        <div className='first-chat-label font-spaceMono mb-1'>FIRST CHAT</div>
+      )}
+
+      {/* Username row */}
+      <div className='flex items-center gap-2 mb-1'>
+        <RoleBadge role={msg.role} subPlan={msg.subPlan} />
+        <span className='font-spaceMono text-sm font-bold' style={{ color: '#00FF87' }}>
+          {msg.user}
+        </span>
+        <span className='font-spaceMono text-[10px]' style={{ color: 'rgba(255,255,255,0.3)' }}>
+          {timeStr}
+        </span>
       </div>
 
-      {/* 訊息內容 */}
-      <div className='glass-bubble text-slate-900 font-medium font-notoSans rounded-xl py-2 px-3 w-fit max-w-[300px]'>
+      {/* Message content */}
+      <div className='font-notoSans text-sm text-white/90'>
         <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
       </div>
     </div>
@@ -127,6 +156,75 @@ const ChatMessageComponent = memo(({ msg }: { msg: ChatMessage }) => {
 })
 
 ChatMessageComponent.displayName = 'ChatMessageComponent'
+
+// Event card component for special events
+const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
+  const typeConfig: Record<string, { cardClass: string; tagIcon: string; label: string }> = {
+    subscription: { cardClass: 'event-card--sub', tagIcon: 'S', label: 'NEW SUB' },
+    resub: { cardClass: 'event-card--resub', tagIcon: 'R', label: 'RESUB' },
+    giftsub: { cardClass: 'event-card--giftsub', tagIcon: 'G', label: 'GIFT SUB' },
+    cheer: { cardClass: 'event-card--cheer', tagIcon: 'B', label: 'BITS' },
+    raid: { cardClass: 'event-card--raid', tagIcon: '!', label: 'RAID' },
+  }
+
+  const config = typeConfig[msg.type] || typeConfig.subscription
+
+  // Right badge content
+  let rightBadge: string | null = null
+  if (msg.type === 'resub' && msg.subMonths) {
+    rightBadge = `${msg.subMonths}mo`
+  } else if (msg.type === 'giftsub' && msg.giftCount) {
+    rightBadge = `x${msg.giftCount}`
+  } else if (msg.type === 'cheer' && msg.bits) {
+    rightBadge = `${msg.bits}`
+  }
+
+  return (
+    <div className={`event-card ${config.cardClass}`}>
+      <div className='event-card-inner'>
+        {/* Type tag row */}
+        <div className='event-type-tag'>
+          <div className='tag-icon font-spaceMono'>{config.tagIcon}</div>
+          <div className='tag-label font-spaceMono text-white/80'>{config.label}</div>
+          {rightBadge && (
+            <span className='font-spaceMono text-xs font-bold text-white/70'>
+              {rightBadge}
+            </span>
+          )}
+        </div>
+
+        {/* Event body */}
+        <div className='event-body'>
+          {msg.type === 'raid' ? (
+            <>
+              <div className='font-spaceMono text-lg font-bold' style={{ color: '#A855F7' }}>
+                {msg.raidFrom || msg.user}
+              </div>
+              {msg.raidViewers != null && (
+                <div className='font-spaceMono text-sm text-white/50'>
+                  {msg.raidViewers} viewers
+                </div>
+              )}
+            </>
+          ) : (
+            <div className='font-spaceMono text-sm font-bold' style={{ color: '#00FF87' }}>
+              {msg.user}
+            </div>
+          )}
+        </div>
+
+        {/* Quote block for messages */}
+        {msg.message && msg.messageFragments.length > 0 && (
+          <div className='event-msg-quote font-notoSans'>
+            <MessageContent fragments={msg.messageFragments} messageId={msg.id} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+})
+
+EventCardComponent.displayName = 'EventCardComponent'
 
 export default function TwitchChat({
   channel,
@@ -147,7 +245,12 @@ export default function TwitchChat({
   const clientRef = useRef<tmi.Client | null>(null)
   const processedMessageIds = useRef(new Set<string>())
 
+  // Badge cache refs - loaded once on mount
+  const channelBadgesCache = useRef<BadgeSet[]>([])
+  const globalBadgesCache = useRef<BadgeSet[]>([])
+  const badgesCacheLoaded = useRef(false)
 
+  // Load 7TV emotes and badges on mount
   useEffect(() => {
     let isSubscribed = true
     const emoteCache = EmoteCache.getInstance()
@@ -157,7 +260,6 @@ export default function TwitchChat({
         const emotes = await fetch7TVEmotes(channelId)
         if (!isSubscribed) return
 
-        // 預先載入所有表情
         const preloadPromises = emotes.map(emote =>
           emoteCache
             .preloadEmote(emote.id, '7tv')
@@ -166,7 +268,6 @@ export default function TwitchChat({
 
         await Promise.all(preloadPromises)
 
-        // 更新快取
         emotes.forEach(emote => {
           sevenTVEmoteCache.current.set(emote.name, emote.id)
         })
@@ -177,7 +278,22 @@ export default function TwitchChat({
       }
     }
 
+    async function loadBadges() {
+      try {
+        const [channelRes, globalRes] = await Promise.all([
+          getChannelBadges(channelId),
+          getGlobalBadges(),
+        ])
+        channelBadgesCache.current = channelRes.data
+        globalBadgesCache.current = globalRes.data
+        badgesCacheLoaded.current = true
+      } catch (error) {
+        console.error('Failed to load badges:', error)
+      }
+    }
+
     loadSevenTVEmotes()
+    loadBadges()
 
     return () => {
       isSubscribed = false
@@ -190,6 +306,41 @@ export default function TwitchChat({
     if (badges.vip) return 'vip'
     if (badges.subscriber || badges.founder) return 'subscriber'
     return 'noRole'
+  }, [])
+
+  // Resolve badges from cache instead of API
+  const resolveBadges = useCallback((tags: any): BadgeSet[] | undefined => {
+    const badges = tags.badges || {}
+    const badgeEntries = Object.entries(badges)
+    if (badgeEntries.length === 0) return undefined
+
+    const badgeImages: BadgeVersion[] = []
+
+    badgeEntries.forEach(([setId, versionId]) => {
+      let badgeVersion: BadgeVersion | undefined
+
+      // Check channel badges first
+      const channelBadgeSet = channelBadgesCache.current.find(b => b.set_id === setId)
+      if (channelBadgeSet) {
+        badgeVersion = channelBadgeSet.versions.find(v => v.id === versionId)
+      }
+
+      // Fallback to global badges
+      if (!badgeVersion) {
+        const globalBadgeSet = globalBadgesCache.current.find(b => b.set_id === setId)
+        if (globalBadgeSet) {
+          badgeVersion = globalBadgeSet.versions.find(v => v.id === versionId)
+        }
+      }
+
+      if (badgeVersion) {
+        badgeImages.push(badgeVersion)
+      }
+    })
+
+    if (badgeImages.length === 0) return undefined
+
+    return [{ set_id: 'user-badges', versions: badgeImages }]
   }, [])
 
   const parseMessageWithEmotes = useCallback(
@@ -208,7 +359,7 @@ export default function TwitchChat({
 
       const emotePositions: Array<{ start: number; end: number; emote: ParsedEmote }> = []
 
-      // 處理 Twitch 表情符號
+      // Twitch emotes
       if (emotes) {
         Object.entries(emotes).forEach(([id, positions]) => {
           positions.forEach(position => {
@@ -234,7 +385,7 @@ export default function TwitchChat({
         })
       }
 
-      // 處理 7TV 表情符號
+      // 7TV emotes
       const words = message.split(/\s+/)
       let currentPosition = 0
 
@@ -301,7 +452,6 @@ export default function TwitchChat({
   )
 
   useEffect(() => {
-    // 確保只創建一個 client 實例
     if (clientRef.current) {
       clientRef.current.disconnect()
     }
@@ -312,77 +462,28 @@ export default function TwitchChat({
 
     clientRef.current = client
 
-    const handleMessage = async (channel: string, tags: any, message: string) => {
+    // Single unified message handler (merged handleMessage + handleTwitchMessage)
+    const handleChatMessage = async (channel: string, tags: any, message: string) => {
       if (tags.id && processedMessageIds.current.has(tags.id)) {
         return
       }
 
       const role = getUserRole(tags.badges || {})
-
       const { parsedEmotes, messageFragments } = parseMessageWithEmotes(
         message,
         tags.emotes
       )
-
       const messageId = tags.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`
 
       if (tags.id) {
         processedMessageIds.current.add(tags.id)
       }
 
-      // **即時請求使用者的 Channel Badges**
-      let userChannelBadges: BadgeSet[] = []
-      let globalBadges: BadgeSet[] = []
-      try {
-        const userBadgesResponse = await getChannelBadges(tags['room-id'])
-        userChannelBadges = userBadgesResponse.data
-      } catch (error) {
-        console.error('Failed to fetch user channel badges:', error)
-      }
-
-      try {
-        const globalBadgesResponse = await getGlobalBadges()
-        globalBadges = globalBadgesResponse.data
-      } catch (error) {
-        console.error('Failed to fetch user global badges:', error)
-      }
-
-      // **解析徽章**
-      const badgeImages: BadgeVersion[] = []
-
-      Object.entries(tags.badges || {}).forEach(([setId, versionId]) => {
-        let badgeVersion: BadgeVersion | undefined
-
-        // **先從 Channel Badges 查找**
-        const channelBadgeSet = userChannelBadges.find(b => b.set_id === setId)
-        if (channelBadgeSet) {
-          badgeVersion = channelBadgeSet.versions.find(v => v.id === versionId)
-        }
-
-        // **如果 Channel Badges 沒有對應的徽章，再從 Global Badges 查找**
-        if (!badgeVersion) {
-          const globalBadgeSet = globalBadges.find(b => b.set_id === setId)
-          if (globalBadgeSet) {
-            badgeVersion = globalBadgeSet.versions.find(v => v.id === versionId)
-          }
-        }
-
-        // **如果找到徽章，才加入 badgeImages**
-        if (badgeVersion) {
-          badgeImages.push(badgeVersion)
-        }
-      })
-
-      // **合併 Channel 和 Global Badges**
-      const combinedBadges: BadgeSet[] = []
-      if (badgeImages.length > 0) {
-        combinedBadges.push({
-          set_id: 'user-badges',
-          versions: badgeImages,
-        })
-      }
+      // Use cached badges instead of API calls
+      const channelBadges = resolveBadges(tags)
 
       const newMessage: ChatMessage = {
+        type: 'message',
         user: tags['display-name'] || 'anonymous',
         message,
         badges: tags.badges || {},
@@ -394,15 +495,13 @@ export default function TwitchChat({
         id: messageId,
         role,
         timestamp: Date.now(),
-        channelBadges: combinedBadges.length > 0 ? combinedBadges : undefined,
-        type: 'subscription',
+        channelBadges,
+        isFirstMessage: tags['first-msg'] === true || tags['first-msg'] === '1',
       }
 
       setMessages(prev => {
         const updated = [...prev, newMessage]
-
-        // **確保訊息最多只有 7 則**
-        return updated.length > 7 ? updated.slice(-7) : updated
+        return updated.length > messagesLimit ? updated.slice(-messagesLimit) : updated
       })
     }
 
@@ -430,6 +529,36 @@ export default function TwitchChat({
         timestamp: Date.now(),
         subPlan: methods.plan,
         subMonths: methods.months,
+      }
+
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    }
+
+    const handleResub = (
+      channel: string,
+      username: string,
+      months: number,
+      message: string,
+      userState: any,
+      methods: any
+    ) => {
+      const newMessage: ChatMessage = {
+        type: 'resub',
+        user: username,
+        message: message || '',
+        badges: userState.badges || {},
+        emotes: userState.emotes,
+        parsedEmotes: [],
+        messageFragments: message
+          ? parseMessageWithEmotes(message, userState.emotes).messageFragments
+          : [],
+        isSubscriber: true,
+        isMod: !!userState.mod,
+        id: userState.id || `${Date.now()}-${Math.random()}`,
+        role: 'subscriber',
+        timestamp: Date.now(),
+        subPlan: methods?.plan,
+        subMonths: months,
       }
 
       setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
@@ -485,25 +614,79 @@ export default function TwitchChat({
       setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
     }
 
+    const handleMysteryGift = (
+      channel: string,
+      username: string,
+      giftCount: number,
+      methods: any,
+      userState: any
+    ) => {
+      const newMessage: ChatMessage = {
+        type: 'giftsub',
+        user: username,
+        message: '',
+        badges: userState.badges || {},
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: [],
+        isSubscriber: true,
+        isMod: false,
+        id: userState.id || `${Date.now()}-${Math.random()}`,
+        role: getUserRole(userState.badges || {}),
+        timestamp: Date.now(),
+        giftCount,
+        subPlan: methods?.plan,
+      }
+
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    }
+
+    const handleRaid = (channel: string, username: string, viewers: number) => {
+      const newMessage: ChatMessage = {
+        type: 'raid',
+        user: username,
+        message: '',
+        badges: {},
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: [],
+        isSubscriber: false,
+        isMod: false,
+        id: `raid-${Date.now()}-${Math.random()}`,
+        role: 'noRole',
+        timestamp: Date.now(),
+        raidFrom: username,
+        raidViewers: viewers,
+      }
+
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    }
+
+    client.on('message', handleChatMessage)
     client.on('subscription', handleSub)
+    client.on('resub', handleResub)
     client.on('cheer', handleCheer)
     client.on('subgift', handleGiftSub)
+    client.on('submysterygift', handleMysteryGift)
+    client.on('raided', handleRaid)
 
-    client.on('message', handleMessage)
     client.connect().catch(console.error)
 
     return () => {
       if (clientRef.current) {
-        clientRef.current.removeListener('message', handleMessage)
-        client.removeListener('subscription', handleSub)
-        client.removeListener('cheer', handleCheer)
-        client.removeListener('subgift', handleGiftSub)
+        clientRef.current.removeListener('message', handleChatMessage)
+        clientRef.current.removeListener('subscription', handleSub)
+        clientRef.current.removeListener('resub', handleResub)
+        clientRef.current.removeListener('cheer', handleCheer)
+        clientRef.current.removeListener('subgift', handleGiftSub)
+        clientRef.current.removeListener('submysterygift', handleMysteryGift)
+        clientRef.current.removeListener('raided', handleRaid)
         clientRef.current.disconnect()
         clientRef.current = null
       }
       processedMessageIds.current.clear()
     }
-  }, [channel, messagesLimit, getUserRole, parseMessageWithEmotes])
+  }, [channel, messagesLimit, getUserRole, parseMessageWithEmotes, resolveBadges])
 
   useEffect(() => {
     if (hideAfter !== Infinity) {
@@ -516,128 +699,36 @@ export default function TwitchChat({
     }
   }, [hideAfter])
 
-  const handleTwitchMessage = useCallback(
-    async (channel: string, tags: any, message: string) => {
-      if (tags.id && processedMessageIds.current.has(tags.id)) {
-        return
-      }
-
-      const role = getUserRole(tags.badges || {})
-      const { parsedEmotes, messageFragments } = parseMessageWithEmotes(
-        message,
-        tags.emotes
-      )
-      const messageId = tags.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`
-
-      if (tags.id) {
-        processedMessageIds.current.add(tags.id)
-      }
-
-      // 獲取徽章
-      let userChannelBadges: BadgeSet[] = []
-      let globalBadges: BadgeSet[] = []
-      try {
-        const userBadgesResponse = await getChannelBadges(tags['room-id'])
-        userChannelBadges = userBadgesResponse.data
-      } catch (error) {
-        console.error('Failed to fetch user channel badges:', error)
-      }
-
-      try {
-        const globalBadgesResponse = await getGlobalBadges()
-        globalBadges = globalBadgesResponse.data
-      } catch (error) {
-        console.error('Failed to fetch user global badges:', error)
-      }
-
-      const badgeImages: BadgeVersion[] = []
-      Object.entries(tags.badges || {}).forEach(([setId, versionId]) => {
-        let badgeVersion: BadgeVersion | undefined
-        const channelBadgeSet = userChannelBadges.find(b => b.set_id === setId)
-        if (channelBadgeSet) {
-          badgeVersion = channelBadgeSet.versions.find(v => v.id === versionId)
-        }
-        if (!badgeVersion) {
-          const globalBadgeSet = globalBadges.find(b => b.set_id === setId)
-          if (globalBadgeSet) {
-            badgeVersion = globalBadgeSet.versions.find(v => v.id === versionId)
-          }
-        }
-        if (badgeVersion) {
-          badgeImages.push(badgeVersion)
-        }
-      })
-
-      const combinedBadges: BadgeSet[] = []
-      if (badgeImages.length > 0) {
-        combinedBadges.push({
-          set_id: 'user-badges',
-          versions: badgeImages,
-        })
-      }
-
+  // Test handlers
+  const handleTestMessage = useCallback(
+    (username: string, message: string) => {
+      const { parsedEmotes, messageFragments } = parseMessageWithEmotes(message, null)
       const newMessage: ChatMessage = {
         type: 'message',
-        user: tags['display-name'] || 'anonymous',
+        user: username,
         message,
-        badges: tags.badges || {},
-        emotes: tags.emotes,
-        parsedEmotes,
-        messageFragments,
-        isSubscriber: !!tags.subscriber,
-        isMod: !!tags.mod,
-        id: messageId,
-        role,
-        timestamp: Date.now(),
-        channelBadges: combinedBadges.length > 0 ? combinedBadges : undefined,
-      }
-
-      setMessages(prev => {
-        const updated = [...prev, newMessage]
-        return updated.length > messagesLimit ? updated.slice(-messagesLimit) : updated
-      })
-    },
-    [messagesLimit, getUserRole, parseMessageWithEmotes]
-  )
-
-  // 測試用的處理函數
-  const handleTestMessage = useCallback(
-    (message: string) => {
-      const mockTags = {
-        'display-name': 'TestUser',
         badges: { subscriber: '0' },
         emotes: null,
+        parsedEmotes,
+        messageFragments,
+        isSubscriber: true,
+        isMod: false,
         id: `test-${Date.now()}`,
-        mod: false,
-        subscriber: true,
-        'room-id': channelId,
+        role: 'subscriber',
+        timestamp: Date.now(),
       }
-
-      handleTwitchMessage(channel, mockTags, message)
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
     },
-    [channel, channelId, handleTwitchMessage]
+    [messagesLimit, parseMessageWithEmotes]
   )
 
   const handleTestSub = useCallback(
     (username: string, months: number, message: string) => {
-      const mockMethods = {
-        plan: '1000',
-        months: months,
-      }
-
-      const mockUserState = {
-        badges: { subscriber: '0' },
-        'display-name': username,
-        id: `test-sub-${Date.now()}`,
-        mod: false,
-        subscriber: true,
-      }
-
       const newMessage: ChatMessage = {
         type: 'subscription',
         user: username,
         message,
-        badges: mockUserState.badges || {},
+        badges: { subscriber: '0' },
         emotes: null,
         parsedEmotes: [],
         messageFragments: message
@@ -645,13 +736,37 @@ export default function TwitchChat({
           : [],
         isSubscriber: true,
         isMod: false,
-        id: mockUserState.id,
+        id: `test-sub-${Date.now()}`,
         role: 'subscriber',
         timestamp: Date.now(),
-        subPlan: mockMethods.plan as any,
+        subPlan: '1000',
         subMonths: months,
       }
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    },
+    [messagesLimit, parseMessageWithEmotes]
+  )
 
+  const handleTestResub = useCallback(
+    (username: string, months: number, message: string) => {
+      const newMessage: ChatMessage = {
+        type: 'resub',
+        user: username,
+        message,
+        badges: { subscriber: '0' },
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: message
+          ? parseMessageWithEmotes(message, null).messageFragments
+          : [],
+        isSubscriber: true,
+        isMod: false,
+        id: `test-resub-${Date.now()}`,
+        role: 'subscriber',
+        timestamp: Date.now(),
+        subPlan: '1000',
+        subMonths: months,
+      }
       setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
     },
     [messagesLimit, parseMessageWithEmotes]
@@ -659,69 +774,67 @@ export default function TwitchChat({
 
   const handleTestCheer = useCallback(
     (username: string, bits: number, message: string) => {
-      const mockUserState = {
-        bits,
-        badges: { bits: '1000' },
-        'display-name': username,
-        id: `test-cheer-${Date.now()}`,
-        mod: false,
-        subscriber: true,
-      }
-
       const newMessage: ChatMessage = {
         type: 'cheer',
         user: username,
         message,
-        badges: mockUserState.badges || {},
+        badges: { bits: '1000' },
         emotes: null,
         parsedEmotes: [],
         messageFragments: parseMessageWithEmotes(message, null).messageFragments,
         isSubscriber: true,
         isMod: false,
-        id: mockUserState.id,
+        id: `test-cheer-${Date.now()}`,
         role: 'subscriber',
         timestamp: Date.now(),
         bits,
       }
-
       setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
     },
     [messagesLimit, parseMessageWithEmotes]
   )
 
   const handleTestGiftSub = useCallback(
-    (gifter: string, recipient: string) => {
-      const mockMethods = {
-        plan: '1000',
-        months: 1,
-      }
-
-      const mockUserState = {
-        badges: { subscriber: '0' },
-        'display-name': gifter,
-        id: `test-giftSub-${Date.now()}`,
-        mod: false,
-        subscriber: true,
-      }
-
+    (gifter: string, count: number) => {
       const newMessage: ChatMessage = {
-        type: 'subscription',
-        user: recipient,
+        type: 'giftsub',
+        user: gifter,
         message: '',
-        badges: mockUserState.badges || {},
+        badges: { subscriber: '0' },
         emotes: null,
         parsedEmotes: [],
         messageFragments: [],
         isSubscriber: true,
         isMod: false,
-        id: mockUserState.id,
+        id: `test-giftsub-${Date.now()}`,
         role: 'subscriber',
         timestamp: Date.now(),
-        subPlan: mockMethods.plan as any,
-        subMonths: 1,
-        subGifter: gifter,
+        giftCount: count,
+        subPlan: '1000',
       }
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    },
+    [messagesLimit]
+  )
 
+  const handleTestRaid = useCallback(
+    (username: string, viewers: number) => {
+      const newMessage: ChatMessage = {
+        type: 'raid',
+        user: username,
+        message: '',
+        badges: {},
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: [],
+        isSubscriber: false,
+        isMod: false,
+        id: `test-raid-${Date.now()}`,
+        role: 'noRole',
+        timestamp: Date.now(),
+        raidFrom: username,
+        raidViewers: viewers,
+      }
       setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
     },
     [messagesLimit]
@@ -729,7 +842,7 @@ export default function TwitchChat({
 
   return (
     <div className='relative h-full w-full overflow-hidden'>
-      <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-3 px-2 pb-4'>
+      <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-2 px-2 pb-4'>
         <AnimatePresence initial={false} mode='popLayout'>
           {messages.map(msg => (
             <motion.div
@@ -746,7 +859,11 @@ export default function TwitchChat({
               className='w-full'
               style={{ willChange: 'transform, opacity' }}
             >
-              <ChatMessageComponent msg={msg} />
+              {msg.type === 'message' ? (
+                <ChatMessageComponent msg={msg} />
+              ) : (
+                <EventCardComponent msg={msg} />
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
@@ -755,8 +872,10 @@ export default function TwitchChat({
         <TwitchChatDebug
           onSendMessage={handleTestMessage}
           onSimulateSub={handleTestSub}
+          onSimulateResub={handleTestResub}
           onSimulateCheer={handleTestCheer}
           onSimulateGiftSub={handleTestGiftSub}
+          onSimulateRaid={handleTestRaid}
         />
       )}
     </div>

@@ -25,11 +25,15 @@ export interface BadgeSet {
 
 export interface ChatMessage {
   user: string
-  type: 'message' | 'subscription' | 'cheer' | 'announcement'
+  type: 'message' | 'subscription' | 'resub' | 'giftsub' | 'cheer' | 'raid'
   bits?: number
   subPlan?: 'Prime' | '1000' | '2000' | '3000'
   subMonths?: number
   subGifter?: string
+  giftCount?: number
+  raidViewers?: number
+  raidFrom?: string
+  isFirstMessage?: boolean
   systemMsg?: string
 
   message: string

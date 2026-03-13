@@ -7,29 +7,39 @@ import React, { useState, useCallback } from 'react'
 const TwitchChatDebug = ({
   onSendMessage,
   onSimulateSub,
+  onSimulateResub,
   onSimulateCheer,
   onSimulateGiftSub,
+  onSimulateRaid,
 }: {
-  onSendMessage: (message: string) => void
+  onSendMessage: (username: string, message: string) => void
   onSimulateSub: (username: string, months: number, message: string) => void
+  onSimulateResub: (username: string, months: number, message: string) => void
   onSimulateCheer: (username: string, bits: number, message: string) => void
-  onSimulateGiftSub: (gifter: string, recipient: string) => void
+  onSimulateGiftSub: (gifter: string, count: number) => void
+  onSimulateRaid: (username: string, viewers: number) => void
 }) => {
   const [message, setMessage] = useState('')
   const [username, setUsername] = useState('TestUser')
   const [bits, setBits] = useState('1000')
   const [months, setMonths] = useState('3')
-  const [recipient, setRecipient] = useState('GiftRecipient')
+  const [giftCount, setGiftCount] = useState('5')
+  const [raidViewers, setRaidViewers] = useState('150')
 
   const handleSendMessage = useCallback(() => {
-    onSendMessage(message)
+    onSendMessage(username, message)
     setMessage('')
-  }, [message, onSendMessage])
+  }, [username, message, onSendMessage])
 
   const handleSimulateSub = useCallback(() => {
     onSimulateSub(username, parseInt(months), message)
     setMessage('')
   }, [username, months, message, onSimulateSub])
+
+  const handleSimulateResub = useCallback(() => {
+    onSimulateResub(username, parseInt(months), message)
+    setMessage('')
+  }, [username, months, message, onSimulateResub])
 
   const handleSimulateCheer = useCallback(() => {
     onSimulateCheer(username, parseInt(bits), message)
@@ -37,8 +47,12 @@ const TwitchChatDebug = ({
   }, [username, bits, message, onSimulateCheer])
 
   const handleSimulateGiftSub = useCallback(() => {
-    onSimulateGiftSub(username, recipient)
-  }, [username, recipient, onSimulateGiftSub])
+    onSimulateGiftSub(username, parseInt(giftCount))
+  }, [username, giftCount, onSimulateGiftSub])
+
+  const handleSimulateRaid = useCallback(() => {
+    onSimulateRaid(username, parseInt(raidViewers))
+  }, [username, raidViewers, onSimulateRaid])
 
   return (
     <Card className='w-[300px] my-32'>
@@ -82,13 +96,25 @@ const TwitchChatDebug = ({
           </div>
         </div>
 
-        <div className='space-y-2'>
-          <Label>禮物訂閱接收者</Label>
-          <Input
-            value={recipient}
-            onChange={e => setRecipient(e.target.value)}
-            placeholder='接收者名稱'
-          />
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label>贈送數量</Label>
+            <Input
+              type='number'
+              value={giftCount}
+              onChange={e => setGiftCount(e.target.value)}
+              placeholder='贈送數量'
+            />
+          </div>
+          <div className='space-y-2'>
+            <Label>Raid 人數</Label>
+            <Input
+              type='number'
+              value={raidViewers}
+              onChange={e => setRaidViewers(e.target.value)}
+              placeholder='人數'
+            />
+          </div>
         </div>
 
         <div className='grid grid-cols-2 gap-2'>
@@ -101,8 +127,14 @@ const TwitchChatDebug = ({
           <Button onClick={handleSimulateSub} variant='outline'>
             模擬訂閱
           </Button>
+          <Button onClick={handleSimulateResub} variant='outline'>
+            模擬 Resub
+          </Button>
           <Button onClick={handleSimulateGiftSub} variant='outline'>
-            模擬禮物訂閱
+            模擬批量禮訂
+          </Button>
+          <Button onClick={handleSimulateRaid} variant='outline'>
+            模擬 Raid
           </Button>
         </div>
       </CardContent>
