@@ -46,48 +46,48 @@ export default function Album({ isPlaying = true }: AlbumProps) {
         viewBox="0 0 200 200"
         style={styles.disc}
       >
-        {/* 外圈主體 */}
-        <circle cx="100" cy="100" r="98" fill="#111714" stroke="#1e2921" strokeWidth="1" />
-
-        {/* 刻紋（多層透明度製造深度） */}
-        <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1.5" />
-        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-        <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-        <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="74" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="66" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="62" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="58" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.8" />
-
-        {/* 光澤反射弧 */}
+        {/* 外圈主體 — 提亮至深灰，跟背景形成對比 */}
+        <circle cx="100" cy="100" r="98" fill="#1c2420" stroke="#2e3d38" strokeWidth="1.5" />
+ 
+        {/* 刻紋 — 提高透明度讓紋路清晰 */}
+        <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="1.5" />
+        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="1" />
+        <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="1" />
+        <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="74" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="66" fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="62" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="58" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+ 
+        {/* 光澤反射弧 — 加強亮度 */}
         <path
           d="M 40 60 Q 70 30 130 45"
           fill="none"
-          stroke="rgba(255,255,255,0.04)"
-          strokeWidth="8"
+          stroke="rgba(255,255,255,0.10)"
+          strokeWidth="10"
           strokeLinecap="round"
         />
         <path
           d="M 55 50 Q 85 25 125 38"
           fill="none"
-          stroke="rgba(255,255,255,0.025)"
-          strokeWidth="4"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="5"
           strokeLinecap="round"
         />
-
-        {/* 中間標籤區 */}
-        <circle cx="100" cy="100" r="34" fill="#0D1610" />
-        <circle cx="100" cy="100" r="33" fill="none" stroke="rgba(0,255,135,0.12)" strokeWidth="1" />
-        <circle cx="100" cy="100" r="28" fill="none" stroke="rgba(0,255,135,0.06)" strokeWidth="0.8" />
-        <circle cx="100" cy="100" r="22" fill="none" stroke="rgba(0,255,135,0.08)" strokeWidth="0.8" />
-
+ 
+        {/* 中間標籤區 — 加入深紫藍色調，與碟面形成色相差 */}
+        <circle cx="100" cy="100" r="34" fill="#0e1520" />
+        <circle cx="100" cy="100" r="33" fill="none" stroke="rgba(0,255,135,0.35)" strokeWidth="1.2" />
+        <circle cx="100" cy="100" r="28" fill="none" stroke="rgba(0,255,135,0.15)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="22" fill="none" stroke="rgba(0,255,135,0.20)" strokeWidth="0.8" />
+ 
         {/* 中心孔 */}
         <circle cx="100" cy="100" r="4" fill="#0A0F0C" />
-        <circle cx="100" cy="100" r="3" fill="none" stroke="rgba(0,255,135,0.3)" strokeWidth="0.8" />
+        <circle cx="100" cy="100" r="3" fill="none" stroke="rgba(0,255,135,0.6)" strokeWidth="1" />
       </svg>
-
+ 
       {/* 唱針 */}
       <svg
         width="80"
@@ -98,7 +98,7 @@ export default function Album({ isPlaying = true }: AlbumProps) {
         {/* 軸心點 */}
         <circle cx="22" cy="8" r="6" fill="#1a2420" stroke="rgba(0,255,135,0.3)" strokeWidth="1" />
         <circle cx="22" cy="8" r="2.5" fill="#00FF87" opacity={0.6} />
-
+ 
         {/* 臂桿（輕微彎曲感） */}
         <path
           d="M22 14 Q28 55 38 105"
@@ -114,7 +114,7 @@ export default function Album({ isPlaying = true }: AlbumProps) {
           strokeWidth="1"
           strokeLinecap="round"
         />
-
+ 
         {/* 唱針頭 */}
         <rect x="33" y="104" width="10" height="3" rx="1.5" fill="#1e2921" stroke="rgba(0,255,135,0.4)" strokeWidth="0.8" />
         <rect x="37" y="107" width="2" height="5" rx="1" fill="#00FF87" opacity={0.7} />
