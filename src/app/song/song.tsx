@@ -1,6 +1,6 @@
 'use client'
 
-import { getSongs } from '@/api/song'
+import { SONG_LIST_STREAM_URL } from '@/api/song'
 import SongList from '@/components/chat/songList'
 import { useEffect, useState } from 'react'
 
@@ -8,14 +8,22 @@ export default function Song() {
   const [songs, setSongs] = useState([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getSongs()
-      setSongs(res.data)
+    const eventSource = new EventSource(SONG_LIST_STREAM_URL)
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        setSongs(data)
+      } catch (error) {
+        console.error('[SSE] Failed to parse song data:', error)
+      }
     }
 
-    const interval = setInterval(fetchData, 2000)
+    eventSource.onerror = () => {
+      console.warn('[SSE] Connection error, will auto-reconnect...')
+    }
 
-    return () => clearInterval(interval)
+    return () => eventSource.close()
   }, [])
 
   return (
