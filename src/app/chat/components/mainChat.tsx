@@ -1,28 +1,14 @@
 'use client'
 
 import TwitchChat from './twitchChat'
-// import { getStreams } from '@/api/twitchClient'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { AiFillSmile } from 'react-icons/ai'
-import { BsTwitterX, BsYoutube } from 'react-icons/bs'
-// import { GoPersonFill } from 'react-icons/go'
+import { useState } from 'react'
 import ReactPlayer from 'react-player'
 
 export default function MainChat() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  // const [viewersCount, setViewersCount] = useState()
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [fadeClass, setFadeClass] = useState('')
   const [videoName, setVideoName] = useState('')
   const [playVideo, setPlayVideo] = useState(false)
-
-  const socialMediaAccounts = [
-    { icon: <BsTwitterX />, name: 'shushu010829', ifShow: true },
-    { icon: <BsYoutube />, name: 'shushu0829', ifShow: true },
-    { icon: <AiFillSmile />, name: '謝謝關注', ifShow: false },
-  ]
 
   const handleVideoPlay = (name: string) => {
     setVideoName(name)
@@ -34,85 +20,22 @@ export default function MainChat() {
     setVideoName('')
   }
 
-  useEffect(() => {
-    const updateTime = () => {
-      setCurrentTime(new Date())
-    }
-    const intervalId = setInterval(updateTime, 1000)
-
-    // const fetchStreamData = async () => {
-    //   const data = await getStreams()
-    //   if (data.data[0]) {
-    //     setViewersCount(data.data[0].viewer_count)
-    //   }
-    // }
-    // fetchStreamData()
-    // const streamIntervalId = setInterval(fetchStreamData, 20000)
-
-    return () => {
-      clearInterval(intervalId)
-      // clearInterval(streamIntervalId)
-    }
-  }, [])
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setFadeClass('fadeOut')
-      setTimeout(() => {
-        setCurrentIndex(prevIndex => (prevIndex + 1) % socialMediaAccounts.length)
-        setFadeClass('')
-      }, 1000)
-    }, 5000)
-
-    return () => clearInterval(intervalId)
-  }, [socialMediaAccounts.length])
-
-  const currentAccount = socialMediaAccounts[currentIndex]
-
-  const formatTime = (time: number) => (time < 10 ? `0${time}` : time)
-  const hour = currentTime.getHours()
-
-  // 英文日期格式化
-  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const formattedDate = `${daysOfWeek[currentTime.getDay()]} ${months[currentTime.getMonth()]} ${currentTime.getDate()}`
-
   return (
     <div className='relative'>
-      <div className='glass-card flex h-[680px] w-[360px] flex-col items-center rounded-3xl overflow-hidden'>
-        {/* 頂部時間區塊 */}
-        <div className='w-full pt-8 pb-4 px-6'>
-          {/* 日期 */}
-          <div className='flex items-center justify-center mb-2'>
-            <p className='font-notoSans text-lg font-semibold text-white/95'>
-              {formattedDate}
-            </p>
-          </div>
-
-          {/* 時間 */}
-          <div className='text-center font-titanOne'>
-            <p className='text-6xl font-extrabold text-white drop-shadow-lg'>
-              <span>{formatTime(hour)}</span>
-              <span className='mx-1 opacity-70'>:</span>
-              <span>{formatTime(currentTime.getMinutes())}</span>
-            </p>
-          </div>
-
-          {/* 觀眾數 */}
-          {/* {viewersCount && (
-            <div className='flex justify-center mt-3'>
-              <div className='glass-tag flex items-center gap-2 rounded-full px-4 py-1'>
-                <GoPersonFill className='text-slate-700' />
-                <span className='font-notoSans text-sm font-bold text-slate-800'>
-                  {viewersCount}
-                </span>
-              </div>
-            </div>
-          )} */}
+      <div className='chat-container flex h-[680px] w-[360px] flex-col rounded-2xl overflow-hidden'>
+        {/* Header */}
+        <div className='flex items-center gap-2 px-4 py-3 border-b' style={{ borderColor: 'rgba(0,255,135,0.1)' }}>
+          <div className='live-dot' />
+          <span className='font-spaceMono text-sm font-bold' style={{ color: '#00FF87' }}>
+            shushu010829
+          </span>
+          <span className='font-spaceMono text-xs' style={{ color: 'rgba(255,255,255,0.3)' }}>
+            LIVE
+          </span>
         </div>
 
-        {/* 聊天區塊 */}
-        <div className='flex-1 w-full px-4 pb-4'>
+        {/* Chat area */}
+        <div className='flex-1 w-full'>
           <TwitchChat
             channel='shushu010829'
             channelId='720691521'

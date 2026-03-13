@@ -120,6 +120,7 @@ const config = {
         notoSans: ['var(--font-noto-sans-tc)'],
         titanOne: ['var(--font-titan-one)'],
         poppins: ['var(--font-poppins)'],
+        spaceMono: ['var(--font-space-mono)'],
         /* E-ink Fonts */
         'eink-serif': ['Merriweather', 'Georgia', 'serif'],
         'eink-sans': ['Inter', 'sans-serif'],
