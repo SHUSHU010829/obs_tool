@@ -1054,3 +1054,8 @@ hr.gradient {
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
+
+@keyframes arm-settle {
+  from { transform: rotate(-18deg); }
+  to   { transform: rotate(0deg); }
+}
