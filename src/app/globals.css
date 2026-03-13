@@ -526,7 +526,7 @@ hr.gradient {
 }
 
 #wrap {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: transparent;
 }
 
 #album {
@@ -546,13 +546,13 @@ hr.gradient {
   z-index: 1;
   width: 100%;
   height: 100%;
-  background: rgb(34, 193, 195);
-  background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+  background: rgb(30, 30, 30);
+  background: linear-gradient(145deg, rgba(40, 40, 40, 1) 0%, rgba(15, 15, 15, 1) 100%);
   background-size: 100% 100%;
   box-shadow:
     5px 0 20px 0 rgba(0, 0, 0, 0.6),
-    inset 0 0 10px 5px rgba(255, 255, 255, 0.2),
-    inset 0 0 4px 2px rgba(0, 0, 0, 0.2);
+    inset 0 0 10px 5px rgba(255, 255, 255, 0.05),
+    inset 0 0 4px 2px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
 }
 #cover::before {
@@ -599,6 +599,7 @@ hr.gradient {
   box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.6);
   border-radius: 50%;
   content: '';
+  filter: brightness(0.7) saturate(0);
   animation:
     spinThat 5s linear infinite,
     getOut 1s ease-out 1s forwards;
@@ -626,7 +627,7 @@ hr.gradient {
   height: 34%;
   width: 34%;
   box-shadow: inset 0 0 0 5px rgba(150, 150, 150, 0.1);
-  background-image: url('http://assets.teamrock.com/image/14d29742-c6f7-43f6-bbe1-6bf7b3b34c6f?w=800');
+  background: radial-gradient(circle, rgba(30,30,30,1) 0%, rgba(15,15,15,1) 60%, rgba(0,255,135,0.08) 100%);
   background-size: cover;
   border-radius: 50%;
 }
