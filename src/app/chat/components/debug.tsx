@@ -11,6 +11,7 @@ const TwitchChatDebug = ({
   onSimulateCheer,
   onSimulateGiftSub,
   onSimulateRaid,
+  onSimulateFirstMessage,
 }: {
   onSendMessage: (username: string, message: string) => void
   onSimulateSub: (username: string, months: number, message: string) => void
@@ -18,6 +19,7 @@ const TwitchChatDebug = ({
   onSimulateCheer: (username: string, bits: number, message: string) => void
   onSimulateGiftSub: (gifter: string, count: number) => void
   onSimulateRaid: (username: string, viewers: number) => void
+  onSimulateFirstMessage: (username: string, message: string) => void
 }) => {
   const [message, setMessage] = useState('')
   const [username, setUsername] = useState('TestUser')
@@ -53,6 +55,11 @@ const TwitchChatDebug = ({
   const handleSimulateRaid = useCallback(() => {
     onSimulateRaid(username, parseInt(raidViewers))
   }, [username, raidViewers, onSimulateRaid])
+
+  const handleSimulateFirstMessage = useCallback(() => {
+    onSimulateFirstMessage(username, message)
+    setMessage('')
+  }, [username, message, onSimulateFirstMessage])
 
   return (
     <Card className='w-[300px] my-32'>
@@ -135,6 +142,9 @@ const TwitchChatDebug = ({
           </Button>
           <Button onClick={handleSimulateRaid} variant='outline'>
             模擬 Raid
+          </Button>
+          <Button onClick={handleSimulateFirstMessage} variant='outline'>
+            模擬首次發言
           </Button>
         </div>
       </CardContent>

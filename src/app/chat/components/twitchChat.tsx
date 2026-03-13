@@ -858,6 +858,29 @@ export default function TwitchChat({
     [messagesLimit]
   )
 
+  const handleTestFirstMessage = useCallback(
+    (username: string, message: string) => {
+      const { parsedEmotes, messageFragments } = parseMessageWithEmotes(message, null)
+      const newMessage: ChatMessage = {
+        type: 'message',
+        user: username,
+        message,
+        badges: {},
+        emotes: null,
+        parsedEmotes,
+        messageFragments,
+        isSubscriber: false,
+        isMod: false,
+        id: `test-first-${Date.now()}`,
+        role: 'noRole',
+        timestamp: Date.now(),
+        isFirstMessage: true,
+      }
+      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+    },
+    [messagesLimit, parseMessageWithEmotes]
+  )
+
   return (
     <div className='relative h-full w-full overflow-hidden'>
       <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-2 px-2 pb-4'>
@@ -894,6 +917,7 @@ export default function TwitchChat({
           onSimulateCheer={handleTestCheer}
           onSimulateGiftSub={handleTestGiftSub}
           onSimulateRaid={handleTestRaid}
+          onSimulateFirstMessage={handleTestFirstMessage}
         />
       )}
     </div>
