@@ -4,8 +4,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 
 interface Song {
   id: number;
-  title: string;
-  artist: string;
+  song_title: string;
+  singer: string;
   now_playing: number;
 }
 
@@ -70,13 +70,13 @@ export default function SongList({ songs }: { songs: Song[] }) {
             className="font-spaceMono text-base font-bold leading-tight truncate w-full"
             style={{ color: '#FFFFFF' }}
           >
-            {nowPlayingSong ? nowPlayingSong.title : "-- --"}
+            {nowPlayingSong ? nowPlayingSong.song_title : "-- --"}
           </p>
           <p
             className="font-spaceMono text-xs mt-1 truncate w-full"
             style={{ color: '#00FF87' }}
           >
-            {nowPlayingSong ? nowPlayingSong.artist : "-- --"}
+            {nowPlayingSong ? nowPlayingSong.singer : "-- --"}
           </p>
         </div>
       </div>
@@ -123,13 +123,13 @@ export default function SongList({ songs }: { songs: Song[] }) {
                 className="font-notoSans text-sm font-semibold truncate"
                 style={{ color: '#d4f5e2' }}
               >
-                {song.title}
+                {song.song_title}
               </p>
               <p
                 className="font-notoSans text-xs truncate"
                 style={{ color: 'rgba(180,230,200,0.5)' }}
               >
-                {song.artist}
+                {song.singer}
               </p>
             </div>
           </div>
