@@ -3,12 +3,31 @@
 import TwitchChat from './twitchChat'
 import TwitchChatListener from '@/lib/twitch'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactPlayer from 'react-player'
 
 export default function MainChat() {
   const [videoName, setVideoName] = useState('')
   const [playVideo, setPlayVideo] = useState(false)
+  const [viewerCount, setViewerCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    const fetchViewerCount = async () => {
+      try {
+        const res = await fetch('/api/twitch/streams')
+        if (!res.ok) throw new Error('Failed to fetch')
+        const data = await res.json()
+        const count = data?.data?.[0]?.viewer_count
+        setViewerCount(typeof count === 'number' ? count : null)
+      } catch {
+        setViewerCount(null)
+      }
+    }
+
+    fetchViewerCount()
+    const interval = setInterval(fetchViewerCount, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleVideoPlay = (name: string) => {
     setVideoName(name)
@@ -44,7 +63,7 @@ export default function MainChat() {
             className='font-spaceMono'
             style={{ fontSize: 10, color: 'rgba(180,230,200,0.5)', marginLeft: 'auto' }}
           >
-            shushu010829
+            {viewerCount !== null ? `${viewerCount.toLocaleString()} watching` : 'shushu010829'}
           </span>
         </div>
 
