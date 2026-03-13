@@ -882,32 +882,34 @@ export default function TwitchChat({
   )
 
   return (
-    <div className='relative h-full w-full overflow-hidden'>
-      <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-2 px-2 pb-4'>
-        <AnimatePresence initial={false} mode='popLayout'>
-          {messages.map(msg => (
-            <motion.div
-              key={msg.id}
-              layout
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{
-                duration: 0.15,
-                ease: [0.25, 0.1, 0.25, 1],
-                layout: { duration: 0.2, ease: 'easeOut' },
-              }}
-              className='w-full'
-              style={{ willChange: 'transform, opacity' }}
-            >
-              {msg.type === 'message' ? (
-                <ChatMessageComponent msg={msg} />
-              ) : (
-                <EventCardComponent msg={msg} />
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+    <>
+      <div className='relative h-full w-full overflow-hidden'>
+        <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-2 px-2 pb-4'>
+          <AnimatePresence initial={false} mode='popLayout'>
+            {messages.map(msg => (
+              <motion.div
+                key={msg.id}
+                layout
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  duration: 0.15,
+                  ease: [0.25, 0.1, 0.25, 1],
+                  layout: { duration: 0.2, ease: 'easeOut' },
+                }}
+                className='w-full'
+                style={{ willChange: 'transform, opacity' }}
+              >
+                {msg.type === 'message' ? (
+                  <ChatMessageComponent msg={msg} />
+                ) : (
+                  <EventCardComponent msg={msg} />
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
       {debug && (
         <TwitchChatDebug
@@ -920,6 +922,6 @@ export default function TwitchChat({
           onSimulateFirstMessage={handleTestFirstMessage}
         />
       )}
-    </div>
+    </>
   )
 }
