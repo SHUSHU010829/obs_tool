@@ -181,7 +181,7 @@ const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
         <span className='tag-label'>{config.label}</span>
 
         {/* Right-side badge per type */}
-        {(msg.type === 'subscription' || msg.type === 'resub') && msg.subMonths != null && (
+        {(msg.type === 'subscription' || msg.type === 'resub') && msg.subMonths != null && msg.subMonths > 0 && (
           <span className='sub-months-tag'>第 {msg.subMonths} 個月</span>
         )}
         {msg.type === 'giftsub' && (
@@ -210,7 +210,11 @@ const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
         ) : msg.type === 'resub' ? (
           <>
             <span className='event-username'>{msg.user}</span>
-            <span className='event-detail'>連續訂閱 {msg.subMonths} 個月 · {tier}</span>
+            <span className='event-detail'>
+              {msg.subMonths != null && msg.subMonths > 0
+                ? `連續訂閱 ${msg.subMonths} 個月 · ${tier}`
+                : `訂閱了頻道 · ${tier}`}
+            </span>
           </>
         ) : msg.type === 'giftsub' ? (
           <>
