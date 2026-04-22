@@ -172,17 +172,18 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
 
   const config = typeConfig[msg.type] || typeConfig.subscription
   const tier = subPlanLabel(msg.subPlan)
+  const isNewSub = msg.type === 'subscription'
 
   return (
-    <div className={`event-card ${config.cardClass}`}>
+    <div className={`event-card ${config.cardClass}${isNewSub ? ' event-card--new-sub' : ''}`}>
       {/* Type tag row */}
       <div className='event-type-tag'>
         <span className='tag-icon'>{config.tagIcon}</span>
         <span className='tag-label'>{config.label}</span>
 
         {/* Right-side badge per type */}
-        {(msg.type === 'subscription' || msg.type === 'resub') && msg.subMonths != null && msg.subMonths > 0 && (
-          <span className='sub-months-tag'>第 {msg.subMonths} 個月</span>
+        {(msg.type === 'subscription' || msg.type === 'resub') && (
+          <span className='sub-tier-tag'>{tier}</span>
         )}
         {msg.type === 'giftsub' && (
           <span className='gift-count-pill'>x {msg.giftCount ?? 1}</span>
@@ -203,19 +204,22 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
             <span className='event-detail'>大駕光臨！</span>
           </>
         ) : msg.type === 'subscription' ? (
-          <>
-            <span className='event-username'>{msg.user}</span>
-            <span className='event-detail'>訂閱了頻道 · {tier}</span>
-          </>
+          <div className='new-sub-body'>
+            <div className='new-sub-sparkle font-spaceMono'>✦  NEW SUBSCRIBER  ✦</div>
+            <div className='new-sub-username font-spaceMono'>{msg.user}</div>
+            <div className='new-sub-detail'>
+              {msg.subGifter ? `由 ${msg.subGifter} 贈送訂閱` : '首次加入訂閱！'}
+            </div>
+          </div>
         ) : msg.type === 'resub' ? (
-          <>
-            <span className='event-username'>{msg.user}</span>
-            <span className='event-detail'>
+          <div className='resub-line'>
+            <span className='resub-username font-spaceMono'>{msg.user}</span>
+            <span className='resub-detail'>
               {msg.subMonths != null && msg.subMonths > 0
-                ? `連續訂閱 ${msg.subMonths} 個月 · ${tier}`
-                : `訂閱了頻道 · ${tier}`}
+                ? ` 訂閱第 ${msg.subMonths} 月了`
+                : ' 訂閱了頻道'}
             </span>
-          </>
+          </div>
         ) : msg.type === 'giftsub' ? (
           <>
             <span className='event-username'>{msg.user}</span>

@@ -830,6 +830,23 @@ hr.gradient {
   background: linear-gradient(90deg, transparent, #FFD166, transparent);
 }
 
+/* New subscriber — deeper gold bloom + shimmer on the top accent line */
+.event-card--new-sub {
+  background: linear-gradient(180deg, rgba(255, 209, 102, 0.14) 0%, rgba(0, 15, 8, 0.4) 100%);
+  box-shadow: 0 4px 28px rgba(255, 209, 102, 0.28);
+}
+.event-card--new-sub::before {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(90deg, transparent, #FFD166 40%, #fff4c2 50%, #FFD166 60%, transparent);
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 2.4s ease-in-out infinite;
+}
+@keyframes new-sub-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Gift Sub — green */
 .event-card--giftsub {
   background: linear-gradient(180deg, rgba(0, 255, 135, 0.06) 0%, rgba(0, 15, 8, 0.35) 100%);
@@ -934,13 +951,18 @@ hr.gradient {
   color: #C084FC;
 }
 
-/* Sub months tag */
-.sub-months-tag {
+/* Sub tier tag (Tier 1 / Tier 2 / Tier 3 / Prime) */
+.sub-tier-tag {
   margin-left: auto;
   font-family: 'Space Mono', monospace;
   font-size: 9px;
-  color: rgba(255, 209, 102, 0.6);
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #FFD166;
+  background: rgba(255, 209, 102, 0.12);
+  border: 1px solid rgba(255, 209, 102, 0.28);
+  border-radius: 3px;
+  padding: 1px 6px;
   flex-shrink: 0;
 }
 
@@ -1003,6 +1025,54 @@ hr.gradient {
   font-size: 11px;
   color: rgba(180, 230, 200, 0.5);
   line-height: 1.5;
+}
+
+/* New subscriber body */
+.new-sub-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0 4px;
+}
+.new-sub-sparkle {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: #FFD166;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+.new-sub-username {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #FFD166;
+  text-shadow: 0 0 12px rgba(255, 209, 102, 0.55);
+  line-height: 1.15;
+}
+.new-sub-detail {
+  font-size: 11px;
+  color: rgba(255, 230, 170, 0.7);
+  letter-spacing: 0.04em;
+}
+
+/* Resub single-line body */
+.resub-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  line-height: 1.4;
+}
+.resub-username {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #FFD166;
+}
+.resub-detail {
+  font-size: 12px;
+  color: rgba(180, 230, 200, 0.7);
 }
 
 .event-msg-quote {
