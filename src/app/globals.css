@@ -2002,3 +2002,64 @@ hr.gradient {
   letter-spacing: 0.14em;
   color: rgba(255, 180, 138, 0.72);
 }
+
+/* ===== Top Chatters — podium treatment ===== */
+.top-chatter-row--gold {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 209, 102, 0.16) 0%,
+    rgba(255, 209, 102, 0.04) 70%,
+    transparent 100%
+  );
+  border-left: 2px solid #FFD166;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 209, 102, 0.2),
+    0 0 18px rgba(255, 209, 102, 0.18);
+}
+.top-chatter-row--silver {
+  background: linear-gradient(
+    90deg,
+    rgba(199, 213, 224, 0.12) 0%,
+    rgba(199, 213, 224, 0.03) 70%,
+    transparent 100%
+  );
+  border-left: 2px solid #C7D5E0;
+}
+.top-chatter-row--bronze {
+  background: linear-gradient(
+    90deg,
+    rgba(217, 147, 91, 0.12) 0%,
+    rgba(217, 147, 91, 0.03) 70%,
+    transparent 100%
+  );
+  border-left: 2px solid #D9935B;
+}
+
+.top-chatter-count--gold {
+  color: #FFD166;
+  text-shadow: 0 0 10px rgba(255, 209, 102, 0.6);
+  animation: top-chatter-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes top-chatter-pulse {
+  0%, 100% {
+    text-shadow: 0 0 6px rgba(255, 209, 102, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 14px rgba(255, 209, 102, 0.85);
+    transform: scale(1.04);
+  }
+}
+
+.top-chatter-crown {
+  color: #FFD166;
+  text-shadow: 0 0 10px rgba(255, 209, 102, 0.75);
+  animation: top-chatter-crown-sway 3.2s ease-in-out infinite;
+  transform-origin: 50% 80%;
+  display: inline-block;
+}
+@keyframes top-chatter-crown-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
