@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import { ArchiveIcon, DragHandleDots2Icon } from '@radix-ui/react-icons'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 interface Song {
   id: number
@@ -62,6 +63,7 @@ export default function SongList() {
   const handleAddSong = async () => {
     await addSong(title, artist)
     await fetchSongs()
+    toast.success('已新增歌曲', { description: `${artist} - ${title}` })
     setOpen(false)
     setTitle('')
     setArtist('')
@@ -72,37 +74,38 @@ export default function SongList() {
     await fetchSongs()
   }
 
-  const handleArchive = async (id: number) => {
-    await deleteSong(id)
+  const handleArchive = async (song: Song) => {
+    await deleteSong(song.id)
     await fetchSongs()
+    toast('已封存', { description: `${song.singer} - ${song.song_title}` })
   }
 
   const handleArchiveAll = async () => {
     await deleteAllSongs()
     await fetchSongs()
+    toast.warning('已封存全部歌曲', { description: '可至「歌本」頁面恢復' })
   }
 
-  const handlePlay = async (id: number, now_playing: number) => {
-    const currentPlayingSong = songList?.find(song => song.now_playing === 1)
+  const handlePlay = async (song: Song) => {
+    const currentPlayingSong = songList?.find(s => s.now_playing === 1)
     if (currentPlayingSong) {
       await clearNowPlaying(currentPlayingSong.id)
     }
-    if (now_playing === 1) {
-      await clearNowPlaying(id)
+    if (song.now_playing === 1) {
+      await clearNowPlaying(song.id)
+      toast('已停止播放')
     } else {
-      await playSong(id)
+      await playSong(song.id)
+      toast.success('開始播放', { description: `${song.singer} - ${song.song_title}` })
     }
     await fetchSongs()
   }
 
-  // Drag and Drop handlers
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     setDraggedIndex(index)
     dragNodeRef.current = e.currentTarget as HTMLDivElement
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData('text/plain', index.toString())
-
-    // Add dragging class after a small delay for visual feedback
     setTimeout(() => {
       if (dragNodeRef.current) {
         dragNodeRef.current.style.opacity = '0.5'
@@ -119,17 +122,12 @@ export default function SongList() {
       const newList = [...songList]
       const [draggedItem] = newList.splice(draggedIndex, 1)
       newList.splice(dragOverIndex, 0, draggedItem)
-
-      // Update local state immediately for smooth UX
       setSongList(newList)
 
-      // Prepare batch update data
       const sortData = newList.map((song, index) => ({
         id: song.id,
         sort_order: index,
       }))
-
-      // Send batch update to server
       await batchUpdateSortOrder(sortData)
     }
 
@@ -146,240 +144,179 @@ export default function SongList() {
     }
   }
 
-  const handleDragLeave = () => {
-    // Only clear if we're leaving the container entirely
-  }
+  const nowPlaying = songList?.find(s => s.now_playing === 1)
 
   return (
-    <div className="eink-card">
-      {/* Card Header */}
-      <div className="eink-card-header flex items-center justify-between">
+    <div className='admin-card'>
+      <div className='admin-card-header'>
         <div>
-          <h3 className="eink-card-title">播放清單</h3>
-          <p className="mt-1 font-eink-serif text-sm text-[var(--eink-text-muted)]">
+          <h3 className='admin-card-title'>播放清單</h3>
+          <p className='mt-1 text-xs text-[color:var(--admin-text-muted)]'>
             共 {songList?.length || 0} 首歌曲（可拖曳排序）
           </p>
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="eink-button eink-button-destructive flex items-center gap-2">
-              <ArchiveIcon className="h-4 w-4" />
-              全部歸檔
+            <button className='admin-button admin-button-danger admin-button-sm'>
+              <ArchiveIcon className='h-4 w-4' />
+              全部封存
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="eink-card border-[var(--eink-border-strong)]">
+          <AlertDialogContent className='admin-shell admin-card border-[color:var(--admin-border-strong)] bg-[color:var(--admin-surface)] text-[color:var(--admin-text)]'>
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-eink-sans text-lg font-semibold">
-                確定要歸檔所有歌曲嗎？
+              <AlertDialogTitle className='text-base font-semibold'>
+                確定要封存所有歌曲嗎？
               </AlertDialogTitle>
-              <AlertDialogDescription className="font-eink-serif text-[var(--eink-text-muted)]">
+              <AlertDialogDescription className='text-[color:var(--admin-text-muted)]'>
                 所有歌曲將移至歷史紀錄，您可以在「歌本」頁面中恢復。
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="gap-2">
-              <AlertDialogCancel className="eink-button">取消</AlertDialogCancel>
+            <AlertDialogFooter className='gap-2'>
+              <AlertDialogCancel className='admin-button'>取消</AlertDialogCancel>
               <AlertDialogAction
-                className="eink-button eink-button-primary"
+                className='admin-button admin-button-primary'
                 onClick={handleArchiveAll}
               >
-                確定歸檔
+                確定封存
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
 
-      {/* Card Content */}
-      <div className="eink-card-content">
-        {/* Table Header - Desktop Only */}
-        <div className="mb-4 hidden border-b border-[var(--eink-border-strong)] pb-3 md:grid md:grid-cols-[40px_60px_1fr_2fr_60px] md:gap-4">
-          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-            排序
-          </span>
-          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-            序號
-          </span>
-          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-            歌手
-          </span>
-          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-            歌名
-          </span>
-          <span className="font-eink-sans text-xs font-semibold uppercase tracking-wider text-[var(--eink-text-muted)]">
-            操作
-          </span>
-        </div>
-
-        {/* Song List */}
+      <div className='admin-card-content'>
         {songList && songList.length > 0 ? (
-          <div className="flex flex-col gap-3">
-            {songList.map((song, index) => (
-              <div
-                key={song.id}
-                draggable
-                onDragStart={e => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={e => handleDragOver(e, index)}
-                onDragLeave={handleDragLeave}
-                className={`flex flex-col gap-3 rounded-eink border p-3 transition-all duration-eink-fast ease-eink md:grid md:grid-cols-[40px_60px_1fr_2fr_60px] md:items-center md:gap-4 ${
-                  song.now_playing === 1
-                    ? 'border-[var(--eink-border-strong)] bg-[var(--eink-text-primary)] text-[var(--eink-bg-secondary)]'
-                    : dragOverIndex === index
-                      ? 'border-[var(--eink-border-strong)] bg-[var(--eink-bg-primary)]'
-                      : 'border-[var(--eink-border-subtle)] hover:border-[var(--eink-border-strong)]'
-                }`}
-              >
-                {/* Mobile: Top Row with Index, Drag Handle, Archive */}
-                <div className="flex items-center justify-between md:contents">
-                  {/* Drag Handle */}
-                  <div
-                    className={`flex h-10 w-10 cursor-grab items-center justify-center rounded-eink transition-colors active:cursor-grabbing ${
-                      song.now_playing === 1
-                        ? 'text-[var(--eink-bg-secondary)]'
-                        : 'text-[var(--eink-text-muted)] hover:text-[var(--eink-text-primary)]'
-                    }`}
-                  >
-                    <DragHandleDots2Icon className="h-5 w-5" />
+          <div className='flex flex-col gap-2'>
+            {songList.map((song, index) => {
+              const isPlaying = song.now_playing === 1
+              const isDragOver = dragOverIndex === index
+              return (
+                <div
+                  key={song.id}
+                  draggable
+                  onDragStart={e => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={e => handleDragOver(e, index)}
+                  className={`group flex flex-col gap-2 rounded-[var(--admin-radius-sm)] border px-3 py-2.5 transition-colors md:grid md:grid-cols-[28px_44px_1fr_2fr_44px] md:items-center md:gap-3 ${
+                    isPlaying
+                      ? 'border-[color:var(--admin-state-live)] bg-[color:var(--admin-state-live-soft)]'
+                      : isDragOver
+                        ? 'border-[color:var(--admin-accent-border)] bg-[color:var(--admin-surface-2)]'
+                        : 'border-[color:var(--admin-border)] hover:border-[color:var(--admin-border-strong)]'
+                  }`}
+                >
+                  <div className='flex items-center justify-between md:contents'>
+                    <div className='flex cursor-grab items-center justify-center text-[color:var(--admin-text-subtle)] hover:text-[color:var(--admin-text)] active:cursor-grabbing'>
+                      <DragHandleDots2Icon className='h-5 w-5' />
+                    </div>
+
+                    <button
+                      onClick={() => handlePlay(song)}
+                      className={`flex h-9 w-11 shrink-0 items-center justify-center rounded-[var(--admin-radius-sm)] border font-[family-name:var(--font-space-mono)] text-sm font-bold transition-colors ${
+                        isPlaying
+                          ? 'border-[color:var(--admin-state-live)] bg-[color:var(--admin-state-live)] text-[#0F1115]'
+                          : 'border-[color:var(--admin-border-strong)] text-[color:var(--admin-text)] hover:border-[color:var(--admin-accent-border)] hover:bg-[color:var(--admin-accent-soft)]'
+                      }`}
+                      title={isPlaying ? '停止播放' : '開始播放'}
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </button>
+
+                    <input
+                      type='text'
+                      defaultValue={song.singer}
+                      onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
+                      className='admin-input hidden md:block'
+                      placeholder='歌手名稱'
+                    />
+
+                    <input
+                      type='text'
+                      defaultValue={song.song_title}
+                      onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
+                      className='admin-input hidden md:block'
+                      placeholder='歌曲名稱'
+                    />
+
+                    <button
+                      onClick={() => handleArchive(song)}
+                      className='admin-button admin-button-ghost admin-button-sm flex h-9 w-9 shrink-0 items-center justify-center p-0'
+                      title='封存歌曲'
+                    >
+                      <ArchiveIcon className='h-4 w-4' />
+                    </button>
                   </div>
 
-                  {/* Index Button */}
-                  <button
-                    onClick={() => handlePlay(song.id, song.now_playing)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-eink border font-eink-sans text-sm font-bold transition-all duration-eink-fast ease-eink ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] bg-[var(--eink-bg-secondary)] text-[var(--eink-text-primary)]'
-                        : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
-                    }`}
-                    title={song.now_playing === 1 ? '停止播放' : '開始播放'}
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </button>
-
-                  {/* Artist Input - Hidden on mobile in this row */}
-                  <input
-                    type="text"
-                    defaultValue={song.singer}
-                    onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
-                    className={`eink-input hidden w-full md:block ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                        : ''
-                    }`}
-                    placeholder="歌手名稱"
-                  />
-
-                  {/* Title Input - Hidden on mobile in this row */}
-                  <input
-                    type="text"
-                    defaultValue={song.song_title}
-                    onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
-                    className={`eink-input hidden w-full md:block ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                        : ''
-                    }`}
-                    placeholder="歌曲名稱"
-                  />
-
-                  {/* Archive Button */}
-                  <button
-                    onClick={() => handleArchive(song.id)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-eink border transition-all duration-eink-fast ease-eink ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] text-[var(--eink-bg-secondary)] hover:bg-[var(--eink-bg-secondary)] hover:text-[var(--eink-text-primary)]'
-                        : 'border-[var(--eink-border-strong)] hover:bg-[var(--eink-text-primary)] hover:text-[var(--eink-bg-secondary)]'
-                    }`}
-                    title="歸檔歌曲"
-                  >
-                    <ArchiveIcon className="h-4 w-4" />
-                  </button>
+                  <div className='flex flex-col gap-2 md:hidden'>
+                    <input
+                      type='text'
+                      defaultValue={song.singer}
+                      onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
+                      className='admin-input'
+                      placeholder='歌手名稱'
+                    />
+                    <input
+                      type='text'
+                      defaultValue={song.song_title}
+                      onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
+                      className='admin-input'
+                      placeholder='歌曲名稱'
+                    />
+                  </div>
                 </div>
-
-                {/* Mobile: Input Fields */}
-                <div className="flex flex-col gap-2 md:hidden">
-                  <input
-                    type="text"
-                    defaultValue={song.singer}
-                    onBlur={e => handleUpdate(song.id, e.target.value, song.song_title)}
-                    className={`eink-input w-full ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                        : ''
-                    }`}
-                    placeholder="歌手名稱"
-                  />
-                  <input
-                    type="text"
-                    defaultValue={song.song_title}
-                    onBlur={e => handleUpdate(song.id, song.singer, e.target.value)}
-                    className={`eink-input w-full ${
-                      song.now_playing === 1
-                        ? 'border-[var(--eink-bg-secondary)] bg-transparent text-[var(--eink-bg-secondary)] placeholder:text-[var(--eink-bg-secondary)]/50'
-                        : ''
-                    }`}
-                    placeholder="歌曲名稱"
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="font-eink-serif text-lg text-[var(--eink-text-muted)]">目前沒有歌曲</p>
-            <p className="mt-2 font-eink-serif text-sm text-[var(--eink-text-muted)]">
+          <div className='flex flex-col items-center justify-center py-14 text-center'>
+            <p className='text-sm text-[color:var(--admin-text-muted)]'>目前沒有歌曲</p>
+            <p className='mt-1 text-xs text-[color:var(--admin-text-subtle)]'>
               點擊下方按鈕新增第一首歌曲
             </p>
           </div>
         )}
 
-        {/* Add Song Button */}
         <Dialog onOpenChange={setOpen} open={open}>
           <DialogTrigger asChild>
-            <button className="eink-button mt-6 w-full">+ 新增歌曲</button>
+            <button className='admin-button admin-button-primary mt-5 w-full'>+ 新增歌曲</button>
           </DialogTrigger>
-          <DialogContent className="eink-card border-[var(--eink-border-strong)] sm:max-w-[425px]">
+          <DialogContent className='admin-shell admin-card border-[color:var(--admin-border-strong)] bg-[color:var(--admin-surface)] text-[color:var(--admin-text)] sm:max-w-[425px]'>
             <DialogHeader>
-              <DialogTitle className="font-eink-sans text-lg font-semibold">新增歌曲</DialogTitle>
+              <DialogTitle className='text-base font-semibold'>新增歌曲</DialogTitle>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label
-                  htmlFor="artist"
-                  className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-                >
+            <div className='grid gap-4 py-2'>
+              <div className='grid gap-2'>
+                <label htmlFor='artist' className='text-xs font-medium text-[color:var(--admin-text-muted)]'>
                   歌手
                 </label>
                 <input
-                  id="artist"
-                  type="text"
+                  id='artist'
+                  type='text'
                   value={artist}
                   onChange={e => setArtist(e.target.value)}
-                  className="eink-input w-full"
-                  placeholder="輸入歌手名稱"
+                  className='admin-input'
+                  placeholder='輸入歌手名稱'
                 />
               </div>
-              <div className="grid gap-2">
-                <label
-                  htmlFor="title"
-                  className="font-eink-sans text-sm font-medium text-[var(--eink-text-secondary)]"
-                >
+              <div className='grid gap-2'>
+                <label htmlFor='title' className='text-xs font-medium text-[color:var(--admin-text-muted)]'>
                   歌名
                 </label>
                 <input
-                  id="title"
-                  type="text"
+                  id='title'
+                  type='text'
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="eink-input w-full"
-                  placeholder="輸入歌曲名稱"
+                  className='admin-input'
+                  placeholder='輸入歌曲名稱'
                 />
               </div>
             </div>
             <DialogFooter>
               <button
-                type="submit"
+                type='submit'
                 onClick={handleAddSong}
-                className="eink-button eink-button-primary"
+                className='admin-button admin-button-primary'
                 disabled={!title || !artist}
               >
                 確認新增
@@ -389,14 +326,12 @@ export default function SongList() {
         </Dialog>
       </div>
 
-      {/* Now Playing Indicator */}
-      {songList?.some(song => song.now_playing === 1) && (
-        <div className="border-t border-[var(--eink-border-strong)] p-4">
-          <div className="flex items-center gap-3">
-            <span className="eink-badge eink-badge-active">播放中</span>
-            <span className="font-eink-serif text-sm">
-              {songList.find(song => song.now_playing === 1)?.singer} -{' '}
-              {songList.find(song => song.now_playing === 1)?.song_title}
+      {nowPlaying && (
+        <div className='border-t border-[color:var(--admin-border)] px-5 py-3'>
+          <div className='flex items-center gap-3'>
+            <span className='admin-badge admin-badge--live'>播放中</span>
+            <span className='truncate text-sm text-[color:var(--admin-text)]'>
+              {nowPlaying.singer} · {nowPlaying.song_title}
             </span>
           </div>
         </div>
