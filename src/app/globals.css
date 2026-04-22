@@ -847,14 +847,150 @@ hr.gradient {
   100% { background-position: -200% 0; }
 }
 
-/* Gift Sub — green */
+/* Gift Sub — green, featured with shimmer */
 .event-card--giftsub {
-  background: linear-gradient(180deg, rgba(0, 255, 135, 0.06) 0%, rgba(0, 15, 8, 0.35) 100%);
-  box-shadow: 0 4px 22px rgba(0, 255, 135, 0.13);
+  background: linear-gradient(180deg, rgba(0, 255, 135, 0.1) 0%, rgba(0, 15, 8, 0.4) 100%);
+  box-shadow: 0 4px 26px rgba(0, 255, 135, 0.22);
 }
-.event-card--giftsub::before,
 .event-card--giftsub::after {
   background: linear-gradient(90deg, transparent, #00FF87, transparent);
+}
+.event-card--giftsub::before {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(90deg, transparent, #00FF87 40%, #b2ffd8 50%, #00FF87 60%, transparent);
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 2.4s ease-in-out infinite;
+}
+
+/* Gift Sub tiers — progressively richer as the count grows */
+/* Uncommon (5-9) — slightly brighter, gentle pulse on count */
+.event-card--giftsub.giftsub--uncommon {
+  background: linear-gradient(180deg, rgba(0, 255, 135, 0.14) 0%, rgba(0, 15, 8, 0.45) 100%);
+  box-shadow: 0 4px 28px rgba(0, 255, 135, 0.3);
+}
+.event-card--giftsub.giftsub--uncommon .giftsub-count-num {
+  animation: giftsub-count-pulse 1.8s ease-in-out infinite;
+}
+
+/* Rare (10-24) — deeper glow + bigger count + warm teal tint */
+.event-card--giftsub.giftsub--rare {
+  background: linear-gradient(180deg, rgba(0, 255, 170, 0.18) 0%, rgba(0, 15, 8, 0.5) 100%);
+  box-shadow: 0 6px 32px rgba(0, 255, 135, 0.38);
+}
+.event-card--giftsub.giftsub--rare .giftsub-count-num {
+  font-size: 34px;
+  text-shadow: 0 0 18px rgba(0, 255, 135, 0.75);
+  animation: giftsub-count-pulse 1.5s ease-in-out infinite;
+}
+.event-card--giftsub.giftsub--rare .giftsub-caption {
+  color: #7cf7b8;
+  opacity: 1;
+}
+
+/* Epic (25-49) — gold accents bleed in, dual-color shimmer, even bigger count */
+.event-card--giftsub.giftsub--epic {
+  background: linear-gradient(180deg, rgba(255, 209, 102, 0.12) 0%, rgba(0, 255, 135, 0.14) 55%, rgba(0, 15, 8, 0.55) 100%);
+  box-shadow:
+    0 6px 36px rgba(0, 255, 135, 0.35),
+    0 0 26px rgba(255, 209, 102, 0.28);
+  border: 1px solid rgba(255, 209, 102, 0.22);
+}
+.event-card--giftsub.giftsub--epic::before {
+  background: linear-gradient(90deg, transparent, #FFD166 30%, #fff4c2 45%, #b2ffd8 55%, #00FF87 70%, transparent);
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 1.8s ease-in-out infinite;
+}
+.event-card--giftsub.giftsub--epic .giftsub-caption {
+  color: #FFD166;
+  opacity: 1;
+  letter-spacing: 0.32em;
+}
+.event-card--giftsub.giftsub--epic .giftsub-count-num {
+  font-size: 40px;
+  background: linear-gradient(135deg, #FFD166 0%, #fff4c2 40%, #00FF87 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 0 22px rgba(255, 209, 102, 0.5);
+  animation: giftsub-count-pulse 1.25s ease-in-out infinite;
+}
+.event-card--giftsub.giftsub--epic .giftsub-count-unit {
+  color: #FFD166;
+  border-color: rgba(255, 209, 102, 0.4);
+  background: rgba(255, 209, 102, 0.12);
+}
+
+/* Legendary (50+) — rainbow shimmer, pulsing aura, huge count, crown caption */
+.event-card--giftsub.giftsub--legendary {
+  background:
+    radial-gradient(ellipse at top, rgba(255, 209, 102, 0.22) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 107, 255, 0.12) 0%, rgba(0, 255, 135, 0.16) 50%, rgba(0, 15, 8, 0.6) 100%);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  animation: giftsub-legendary-aura 2.6s ease-in-out infinite;
+}
+.event-card--giftsub.giftsub--legendary::before {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #FF6BFF 20%,
+    #FFD166 35%,
+    #fff4c2 50%,
+    #00FF87 65%,
+    #60C8FF 80%,
+    transparent
+  );
+  background-size: 220% 100%;
+  animation: new-sub-shimmer 1.4s linear infinite;
+}
+.event-card--giftsub.giftsub--legendary::after {
+  height: 2px;
+  opacity: 0.7;
+  background: linear-gradient(90deg, transparent, #FFD166, transparent);
+}
+.event-card--giftsub.giftsub--legendary .giftsub-caption {
+  color: #FFD166;
+  letter-spacing: 0.34em;
+  font-size: 10px;
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(255, 209, 102, 0.6);
+}
+.event-card--giftsub.giftsub--legendary .giftsub-count-num {
+  font-size: 52px;
+  line-height: 1;
+  background: linear-gradient(135deg, #FF6BFF 0%, #FFD166 35%, #fff4c2 55%, #00FF87 85%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 0 28px rgba(255, 209, 102, 0.6);
+  animation: giftsub-legendary-hue 3s ease-in-out infinite, giftsub-count-pulse 1s ease-in-out infinite;
+}
+.event-card--giftsub.giftsub--legendary .giftsub-count-unit {
+  color: #FFD166;
+  border-color: rgba(255, 209, 102, 0.55);
+  background: rgba(255, 209, 102, 0.18);
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.35);
+}
+.event-card--giftsub.giftsub--legendary .giftsub-gifter-name {
+  color: #FFD166;
+  text-shadow: 0 0 8px rgba(255, 209, 102, 0.5);
+}
+
+@keyframes giftsub-count-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+@keyframes giftsub-legendary-aura {
+  0%, 100% { box-shadow: 0 6px 38px rgba(0, 255, 135, 0.35), 0 0 32px rgba(255, 209, 102, 0.38); }
+  50%      { box-shadow: 0 6px 52px rgba(0, 255, 135, 0.55), 0 0 46px rgba(255, 209, 102, 0.6); }
+}
+@keyframes giftsub-legendary-hue {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
 /* Cheer/Bits — blue */
@@ -867,14 +1003,20 @@ hr.gradient {
   background: linear-gradient(90deg, transparent, #60C8FF, transparent);
 }
 
-/* Raid — purple */
+/* Raid — purple, featured with shimmer */
 .event-card--raid {
-  background: linear-gradient(180deg, rgba(192, 132, 252, 0.08) 0%, rgba(5, 0, 15, 0.35) 100%);
-  box-shadow: 0 4px 22px rgba(192, 132, 252, 0.16);
+  background: linear-gradient(180deg, rgba(192, 132, 252, 0.12) 0%, rgba(5, 0, 15, 0.4) 100%);
+  box-shadow: 0 4px 28px rgba(192, 132, 252, 0.26);
 }
-.event-card--raid::before,
 .event-card--raid::after {
   background: linear-gradient(90deg, transparent, #C084FC, transparent);
+}
+.event-card--raid::before {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(90deg, transparent, #C084FC 40%, #e9d5ff 50%, #C084FC 60%, transparent);
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 2.4s ease-in-out infinite;
 }
 
 /* Event type tag row */
@@ -963,23 +1105,6 @@ hr.gradient {
   border: 1px solid rgba(255, 209, 102, 0.28);
   border-radius: 3px;
   padding: 1px 6px;
-  flex-shrink: 0;
-}
-
-/* Gift count pill */
-.gift-count-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 7px;
-  border-radius: 20px;
-  background: rgba(0, 255, 135, 0.1);
-  border: 1px solid rgba(0, 255, 135, 0.22);
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  color: #00FF87;
-  letter-spacing: 0.04em;
-  margin-left: auto;
   flex-shrink: 0;
 }
 
@@ -1115,28 +1240,105 @@ hr.gradient {
   color: #C084FC;
 }
 
-/* Raid num block */
-.raid-num-block {
+/* Raid (揪團) body */
+.raid-body {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0 4px;
+}
+.raid-caption {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: #C084FC;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+.raid-username {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #C084FC;
+  text-shadow: 0 0 12px rgba(192, 132, 252, 0.55);
+  line-height: 1.15;
+}
+.raid-count-row {
+  display: inline-flex;
   align-items: baseline;
   gap: 6px;
-  margin-top: 5px;
+  margin-top: 2px;
 }
-
 .raid-big-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #C084FC;
   line-height: 1;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.45);
+}
+.raid-num-label {
+  font-size: 10px;
+  color: rgba(200, 170, 255, 0.65);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.raid-num-label {
+/* Community gift (批量贈訂) body */
+.giftsub-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0 4px;
+}
+.giftsub-caption {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: #00FF87;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+.giftsub-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.giftsub-count-num {
+  display: inline-block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #00FF87;
+  text-shadow: 0 0 14px rgba(0, 255, 135, 0.55);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transform-origin: center;
+}
+.giftsub-count-unit {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
-  color: rgba(192, 132, 252, 0.5);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #00FF87;
+  background: rgba(0, 255, 135, 0.1);
+  border: 1px solid rgba(0, 255, 135, 0.28);
+  border-radius: 3px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.giftsub-gifter {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.giftsub-gifter-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #00FF87;
+  letter-spacing: 0.01em;
+}
+.giftsub-gifter-text {
+  color: rgba(200, 255, 220, 0.7);
 }
 
 @keyframes arm-settle {
