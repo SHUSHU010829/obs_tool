@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Noto_Sans_TC, Montserrat, Titan_One, Poppins, Space_Mono } from 'next/font/google'
 import React from 'react'
+import { Toaster } from 'sonner'
 
 const notoSansTC = Noto_Sans_TC({
   subsets: ['latin'],
@@ -51,6 +52,12 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         {children}
+        <Toaster
+          position='bottom-right'
+          theme='dark'
+          duration={3000}
+          toastOptions={{ className: 'admin-toast' }}
+        />
       </body>
     </html>
   )
