@@ -1,5 +1,6 @@
 'use client'
 
+import { eventMotionProps } from '@/app/chat/components/eventMotion'
 import { EventCardComponent } from '@/app/chat/components/twitchChat'
 import { ChatMessage } from '@/app/chat/components/type'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -76,18 +77,21 @@ export default function EventsFeed({ events }: Props) {
           </div>
         ) : (
           <AnimatePresence initial={false}>
-            {events.map(ev => (
-              <motion.div
-                key={ev.id}
-                layout
-                initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <EventCardComponent msg={ev} />
-              </motion.div>
-            ))}
+            {events.map(ev => {
+              const motionProps = eventMotionProps(ev)
+              return (
+                <motion.div
+                  key={ev.id}
+                  layout
+                  initial={motionProps.initial}
+                  animate={motionProps.animate}
+                  exit={motionProps.exit}
+                  transition={motionProps.transition}
+                >
+                  <EventCardComponent msg={ev} />
+                </motion.div>
+              )
+            })}
           </AnimatePresence>
         )}
       </div>

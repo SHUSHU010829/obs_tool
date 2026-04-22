@@ -3,8 +3,10 @@
 import TwitchChatDebug from './debug'
 import { EmoteCache } from './emoteCache'
 import MessageFragment from './messageFragment'
+import { eventMotionProps, subPlanModifier } from './eventMotion'
 import { BadgeSet, BadgeVersion, ChatMessage, ParsedEmote, SevenTVEmote } from './type'
 import { getChannelBadges, getGlobalBadges } from '@/api/twitchClient'
+import { useTwitchHypeTrain, type HypeTrainEvent } from '@/lib/twitchEventSub'
 import { motion, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState, memo, useCallback, useRef } from 'react'
 import tmi from 'tmi.js'
@@ -177,6 +179,7 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
     giftsub:      { cardClass: 'event-card--giftsub', tagIcon: 'G', label: 'Community Gift' },
     cheer:        { cardClass: 'event-card--cheer',  tagIcon: 'B', label: 'Cheer' },
     raid:         { cardClass: 'event-card--raid',   tagIcon: '!', label: 'Incoming Raid' },
+    hype_train:   { cardClass: 'event-card--hype',   tagIcon: 'HT', label: 'Hype Train' },
   }
 
   const config = typeConfig[msg.type] || typeConfig.subscription
@@ -186,9 +189,15 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
     ? giftsubTier(msg.giftCount ?? 1)
     : null
 
+  const isTieredSub = msg.type === 'subscription' || msg.type === 'resub'
+  const tierModifier = isTieredSub ? ` event-card--${subPlanModifier(msg.subPlan)}` : ''
+  const hypeStageModifier =
+    msg.type === 'hype_train' && msg.hypeStage ? ` event-card--hype-${msg.hypeStage}` : ''
+
   return (
     <div
-      className={`event-card ${config.cardClass}${isNewSub ? ' event-card--new-sub' : ''}${giftMeta && giftMeta.modifier ? ' ' + giftMeta.modifier : ''}`}
+      data-tier={isTieredSub ? subPlanModifier(msg.subPlan) : undefined}
+      className={`event-card ${config.cardClass}${isNewSub ? ' event-card--new-sub' : ''}${giftMeta && giftMeta.modifier ? ' ' + giftMeta.modifier : ''}${tierModifier}${hypeStageModifier}`}
     >
       {/* Type tag row */}
       <div className='event-type-tag'>
@@ -247,6 +256,48 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
               <span className='giftsub-gifter-text'> 贈送訂閱給社群！</span>
             </div>
           </div>
+        ) : msg.type === 'hype_train' ? (
+          <div className='hype-body'>
+            {msg.hypeStage === 'end' ? (
+              <>
+                <div className='hype-caption font-spaceMono'>★  HYPE TRAIN END  ★</div>
+                <div className='hype-level font-spaceMono'>
+                  <span className='hype-level-label'>FINAL LEVEL</span>
+                  <span className='hype-level-num'>{msg.hypeLevel ?? 1}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className='hype-caption font-spaceMono'>
+                  {msg.hypeStage === 'begin' ? '»»  HYPE TRAIN START  »»' : '»»  HYPE TRAIN  »»'}
+                </div>
+                <div className='hype-level font-spaceMono'>
+                  <span className='hype-level-label'>LEVEL</span>
+                  <span className='hype-level-num'>{msg.hypeLevel ?? 1}</span>
+                </div>
+                {msg.hypeGoal != null && msg.hypeGoal > 0 && (
+                  <div className='hype-progress-row'>
+                    <div className='hype-progress-bar'>
+                      <div
+                        className='hype-progress-fill'
+                        style={{
+                          width: `${Math.min(100, Math.round(((msg.hypeProgress ?? 0) / msg.hypeGoal) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                    <span className='hype-progress-text font-spaceMono'>
+                      {msg.hypeProgress ?? 0} / {msg.hypeGoal}
+                    </span>
+                  </div>
+                )}
+                {msg.hypeTopContributorName && (
+                  <div className='hype-top font-spaceMono'>
+                    TOP  ·  {msg.hypeTopContributorName}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         ) : (
           // cheer
           <span className='event-username'>{msg.user}</span>
@@ -294,7 +345,8 @@ export default function TwitchChat({
   const appendMessage = useCallback(
     (msg: ChatMessage) => {
       setMessages(prev => {
-        const updated = [...prev, msg]
+        const filtered = prev.filter(m => m.id !== msg.id)
+        const updated = [...filtered, msg]
         return updated.length > messagesLimit ? updated.slice(-messagesLimit) : updated
       })
       onMessageRef.current?.(msg)
@@ -525,6 +577,9 @@ export default function TwitchChat({
         return
       }
 
+      const displayName = (tags['display-name'] || tags.username || '').toLowerCase()
+      if (displayName === 'streamelements') return
+
       const role = getUserRole(tags.badges || {})
       const { parsedEmotes, messageFragments } = parseMessageWithEmotes(
         message,
@@ -640,33 +695,11 @@ export default function TwitchChat({
       appendMessage(newMessage)
     }
 
-    const handleGiftSub = (
-      channel: string,
-      username: string,
-      streakMonths: number,
-      recipient: string,
-      methods: any,
-      userState: any
-    ) => {
-      const newMessage: ChatMessage = {
-        type: 'subscription',
-        user: recipient,
-        message: '',
-        badges: userState.badges || {},
-        emotes: null,
-        parsedEmotes: [],
-        messageFragments: [],
-        isSubscriber: true,
-        isMod: false,
-        id: userState.id || `${Date.now()}-${Math.random()}`,
-        role: 'subscriber',
-        timestamp: Date.now(),
-        subPlan: methods.plan,
-        subMonths: 1,
-        subGifter: username,
-      }
-
-      appendMessage(newMessage)
+    // Individual gift-recipient events are intentionally suppressed:
+    // the Community Gift summary (submysterygift → handleMysteryGift) already
+    // conveys the gifter's contribution, and per-recipient cards flood the feed.
+    const handleGiftSub = () => {
+      return
     }
 
     const handleMysteryGift = (
@@ -754,6 +787,35 @@ export default function TwitchChat({
     }
   }, [hideAfter])
 
+  const handleHypeEvent = useCallback(
+    (ev: HypeTrainEvent) => {
+      const newMessage: ChatMessage = {
+        type: 'hype_train',
+        user: ev.topContributorName || 'Hype Train',
+        message: '',
+        badges: {},
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: [],
+        isSubscriber: false,
+        isMod: false,
+        id: `hype-${ev.id}`,
+        role: 'noRole',
+        timestamp: Date.now(),
+        hypeLevel: ev.level,
+        hypeProgress: ev.progress,
+        hypeGoal: ev.goal,
+        hypeStage: ev.stage,
+        hypeTopContributorName: ev.topContributorName,
+        hypeTotal: ev.total,
+      }
+      appendMessage(newMessage)
+    },
+    [appendMessage]
+  )
+
+  useTwitchHypeTrain({ channelId, onEvent: handleHypeEvent })
+
   // Test handlers
   const handleTestMessage = useCallback(
     (username: string, message: string) => {
@@ -778,7 +840,7 @@ export default function TwitchChat({
   )
 
   const handleTestSub = useCallback(
-    (username: string, months: number, message: string) => {
+    (username: string, months: number, message: string, tier: '1000' | '2000' | '3000' = '1000') => {
       const newMessage: ChatMessage = {
         type: 'subscription',
         user: username,
@@ -794,7 +856,7 @@ export default function TwitchChat({
         id: `test-sub-${Date.now()}`,
         role: 'subscriber',
         timestamp: Date.now(),
-        subPlan: '1000',
+        subPlan: tier,
         subMonths: months,
       }
       appendMessage(newMessage)
@@ -803,7 +865,7 @@ export default function TwitchChat({
   )
 
   const handleTestResub = useCallback(
-    (username: string, months: number, message: string) => {
+    (username: string, months: number, message: string, tier: '1000' | '2000' | '3000' = '1000') => {
       const newMessage: ChatMessage = {
         type: 'resub',
         user: username,
@@ -819,12 +881,39 @@ export default function TwitchChat({
         id: `test-resub-${Date.now()}`,
         role: 'subscriber',
         timestamp: Date.now(),
-        subPlan: '1000',
+        subPlan: tier,
         subMonths: months,
       }
       appendMessage(newMessage)
     },
     [parseMessageWithEmotes, appendMessage]
+  )
+
+  const handleTestHypeTrain = useCallback(
+    (stage: 'begin' | 'progress' | 'end', level: number) => {
+      const newMessage: ChatMessage = {
+        type: 'hype_train',
+        user: 'Hype Train',
+        message: '',
+        badges: {},
+        emotes: null,
+        parsedEmotes: [],
+        messageFragments: [],
+        isSubscriber: false,
+        isMod: false,
+        id: 'test-hype-current',
+        role: 'noRole',
+        timestamp: Date.now(),
+        hypeLevel: level,
+        hypeProgress: stage === 'end' ? undefined : 3200 + level * 400,
+        hypeGoal: stage === 'end' ? undefined : 5000 + level * 500,
+        hypeStage: stage,
+        hypeTopContributorName: 'TopFan',
+        hypeTotal: level * 12000,
+      }
+      appendMessage(newMessage)
+    },
+    [appendMessage]
   )
 
   const handleTestCheer = useCallback(
@@ -923,28 +1012,30 @@ export default function TwitchChat({
       <div className='relative h-full w-full overflow-hidden'>
         <div className='absolute bottom-0 left-0 right-0 flex flex-col gap-2 px-2 pb-4'>
           <AnimatePresence initial={false} mode='popLayout'>
-            {messages.map(msg => (
-              <motion.div
-                key={msg.id}
-                layout
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{
-                  duration: 0.15,
-                  ease: [0.25, 0.1, 0.25, 1],
-                  layout: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='w-full'
-                style={{ willChange: 'transform, opacity' }}
-              >
-                {msg.type === 'message' ? (
-                  <ChatMessageComponent msg={msg} />
-                ) : (
-                  <EventCardComponent msg={msg} />
-                )}
-              </motion.div>
-            ))}
+            {messages.map(msg => {
+              const motionProps = eventMotionProps(msg)
+              return (
+                <motion.div
+                  key={msg.id}
+                  layout
+                  initial={motionProps.initial}
+                  animate={motionProps.animate}
+                  exit={motionProps.exit}
+                  transition={{
+                    ...motionProps.transition,
+                    layout: { duration: 0.2, ease: 'easeOut' },
+                  }}
+                  className='w-full'
+                  style={{ willChange: 'transform, opacity' }}
+                >
+                  {msg.type === 'message' ? (
+                    <ChatMessageComponent msg={msg} />
+                  ) : (
+                    <EventCardComponent msg={msg} />
+                  )}
+                </motion.div>
+              )
+            })}
           </AnimatePresence>
         </div>
       </div>
@@ -957,6 +1048,7 @@ export default function TwitchChat({
           onSimulateGiftSub={handleTestGiftSub}
           onSimulateRaid={handleTestRaid}
           onSimulateFirstMessage={handleTestFirstMessage}
+          onSimulateHypeTrain={handleTestHypeTrain}
         />
       )}
     </>

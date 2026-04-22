@@ -25,7 +25,7 @@ export interface BadgeSet {
 
 export interface ChatMessage {
   user: string
-  type: 'message' | 'subscription' | 'resub' | 'giftsub' | 'cheer' | 'raid'
+  type: 'message' | 'subscription' | 'resub' | 'giftsub' | 'cheer' | 'raid' | 'hype_train'
   bits?: number
   subPlan?: 'Prime' | '1000' | '2000' | '3000'
   subMonths?: number
@@ -36,6 +36,12 @@ export interface ChatMessage {
   isFirstMessage?: boolean
   color?: string
   systemMsg?: string
+  hypeLevel?: number
+  hypeProgress?: number
+  hypeGoal?: number
+  hypeStage?: 'begin' | 'progress' | 'end'
+  hypeTopContributorName?: string
+  hypeTotal?: number
 
   message: string
   badges: Record<string, string | undefined>

@@ -1522,6 +1522,81 @@ hr.gradient {
   flex-shrink: 0;
 }
 
+/* Tier 2 sub card — silver-blue palette */
+.event-card--tier-2 .sub-tier-tag {
+  color: #9FD4FF;
+  background: rgba(159, 212, 255, 0.14);
+  border-color: rgba(159, 212, 255, 0.34);
+}
+.event-card--tier-2 {
+  background: linear-gradient(180deg, rgba(159, 212, 255, 0.1) 0%, rgba(0, 15, 20, 0.4) 100%);
+  box-shadow: 0 4px 24px rgba(159, 212, 255, 0.2);
+}
+.event-card--tier-2.event-card--sub::before,
+.event-card--tier-2.event-card--sub::after,
+.event-card--tier-2.event-card--resub::before,
+.event-card--tier-2.event-card--resub::after {
+  background: linear-gradient(90deg, transparent, #9FD4FF, transparent);
+}
+
+/* Tier 3 sub card — magenta glow + animated aurora border + sparkle overlay */
+.event-card--tier-3 .sub-tier-tag {
+  color: #F5C2FF;
+  background: rgba(232, 121, 249, 0.18);
+  border-color: rgba(232, 121, 249, 0.5);
+  text-shadow: 0 0 8px rgba(232, 121, 249, 0.7);
+}
+.event-card--tier-3 {
+  background:
+    linear-gradient(180deg, rgba(232, 121, 249, 0.16) 0%, rgba(20, 0, 28, 0.55) 100%);
+  box-shadow:
+    0 0 0 1px rgba(232, 121, 249, 0.5),
+    0 6px 34px rgba(232, 121, 249, 0.42),
+    0 0 60px rgba(232, 121, 249, 0.22);
+  animation: t3-aurora 2.6s ease-in-out infinite;
+}
+.event-card--tier-3.event-card--sub::before,
+.event-card--tier-3.event-card--sub::after,
+.event-card--tier-3.event-card--resub::before,
+.event-card--tier-3.event-card--resub::after {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #E879F9 35%,
+    #fff0ff 50%,
+    #E879F9 65%,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 2s ease-in-out infinite;
+}
+.event-card--tier-3 .new-sub-username,
+.event-card--tier-3 .resub-username {
+  color: #F5C2FF;
+  text-shadow: 0 0 14px rgba(232, 121, 249, 0.9);
+}
+.event-card--tier-3 .new-sub-sparkle {
+  color: #F5C2FF;
+  letter-spacing: 0.22em;
+}
+
+@keyframes t3-aurora {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(232, 121, 249, 0.5),
+      0 6px 34px rgba(232, 121, 249, 0.42),
+      0 0 60px rgba(232, 121, 249, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(245, 194, 255, 0.8),
+      0 8px 42px rgba(232, 121, 249, 0.65),
+      0 0 80px rgba(232, 121, 249, 0.38);
+  }
+}
+
 /* Bits amount block */
 .bits-amount-block {
   display: flex;
@@ -1841,4 +1916,89 @@ hr.gradient {
 @keyframes live-ping-wave {
   0%   { transform: scale(0.3); opacity: 0.85; }
   100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* ===== Hype Train event card ===== */
+.event-card--hype {
+  background: linear-gradient(180deg, rgba(255, 140, 86, 0.14) 0%, rgba(24, 8, 0, 0.55) 100%);
+  box-shadow: 0 4px 26px rgba(255, 140, 86, 0.3);
+}
+.event-card--hype::before,
+.event-card--hype::after {
+  background: linear-gradient(90deg, transparent, #FF8C56, transparent);
+}
+.event-card--hype .tag-icon {
+  background: rgba(255, 140, 86, 0.14);
+  color: #FFB48A;
+  border: 1px solid rgba(255, 140, 86, 0.4);
+}
+.event-card--hype .event-type-tag {
+  color: #FFB48A;
+}
+
+.event-card--hype-end {
+  background: linear-gradient(180deg, rgba(255, 86, 140, 0.2) 0%, rgba(24, 0, 12, 0.6) 100%);
+  box-shadow: 0 6px 34px rgba(255, 86, 140, 0.4), 0 0 60px rgba(255, 140, 86, 0.24);
+  animation: t3-aurora 2.6s ease-in-out infinite;
+}
+
+.hype-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hype-caption {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #FFB48A;
+  opacity: 0.95;
+}
+.hype-level {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hype-level-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 180, 138, 0.7);
+}
+.hype-level-num {
+  font-size: 30px;
+  font-weight: 700;
+  color: #FFD4B3;
+  text-shadow: 0 0 14px rgba(255, 140, 86, 0.85);
+  line-height: 1;
+}
+.hype-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+.hype-progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 140, 86, 0.14);
+  overflow: hidden;
+  border: 1px solid rgba(255, 140, 86, 0.28);
+}
+.hype-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF8C56, #FF568C);
+  box-shadow: 0 0 12px rgba(255, 140, 86, 0.7);
+  transition: width 0.4s ease;
+}
+.hype-progress-text {
+  font-size: 10px;
+  color: rgba(255, 212, 179, 0.85);
+  letter-spacing: 0.06em;
+  min-width: 60px;
+  text-align: right;
+}
+.hype-top {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 180, 138, 0.72);
 }
