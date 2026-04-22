@@ -160,6 +160,15 @@ function subPlanLabel(plan?: string): string {
   return 'Tier 1'
 }
 
+// Community-gift size → visual tier (50+ = legendary)
+function giftsubTier(count: number): { modifier: string; caption: string } {
+  if (count >= 50) return { modifier: 'giftsub--legendary', caption: '★  LEGENDARY GIFT  ★' }
+  if (count >= 25) return { modifier: 'giftsub--epic',      caption: '✧  EPIC GIFT  ✧' }
+  if (count >= 10) return { modifier: 'giftsub--rare',      caption: '✦  GENEROUS GIFT  ✦' }
+  if (count >= 5)  return { modifier: 'giftsub--uncommon',  caption: '✦  COMMUNITY GIFT  ✦' }
+  return { modifier: '',                                    caption: '✦  COMMUNITY GIFT  ✦' }
+}
+
 // Event card component for special events
 export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const typeConfig: Record<string, { cardClass: string; tagIcon: string; label: string }> = {
@@ -173,9 +182,14 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const config = typeConfig[msg.type] || typeConfig.subscription
   const tier = subPlanLabel(msg.subPlan)
   const isNewSub = msg.type === 'subscription'
+  const giftMeta = msg.type === 'giftsub'
+    ? giftsubTier(msg.giftCount ?? 1)
+    : null
 
   return (
-    <div className={`event-card ${config.cardClass}${isNewSub ? ' event-card--new-sub' : ''}`}>
+    <div
+      className={`event-card ${config.cardClass}${isNewSub ? ' event-card--new-sub' : ''}${giftMeta && giftMeta.modifier ? ' ' + giftMeta.modifier : ''}`}
+    >
       {/* Type tag row */}
       <div className='event-type-tag'>
         <span className='tag-icon'>{config.tagIcon}</span>
@@ -223,7 +237,7 @@ export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
           </div>
         ) : msg.type === 'giftsub' ? (
           <div className='giftsub-body'>
-            <div className='giftsub-caption font-spaceMono'>✦  COMMUNITY GIFT  ✦</div>
+            <div className='giftsub-caption font-spaceMono'>{giftMeta?.caption}</div>
             <div className='giftsub-count font-spaceMono'>
               <span className='giftsub-count-num'>×{msg.giftCount ?? 1}</span>
               <span className='giftsub-count-unit'>{tier}</span>
