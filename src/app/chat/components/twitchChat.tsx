@@ -161,7 +161,7 @@ function subPlanLabel(plan?: string): string {
 }
 
 // Event card component for special events
-const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
+export const EventCardComponent = memo(({ msg }: { msg: ChatMessage }) => {
   const typeConfig: Record<string, { cardClass: string; tagIcon: string; label: string }> = {
     subscription: { cardClass: 'event-card--sub',    tagIcon: 'S', label: 'New Subscriber' },
     resub:        { cardClass: 'event-card--resub',  tagIcon: 'R', label: 'Resub' },
@@ -253,18 +253,36 @@ export default function TwitchChat({
   hideAfter = 999,
   messagesLimit = 200,
   debug = false,
+  onMessage,
 }: {
   channel: string
   channelId: string
   hideAfter?: number
   messagesLimit?: number
   debug?: boolean
+  onMessage?: (msg: ChatMessage) => void
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([])
   const sevenTVEmoteCache = useRef<Map<string, string>>(new Map())
   const clientRef = useRef<tmi.Client | null>(null)
   const processedMessageIds = useRef(new Set<string>())
+
+  const onMessageRef = useRef(onMessage)
+  useEffect(() => {
+    onMessageRef.current = onMessage
+  }, [onMessage])
+
+  const appendMessage = useCallback(
+    (msg: ChatMessage) => {
+      setMessages(prev => {
+        const updated = [...prev, msg]
+        return updated.length > messagesLimit ? updated.slice(-messagesLimit) : updated
+      })
+      onMessageRef.current?.(msg)
+    },
+    [messagesLimit]
+  )
 
   // Badge cache refs - loaded once on mount
   const channelBadgesCache = useRef<BadgeSet[]>([])
@@ -521,10 +539,7 @@ export default function TwitchChat({
         color: tags.color || undefined,
       }
 
-      setMessages(prev => {
-        const updated = [...prev, newMessage]
-        return updated.length > messagesLimit ? updated.slice(-messagesLimit) : updated
-      })
+      appendMessage(newMessage)
     }
 
     const handleSub = (
@@ -553,7 +568,7 @@ export default function TwitchChat({
         subMonths: methods.months,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     const handleResub = (
@@ -583,7 +598,7 @@ export default function TwitchChat({
         subMonths: months,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     const handleCheer = (channel: string, userState: any, message: string) => {
@@ -604,7 +619,7 @@ export default function TwitchChat({
         bits: userState.bits,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     const handleGiftSub = (
@@ -633,7 +648,7 @@ export default function TwitchChat({
         subGifter: username,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     const handleMysteryGift = (
@@ -660,7 +675,7 @@ export default function TwitchChat({
         subPlan: methods?.plan,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     const handleRaid = (channel: string, username: string, viewers: number) => {
@@ -681,7 +696,7 @@ export default function TwitchChat({
         raidViewers: viewers,
       }
 
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     }
 
     client.on('message', handleChatMessage)
@@ -708,7 +723,7 @@ export default function TwitchChat({
       }
       processedMessageIds.current.clear()
     }
-  }, [channel, messagesLimit, getUserRole, parseMessageWithEmotes, resolveBadges])
+  }, [channel, messagesLimit, getUserRole, parseMessageWithEmotes, resolveBadges, appendMessage])
 
   useEffect(() => {
     if (hideAfter !== Infinity) {
@@ -739,9 +754,9 @@ export default function TwitchChat({
         role: 'subscriber',
         timestamp: Date.now(),
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit, parseMessageWithEmotes]
+    [parseMessageWithEmotes, appendMessage]
   )
 
   const handleTestSub = useCallback(
@@ -764,9 +779,9 @@ export default function TwitchChat({
         subPlan: '1000',
         subMonths: months,
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit, parseMessageWithEmotes]
+    [parseMessageWithEmotes, appendMessage]
   )
 
   const handleTestResub = useCallback(
@@ -789,9 +804,9 @@ export default function TwitchChat({
         subPlan: '1000',
         subMonths: months,
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit, parseMessageWithEmotes]
+    [parseMessageWithEmotes, appendMessage]
   )
 
   const handleTestCheer = useCallback(
@@ -811,9 +826,9 @@ export default function TwitchChat({
         timestamp: Date.now(),
         bits,
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit, parseMessageWithEmotes]
+    [parseMessageWithEmotes, appendMessage]
   )
 
   const handleTestGiftSub = useCallback(
@@ -834,9 +849,9 @@ export default function TwitchChat({
         giftCount: count,
         subPlan: '1000',
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit]
+    [appendMessage]
   )
 
   const handleTestRaid = useCallback(
@@ -857,9 +872,9 @@ export default function TwitchChat({
         raidFrom: username,
         raidViewers: viewers,
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit]
+    [appendMessage]
   )
 
   const handleTestFirstMessage = useCallback(
@@ -880,9 +895,9 @@ export default function TwitchChat({
         timestamp: Date.now(),
         isFirstMessage: true,
       }
-      setMessages(prev => [...prev, newMessage].slice(-messagesLimit))
+      appendMessage(newMessage)
     },
-    [messagesLimit, parseMessageWithEmotes]
+    [parseMessageWithEmotes, appendMessage]
   )
 
   return (
