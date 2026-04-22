@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import EventsFeed from './components/EventsFeed'
 import HudFooter from './components/HudFooter'
 import HudHeader from './components/HudHeader'
+import SpotifyNowPlaying from './components/SpotifyNowPlaying'
 import StatsPanel from './components/StatsPanel'
 import TopChatters from './components/TopChatters'
 import { useChatAggregates } from './hooks/useChatAggregates'
@@ -65,6 +66,7 @@ export default function FullscreenChat() {
           isLive={telemetry.isLive}
         />
         <TopChatters chatters={aggregates.topChatters} />
+        <SpotifyNowPlaying />
       </div>
 
       {/* Center: chat */}
