@@ -15,7 +15,7 @@ const CHANNEL_ID = '720691521'
 
 export default function FullscreenChat() {
   const telemetry = useStreamTelemetry()
-  const aggregates = useChatAggregates()
+  const aggregates = useChatAggregates(telemetry.startedAt)
   const [debugMode, setDebugMode] = useState(false)
 
   useEffect(() => {
