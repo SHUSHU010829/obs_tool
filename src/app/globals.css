@@ -1765,24 +1765,27 @@ hr.gradient {
   padding: 7px 22px;
 }
 .fullscreen-chat-center .msg-text {
-  font-size: 45px;
+  font-size: 22.5px;
   line-height: 1.6;
 }
+.fullscreen-chat-center .msg-text img {
+  height: 36px;
+}
 .fullscreen-chat-center .msg-username {
-  font-size: 42px;
+  font-size: 21px;
 }
 .fullscreen-chat-center .msg-colon {
-  font-size: 42px;
+  font-size: 21px;
 }
 .fullscreen-chat-center .msg-ts {
-  font-size: 30px;
+  font-size: 15px;
 }
 .fullscreen-chat-center .chat-badge {
-  font-size: 27px;
+  font-size: 13.5px;
   padding: 2px 6px;
 }
 .fullscreen-chat-center .first-chat-label {
-  font-size: 30px;
+  font-size: 15px;
 }
 .fullscreen-chat-center .event-card {
   margin: 10px 14px;
