@@ -62,7 +62,6 @@ export default function FullscreenChat() {
         <StatsPanel
           currentViewers={telemetry.currentViewers}
           viewerHistory={telemetry.viewerHistory}
-          msgPerMinute={aggregates.msgPerMinute}
           isLive={telemetry.isLive}
         />
         <TopChatters chatters={aggregates.topChatters} />

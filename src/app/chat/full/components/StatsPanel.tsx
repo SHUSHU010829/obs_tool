@@ -6,7 +6,6 @@ import Sparkline from './Sparkline'
 type Props = {
   currentViewers: number | null
   viewerHistory: number[]
-  msgPerMinute: number
   isLive: boolean
 }
 
@@ -25,7 +24,7 @@ function StatLabel({ children }: { children: ReactNode }) {
   )
 }
 
-export default function StatsPanel({ currentViewers, viewerHistory, msgPerMinute, isLive }: Props) {
+export default function StatsPanel({ currentViewers, viewerHistory, isLive }: Props) {
   const peak = viewerHistory.length > 0 ? Math.max(...viewerHistory) : null
 
   return (
@@ -70,28 +69,6 @@ export default function StatsPanel({ currentViewers, viewerHistory, msgPerMinute
         </div>
       </div>
 
-      <div
-        style={{
-          height: 1,
-          background: 'rgba(0,255,135,0.12)',
-        }}
-      />
-
-      <div>
-        <StatLabel>Msg / Min</StatLabel>
-        <div
-          className='font-spaceMono'
-          style={{
-            fontSize: 32,
-            lineHeight: 1,
-            color: '#d4f5e2',
-            marginTop: 6,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {msgPerMinute}
-        </div>
-      </div>
     </div>
   )
 }

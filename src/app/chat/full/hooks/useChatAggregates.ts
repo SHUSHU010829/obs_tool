@@ -150,7 +150,8 @@ export function useChatAggregates(sessionId: number | null): ChatAggregates {
       }
     } else {
       setRecentEvents(prev => {
-        const next = [msg, ...prev]
+        const filtered = prev.filter(e => e.id !== msg.id)
+        const next = [msg, ...filtered]
         return next.length > EVENTS_BUFFER ? next.slice(0, EVENTS_BUFFER) : next
       })
     }

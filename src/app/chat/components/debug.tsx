@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import React, { useState, useCallback } from 'react'
 
+type SubTier = '1000' | '2000' | '3000'
+
 const TwitchChatDebug = ({
   onSendMessage,
   onSimulateSub,
@@ -12,14 +14,16 @@ const TwitchChatDebug = ({
   onSimulateGiftSub,
   onSimulateRaid,
   onSimulateFirstMessage,
+  onSimulateHypeTrain,
 }: {
   onSendMessage: (username: string, message: string) => void
-  onSimulateSub: (username: string, months: number, message: string) => void
-  onSimulateResub: (username: string, months: number, message: string) => void
+  onSimulateSub: (username: string, months: number, message: string, tier: SubTier) => void
+  onSimulateResub: (username: string, months: number, message: string, tier: SubTier) => void
   onSimulateCheer: (username: string, bits: number, message: string) => void
   onSimulateGiftSub: (gifter: string, count: number) => void
   onSimulateRaid: (username: string, viewers: number) => void
   onSimulateFirstMessage: (username: string, message: string) => void
+  onSimulateHypeTrain?: (stage: 'begin' | 'progress' | 'end', level: number) => void
 }) => {
   const [message, setMessage] = useState('')
   const [username, setUsername] = useState('TestUser')
@@ -27,6 +31,7 @@ const TwitchChatDebug = ({
   const [months, setMonths] = useState('3')
   const [giftCount, setGiftCount] = useState('5')
   const [raidViewers, setRaidViewers] = useState('150')
+  const [tier, setTier] = useState<SubTier>('1000')
 
   const handleSendMessage = useCallback(() => {
     onSendMessage(username, message)
@@ -34,14 +39,14 @@ const TwitchChatDebug = ({
   }, [username, message, onSendMessage])
 
   const handleSimulateSub = useCallback(() => {
-    onSimulateSub(username, parseInt(months), message)
+    onSimulateSub(username, parseInt(months), message, tier)
     setMessage('')
-  }, [username, months, message, onSimulateSub])
+  }, [username, months, message, tier, onSimulateSub])
 
   const handleSimulateResub = useCallback(() => {
-    onSimulateResub(username, parseInt(months), message)
+    onSimulateResub(username, parseInt(months), message, tier)
     setMessage('')
-  }, [username, months, message, onSimulateResub])
+  }, [username, months, message, tier, onSimulateResub])
 
   const handleSimulateCheer = useCallback(() => {
     onSimulateCheer(username, parseInt(bits), message)
@@ -124,6 +129,22 @@ const TwitchChatDebug = ({
           </div>
         </div>
 
+        <div className='space-y-2'>
+          <Label>訂閱 Tier</Label>
+          <div className='grid grid-cols-3 gap-2'>
+            {(['1000', '2000', '3000'] as const).map(t => (
+              <Button
+                key={t}
+                onClick={() => setTier(t)}
+                variant={tier === t ? 'default' : 'outline'}
+                size='sm'
+              >
+                T{t === '1000' ? 1 : t === '2000' ? 2 : 3}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         <div className='grid grid-cols-2 gap-2'>
           <Button onClick={handleSendMessage} variant='outline'>
             發送訊息
@@ -146,6 +167,19 @@ const TwitchChatDebug = ({
           <Button onClick={handleSimulateFirstMessage} variant='outline'>
             模擬首次發言
           </Button>
+          {onSimulateHypeTrain && (
+            <>
+              <Button onClick={() => onSimulateHypeTrain('begin', 1)} variant='outline'>
+                發燒列車 開始
+              </Button>
+              <Button onClick={() => onSimulateHypeTrain('progress', 3)} variant='outline'>
+                發燒列車 LV3
+              </Button>
+              <Button onClick={() => onSimulateHypeTrain('end', 5)} variant='outline'>
+                發燒列車 結束
+              </Button>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
