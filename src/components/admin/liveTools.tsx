@@ -36,20 +36,6 @@ const OVERLAYS: OverlayEntry[] = [
     hint: '建議 1280 × 720 或更大',
   },
   {
-    id: 'chat-overlay-all',
-    name: '聊天室 Overlay (All)',
-    description: '極簡風格的訊息疊層，顯示所有內容。',
-    path: '/chat/overlay?style=all',
-    category: 'chat',
-  },
-  {
-    id: 'chat-overlay-simple',
-    name: '聊天室 Overlay (Simple)',
-    description: '僅顯示精簡訊息，無多餘裝飾。',
-    path: '/chat/overlay?style=simple',
-    category: 'chat',
-  },
-  {
     id: 'song',
     name: '歌曲資訊',
     description: '旋轉黑膠 + 當前播放歌曲資訊。',
