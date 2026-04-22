@@ -1087,3 +1087,55 @@ hr.gradient {
 .fullscreen-chat-center .event-card {
   margin: 10px 14px;
 }
+
+/* Sonar-ping live indicator (fullscreen HUD) */
+.live-ping {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-ping > .live-ping-core {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00FF87;
+  box-shadow: 0 0 6px #00FF87, 0 0 2px #00FF87;
+  position: relative;
+  z-index: 1;
+}
+
+.live-ping::before,
+.live-ping::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid #00FF87;
+  opacity: 0;
+  animation: live-ping-wave 1.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.live-ping::after {
+  animation-delay: 0.9s;
+}
+
+.live-ping--offline::before,
+.live-ping--offline::after {
+  animation: none;
+  opacity: 0;
+}
+
+.live-ping--offline > .live-ping-core {
+  background: rgba(180, 230, 200, 0.3);
+  box-shadow: none;
+}
+
+@keyframes live-ping-wave {
+  0%   { transform: scale(0.3); opacity: 0.85; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
