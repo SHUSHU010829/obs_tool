@@ -1244,7 +1244,7 @@ hr.gradient {
   background: linear-gradient(90deg, transparent, #FFD166, transparent);
 }
 
-/* New subscriber — deeper gold bloom + shimmer on the top accent line */
+/* New subscriber — deeper gold bloom. Top line shimmer is reserved for T2 (see below). */
 .event-card--new-sub {
   background: linear-gradient(180deg, rgba(255, 209, 102, 0.14) 0%, rgba(0, 15, 8, 0.4) 100%);
   box-shadow: 0 4px 28px rgba(255, 209, 102, 0.28);
@@ -1252,9 +1252,7 @@ hr.gradient {
 .event-card--new-sub::before {
   height: 2px;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, #FFD166 40%, #fff4c2 50%, #FFD166 60%, transparent);
-  background-size: 200% 100%;
-  animation: new-sub-shimmer 2.4s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, #FFD166, transparent);
 }
 @keyframes new-sub-shimmer {
   0%   { background-position: 200% 0; }
@@ -1537,6 +1535,14 @@ hr.gradient {
 .event-card--tier-2.event-card--resub::before,
 .event-card--tier-2.event-card--resub::after {
   background: linear-gradient(90deg, transparent, #9FD4FF, transparent);
+}
+/* T2 first-time sub inherits the shimmering top accent line that T1 used to have. */
+.event-card--tier-2.event-card--new-sub::before {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(90deg, transparent, #9FD4FF 40%, #EAF6FF 50%, #9FD4FF 60%, transparent);
+  background-size: 200% 100%;
+  animation: new-sub-shimmer 2.4s ease-in-out infinite;
 }
 
 /* Tier 3 sub card — magenta glow + animated aurora border + sparkle overlay */
