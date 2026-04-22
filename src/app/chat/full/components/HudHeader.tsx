@@ -21,9 +21,11 @@ export default function HudHeader({ isLive, uptimeSeconds }: Props) {
     >
       <div className='flex items-center' style={{ gap: 12 }}>
         <div
-          className='live-dot'
-          style={{ opacity: isLive ? 1 : 0.3, background: isLive ? undefined : '#555' }}
-        />
+          className={`live-ping${isLive ? '' : ' live-ping--offline'}`}
+          aria-hidden='true'
+        >
+          <span className='live-ping-core' />
+        </div>
         <span
           className='font-spaceMono font-bold uppercase'
           style={{ fontSize: 13, letterSpacing: '0.2em', color: '#00FF87' }}
