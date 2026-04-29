@@ -597,6 +597,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'message',
         user: tags['display-name'] || 'anonymous',
+        userLogin: tags.username ? String(tags.username).toLowerCase() : undefined,
         message,
         badges: tags.badges || {},
         emotes: tags.emotes,
@@ -625,6 +626,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'subscription',
         user: username,
+        userLogin: (userState.username || username || '').toLowerCase() || undefined,
         message,
         badges: userState.badges || {},
         emotes: userState.emotes,
@@ -655,6 +657,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'resub',
         user: username,
+        userLogin: (userState.username || username || '').toLowerCase() || undefined,
         message: message || '',
         badges: userState.badges || {},
         emotes: userState.emotes,
@@ -678,6 +681,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'cheer',
         user: userState['display-name'] || 'anonymous',
+        userLogin: userState.username ? String(userState.username).toLowerCase() : undefined,
         message,
         badges: userState.badges || {},
         emotes: userState.emotes,
@@ -712,6 +716,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'giftsub',
         user: username,
+        userLogin: (userState.username || username || '').toLowerCase() || undefined,
         message: '',
         badges: userState.badges || {},
         emotes: null,
@@ -733,6 +738,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'raid',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message: '',
         badges: {},
         emotes: null,
@@ -823,6 +829,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'message',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message,
         badges: { subscriber: '0' },
         emotes: null,
@@ -844,6 +851,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'subscription',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message,
         badges: { subscriber: '0' },
         emotes: null,
@@ -869,6 +877,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'resub',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message,
         badges: { subscriber: '0' },
         emotes: null,
@@ -921,6 +930,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'cheer',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message,
         badges: { bits: '1000' },
         emotes: null,
@@ -943,6 +953,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'giftsub',
         user: gifter,
+        userLogin: gifter ? gifter.toLowerCase() : undefined,
         message: '',
         badges: { subscriber: '0' },
         emotes: null,
@@ -966,6 +977,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'raid',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message: '',
         badges: {},
         emotes: null,
@@ -990,6 +1002,7 @@ export default function TwitchChat({
       const newMessage: ChatMessage = {
         type: 'message',
         user: username,
+        userLogin: username ? username.toLowerCase() : undefined,
         message,
         badges: {},
         emotes: null,

@@ -4,6 +4,8 @@ import { ChatMessage } from '@/app/chat/components/type'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type TopChatter = {
+  login: string
+  displayName: string
   user: string
   count: number
   color: string
@@ -15,6 +17,7 @@ type ChatAggregates = {
   msgPerMinute: number
   recentEvents: ChatMessage[]
   push: (msg: ChatMessage) => void
+  getAllScores: () => TopChatter[]
 }
 
 const EVENTS_BUFFER = 20
@@ -27,10 +30,27 @@ function serialize(map: Map<string, TopChatter>): string {
   return JSON.stringify(Array.from(map.entries()))
 }
 
+function migrateEntry(key: string, value: Partial<TopChatter> & { user?: string }): TopChatter {
+  const displayName = value.displayName ?? value.user ?? key
+  const login = value.login ?? key
+  return {
+    login,
+    displayName,
+    user: displayName,
+    count: typeof value.count === 'number' ? value.count : 0,
+    color: value.color ?? '#00FF87',
+    lastTs: typeof value.lastTs === 'number' ? value.lastTs : 0,
+  }
+}
+
 function deserialize(raw: string): Map<string, TopChatter> {
   try {
-    const parsed = JSON.parse(raw) as Array<[string, TopChatter]>
-    return new Map(parsed)
+    const parsed = JSON.parse(raw) as Array<[string, Partial<TopChatter> & { user?: string }]>
+    const map = new Map<string, TopChatter>()
+    for (const [k, v] of parsed) {
+      map.set(k, migrateEntry(k, v))
+    }
+    return map
   } catch {
     return new Map()
   }
@@ -56,10 +76,14 @@ function cleanupOldSessions(keepSessionId: number) {
   }
 }
 
+function sortAll(map: Map<string, TopChatter>): TopChatter[] {
+  return Array.from(map.values()).sort(
+    (a, b) => b.count - a.count || b.lastTs - a.lastTs
+  )
+}
+
 function sortTop(map: Map<string, TopChatter>): TopChatter[] {
-  return Array.from(map.values())
-    .sort((a, b) => b.count - a.count || b.lastTs - a.lastTs)
-    .slice(0, TOP_N)
+  return sortAll(map).slice(0, TOP_N)
 }
 
 export function useChatAggregates(sessionId: number | null): ChatAggregates {
@@ -90,7 +114,9 @@ export function useChatAggregates(sessionId: number | null): ChatAggregates {
             const existing = merged.get(k)
             if (existing) {
               merged.set(k, {
-                user: v.user || existing.user,
+                login: existing.login || v.login,
+                displayName: v.displayName || existing.displayName,
+                user: v.displayName || existing.displayName,
                 color: v.color || existing.color,
                 count: existing.count + v.count,
                 lastTs: Math.max(existing.lastTs, v.lastTs),
@@ -128,10 +154,14 @@ export function useChatAggregates(sessionId: number | null): ChatAggregates {
 
   const push = useCallback((msg: ChatMessage) => {
     if (msg.type === 'message') {
-      const key = msg.user.toLowerCase()
+      const login = msg.userLogin ?? msg.user.toLowerCase()
+      const key = login
       const existing = countsRef.current.get(key)
+      const displayName = msg.user
       countsRef.current.set(key, {
-        user: msg.user,
+        login,
+        displayName,
+        user: displayName,
         count: (existing?.count ?? 0) + 1,
         color: msg.color || existing?.color || '#00FF87',
         lastTs: msg.timestamp,
@@ -157,6 +187,8 @@ export function useChatAggregates(sessionId: number | null): ChatAggregates {
     }
   }, [])
 
+  const getAllScores = useCallback(() => sortAll(countsRef.current), [])
+
   useEffect(() => {
     const id = setInterval(() => {
       const cutoff = Date.now() - MINUTE_MS
@@ -166,5 +198,5 @@ export function useChatAggregates(sessionId: number | null): ChatAggregates {
     return () => clearInterval(id)
   }, [])
 
-  return { topChatters, msgPerMinute, recentEvents, push }
+  return { topChatters, msgPerMinute, recentEvents, push, getAllScores }
 }
