@@ -9,6 +9,7 @@ import SpotifyNowPlaying from './components/SpotifyNowPlaying'
 import StatsPanel from './components/StatsPanel'
 import TopChatters from './components/TopChatters'
 import { useChatAggregates } from './hooks/useChatAggregates'
+import { useScoreFlush } from './hooks/useScoreFlush'
 import { useStreamTelemetry } from './hooks/useStreamTelemetry'
 
 const CHANNEL = 'shushu010829'
@@ -18,6 +19,13 @@ export default function FullscreenChat() {
   const telemetry = useStreamTelemetry()
   const aggregates = useChatAggregates(telemetry.startedAt)
   const [debugMode, setDebugMode] = useState(false)
+
+  useScoreFlush({
+    channel: CHANNEL,
+    channelId: CHANNEL_ID,
+    sessionId: telemetry.startedAt,
+    getScores: aggregates.getAllScores,
+  })
 
   useEffect(() => {
     const stored = localStorage.getItem('obs-debug-mode')

@@ -25,6 +25,7 @@ export interface BadgeSet {
 
 export interface ChatMessage {
   user: string
+  userLogin?: string
   type: 'message' | 'subscription' | 'resub' | 'giftsub' | 'cheer' | 'raid' | 'hype_train'
   bits?: number
   subPlan?: 'Prime' | '1000' | '2000' | '3000'
