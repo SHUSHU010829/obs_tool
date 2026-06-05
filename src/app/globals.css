@@ -495,6 +495,12 @@
   min-height: 100vh;
 }
 
+.admin-shell[role='dialog'],
+.admin-shell[role='alertdialog'] {
+  min-height: 0;
+  background-color: transparent;
+}
+
 .admin-shell *,
 .admin-shell *::before,
 .admin-shell *::after {
