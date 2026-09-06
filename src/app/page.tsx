@@ -2,19 +2,30 @@
 
 import LiveTools from '@/components/admin/liveTools'
 import MessageBoard from '@/components/admin/messageBoard'
+import SongArchive from '@/components/admin/songArchive'
 import SongBook from '@/components/admin/songBook'
 import SongList from '@/components/admin/songList'
+import SongRequests from '@/components/admin/songRequests'
+import { usePendingRequests } from '@/hooks/usePendingRequests'
 import { useState, useEffect } from 'react'
 import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
 
 type NavSection = 'songs' | 'messages' | 'livetools'
-type SongTab = 'songList' | 'songBook'
+type SongTab = 'songList' | 'songBook' | 'songRequest' | 'archive'
 
 interface NavEntry {
   key: string
   label: string
   onClick: () => void
   isActive: boolean
+  badge?: number
+}
+
+const SONG_TAB_META: Record<SongTab, { title: string; subtitle: string }> = {
+  songList: { title: '歌單管理', subtitle: '管理目前的播放歌單，可新增、編輯或刪除歌曲' },
+  songBook: { title: '曲庫管理', subtitle: '管理主播會唱的歌曲與分類' },
+  songRequest: { title: '點歌審核', subtitle: '審核觀眾送出的點歌請求' },
+  archive: { title: '歷史紀錄', subtitle: '查看並恢復已封存的歌曲' },
 }
 
 export default function Home() {
@@ -22,6 +33,7 @@ export default function Home() {
   const [activeSongTab, setActiveSongTab] = useState<SongTab>('songList')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [debugMode, setDebugMode] = useState(false)
+  const pendingRequestCount = usePendingRequests()
 
   useEffect(() => {
     const stored = localStorage.getItem('obs-debug-mode')
@@ -54,6 +66,19 @@ export default function Home() {
       label: '歌本 Song Book',
       onClick: () => go('songs', 'songBook'),
       isActive: activeSection === 'songs' && activeSongTab === 'songBook',
+    },
+    {
+      key: 'songRequest',
+      label: '點歌審核',
+      onClick: () => go('songs', 'songRequest'),
+      isActive: activeSection === 'songs' && activeSongTab === 'songRequest',
+      badge: pendingRequestCount,
+    },
+    {
+      key: 'archive',
+      label: '歷史紀錄',
+      onClick: () => go('songs', 'archive'),
+      isActive: activeSection === 'songs' && activeSongTab === 'archive',
     },
   ]
 
@@ -136,17 +161,13 @@ export default function Home() {
           {activeSection === 'songs' && (
             <>
               <header className='mb-7'>
-                <h2 className='admin-section-title'>
-                  {activeSongTab === 'songList' ? '歌單管理' : '歌本管理'}
-                </h2>
+                <h2 className='admin-section-title'>{SONG_TAB_META[activeSongTab].title}</h2>
                 <p className='admin-section-subtitle'>
-                  {activeSongTab === 'songList'
-                    ? '管理目前的播放歌單，可新增、編輯或刪除歌曲'
-                    : '管理歌曲類型與分類'}
+                  {SONG_TAB_META[activeSongTab].subtitle}
                 </p>
               </header>
 
-              <div className='admin-segmented mb-5'>
+              <div className='admin-segmented mb-5 flex-wrap'>
                 <button
                   onClick={() => setActiveSongTab('songList')}
                   className={activeSongTab === 'songList' ? 'active' : ''}
@@ -159,10 +180,24 @@ export default function Home() {
                 >
                   歌本
                 </button>
+                <button
+                  onClick={() => setActiveSongTab('songRequest')}
+                  className={activeSongTab === 'songRequest' ? 'active' : ''}
+                >
+                  點歌審核{pendingRequestCount > 0 ? `（${pendingRequestCount}）` : ''}
+                </button>
+                <button
+                  onClick={() => setActiveSongTab('archive')}
+                  className={activeSongTab === 'archive' ? 'active' : ''}
+                >
+                  歷史紀錄
+                </button>
               </div>
 
               {activeSongTab === 'songList' && <SongList />}
               {activeSongTab === 'songBook' && <SongBook />}
+              {activeSongTab === 'songRequest' && <SongRequests />}
+              {activeSongTab === 'archive' && <SongArchive />}
             </>
           )}
 
@@ -205,9 +240,12 @@ function NavGroup({ title, entries }: { title: string; entries: NavEntry[] }) {
         <button
           key={entry.key}
           onClick={entry.onClick}
-          className={`admin-nav-item ${entry.isActive ? 'active' : ''}`}
+          className={`admin-nav-item flex items-center justify-between gap-2 ${entry.isActive ? 'active' : ''}`}
         >
-          {entry.label}
+          <span>{entry.label}</span>
+          {!!entry.badge && (
+            <span className='admin-badge admin-badge--warn shrink-0'>{entry.badge}</span>
+          )}
         </button>
       ))}
     </div>

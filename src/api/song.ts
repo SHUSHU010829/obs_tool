@@ -1,11 +1,29 @@
 import axios from 'axios'
 
 const SONG_LIST_BASE_URL = 'https://shustream.zeabur.app/songList'
+const PROXY_BASE_URL = '/api/stream/songList'
 
 export const SONG_LIST_STREAM_URL = `${SONG_LIST_BASE_URL}/stream`
 
 function generateApiUrl(endpoint: string) {
-  return `${SONG_LIST_BASE_URL}${endpoint}`
+  return `${PROXY_BASE_URL}${endpoint}`
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function request<T = any>(
+  method: 'get' | 'post' | 'put' | 'delete',
+  endpoint: string,
+  data?: unknown,
+  errorLabel?: string
+) {
+  try {
+    return await axios.request<T>({ method, url: generateApiUrl(endpoint), data })
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(`${errorLabel ?? 'Error calling song API'}: ${error.message}`)
+    }
+    throw new Error('Unknown error occurred')
+  }
 }
 
 // ============================================
@@ -14,50 +32,17 @@ function generateApiUrl(endpoint: string) {
 
 // 取得所有歌曲（含歸檔）
 export async function getSongs() {
-  const endpoint = ''
-
-  try {
-    const response = await axios.get(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error fetching songs: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('get', '', undefined, 'Error fetching songs')
 }
 
 // 取得活動中歌曲（已排序）- 前端顯示當前歌單用
 export async function getActiveSongs() {
-  const endpoint = '/active'
-
-  try {
-    const response = await axios.get(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error fetching active songs: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('get', '/active', undefined, 'Error fetching active songs')
 }
 
 // 取得歷史歌曲（已歸檔）
 export async function getHistorySongs() {
-  const endpoint = '/history'
-
-  try {
-    const response = await axios.get(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error fetching history songs: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('get', '/history', undefined, 'Error fetching history songs')
 }
 
 // ============================================
@@ -66,34 +51,12 @@ export async function getHistorySongs() {
 
 // 設定播放中的歌曲
 export async function playSong(id: number) {
-  const endpoint = `/start/${id}`
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error starting song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', `/start/${id}`, undefined, 'Error starting song')
 }
 
 // 停止播放
 export async function clearNowPlaying(id: number) {
-  const endpoint = `/stop/${id}`
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error stopping song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', `/stop/${id}`, undefined, 'Error stopping song')
 }
 
 // ============================================
@@ -102,44 +65,12 @@ export async function clearNowPlaying(id: number) {
 
 // 新增歌曲
 export async function addSong(title: string, artist: string) {
-  const endpoint = ''
-
-  const requestData = {
-    title,
-    artist,
-  }
-
-  try {
-    const response = await axios.post(generateApiUrl(endpoint), requestData)
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error adding song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('post', '', { title, artist }, 'Error adding song')
 }
 
 // 更新歌曲資訊
 export async function updateSong(id: number, title: string, artist: string) {
-  const endpoint = `/${id}`
-
-  const requestData = {
-    title,
-    artist,
-  }
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint), requestData)
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error updating song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', `/${id}`, { title, artist }, 'Error updating song')
 }
 
 // ============================================
@@ -148,42 +79,12 @@ export async function updateSong(id: number, title: string, artist: string) {
 
 // 更新單一歌曲排序
 export async function updateSongSortOrder(id: number, sortOrder: number) {
-  const endpoint = `/sort/${id}`
-
-  const requestData = {
-    sort_order: sortOrder,
-  }
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint), requestData)
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error updating sort order: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', `/sort/${id}`, { sort_order: sortOrder }, 'Error updating sort order')
 }
 
 // 批量更新排序（拖曳排序用）
 export async function batchUpdateSortOrder(songs: { id: number; sort_order: number }[]) {
-  const endpoint = '/sort'
-
-  const requestData = {
-    songs,
-  }
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint), requestData)
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error batch updating sort order: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', '/sort', { songs }, 'Error batch updating sort order')
 }
 
 // ============================================
@@ -192,80 +93,25 @@ export async function batchUpdateSortOrder(songs: { id: number; sort_order: numb
 
 // 歸檔歌曲（軟刪除）
 export async function deleteSong(id: number) {
-  const endpoint = `/${id}`
-
-  try {
-    const response = await axios.delete(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error archiving song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('delete', `/${id}`, undefined, 'Error archiving song')
 }
 
 // 歸檔所有歌曲（軟刪除）
 export async function deleteAllSongs() {
-  const endpoint = ''
-
-  try {
-    const response = await axios.delete(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error archiving all songs: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('delete', '', undefined, 'Error archiving all songs')
 }
 
 // 恢復歸檔歌曲
 export async function restoreSong(id: number) {
-  const endpoint = `/restore/${id}`
-
-  try {
-    const response = await axios.put(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error restoring song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('put', `/restore/${id}`, undefined, 'Error restoring song')
 }
 
 // 永久刪除歌曲
 export async function hardDeleteSong(id: number) {
-  const endpoint = `/hard/${id}`
-
-  try {
-    const response = await axios.delete(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error permanently deleting song: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('delete', `/hard/${id}`, undefined, 'Error permanently deleting song')
 }
 
 // 永久刪除所有歌曲
 export async function hardDeleteAllSongs() {
-  const endpoint = '/hard'
-
-  try {
-    const response = await axios.delete(generateApiUrl(endpoint))
-    return response
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw new Error('Error permanently deleting all songs: ' + error.message)
-    } else {
-      throw new Error('Unknown error occurred')
-    }
-  }
+  return request('delete', '/hard', undefined, 'Error permanently deleting all songs')
 }
