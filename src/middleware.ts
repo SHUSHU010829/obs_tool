@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export function middleware(req: NextRequest) {
-  const user = process.env.ADMIN_BASIC_USER
-  const pass = process.env.ADMIN_BASIC_PASS
+import { SESSION_COOKIE_NAME, verifySessionCookieValue } from '@/lib/adminSession'
 
-  if (!user || !pass) {
-    return NextResponse.json(
-      { error: 'ADMIN_BASIC_USER / ADMIN_BASIC_PASS not configured' },
-      { status: 500 }
-    )
+export async function middleware(req: NextRequest) {
+  const secret = process.env.SESSION_SECRET
+  if (!secret) {
+    return NextResponse.json({ error: 'SESSION_SECRET not configured' }, { status: 500 })
   }
 
-  const authHeader = req.headers.get('authorization')
-  const expected = 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64')
+  const cookie = req.cookies.get(SESSION_COOKIE_NAME)?.value
+  const authenticated = await verifySessionCookieValue(secret, cookie)
 
-  if (authHeader === expected) {
+  if (authenticated) {
     return NextResponse.next()
   }
 
-  return new NextResponse('Authentication required', {
-    status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="obs_tool admin"' },
-  })
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const loginUrl = new URL('/login', req.url)
+  loginUrl.searchParams.set('next', req.nextUrl.pathname)
+  return NextResponse.redirect(loginUrl)
 }
 
 export const config = {

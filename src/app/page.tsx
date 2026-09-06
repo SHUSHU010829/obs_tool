@@ -8,7 +8,8 @@ import SongList from '@/components/admin/songList'
 import SongRequests from '@/components/admin/songRequests'
 import { usePendingRequests } from '@/hooks/usePendingRequests'
 import { useState, useEffect } from 'react'
-import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons'
+import { useRouter } from 'next/navigation'
+import { HamburgerMenuIcon, Cross1Icon, ExitIcon } from '@radix-ui/react-icons'
 
 type NavSection = 'songs' | 'messages' | 'livetools'
 type SongTab = 'songList' | 'songBook' | 'songRequest' | 'archive'
@@ -34,6 +35,13 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [debugMode, setDebugMode] = useState(false)
   const pendingRequestCount = usePendingRequests()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' })
+    router.push('/login')
+    router.refresh()
+  }
 
   useEffect(() => {
     const stored = localStorage.getItem('obs-debug-mode')
@@ -135,12 +143,19 @@ export default function Home() {
           {renderNav()}
           <div className='border-t border-[color:var(--admin-border)] px-4 py-4'>
             <DebugToggle debugMode={debugMode} onToggle={toggleDebugMode} />
+            <button
+              onClick={handleLogout}
+              className='admin-button admin-button-ghost admin-button-sm mt-2 w-full'
+            >
+              <ExitIcon className='h-4 w-4' />
+              登出
+            </button>
           </div>
         </div>
       )}
 
       {/* Desktop Sidebar */}
-      <aside className='admin-sidebar relative hidden w-64 flex-shrink-0 md:flex md:flex-col'>
+      <aside className='admin-sidebar sticky top-0 hidden h-screen w-64 flex-shrink-0 self-start overflow-y-auto md:flex md:flex-col'>
         <div className='px-6 py-6'>
           <h1 className='text-lg font-semibold tracking-tight'>OBS 後台管理</h1>
           <p className='mt-1 text-xs text-[color:var(--admin-text-subtle)]'>Streaming Dashboard</p>
@@ -149,6 +164,13 @@ export default function Home() {
         {renderNav()}
         <div className='mt-auto border-t border-[color:var(--admin-border)] p-4'>
           <DebugToggle debugMode={debugMode} onToggle={toggleDebugMode} />
+          <button
+            onClick={handleLogout}
+            className='admin-button admin-button-ghost admin-button-sm mt-2 w-full'
+          >
+            <ExitIcon className='h-4 w-4' />
+            登出
+          </button>
           <p className='mt-3 text-[11px] text-[color:var(--admin-text-subtle)]'>
             Neutral HUD · v1.1.0
           </p>
