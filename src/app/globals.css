@@ -452,7 +452,11 @@
 
 /*=============== ADMIN (Chat-room style, neutral dark) ===============*/
 
-.admin-shell {
+/* Admin design tokens live on :root so portalled UI (sonner toasts, Radix
+   dialog portals) that renders outside .admin-shell can still resolve them.
+   An unresolved var() makes the whole declaration invalid, which is what made
+   those surfaces render fully transparent. */
+:root {
   /* Surfaces */
   --admin-bg: #0F1115;
   --admin-surface: #171A20;
@@ -488,17 +492,21 @@
   --admin-shadow-sm:
     0 0 0 1px rgba(255, 255, 255, 0.04),
     0 4px 14px rgba(0, 0, 0, 0.35);
+}
 
+.admin-shell {
   font-family: 'Inter', sans-serif;
   background-color: var(--admin-bg);
   color: var(--admin-text);
   min-height: 100vh;
 }
 
+/* Dialog/alert-dialog surfaces sit on top of the overlay, so they use the
+   raised surface colour instead of the page background. */
 .admin-shell[role='dialog'],
 .admin-shell[role='alertdialog'] {
   min-height: 0;
-  background-color: transparent;
+  background-color: var(--admin-surface);
 }
 
 .admin-shell *,
