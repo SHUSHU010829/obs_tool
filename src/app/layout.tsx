@@ -54,7 +54,7 @@ export default function RootLayout({
         {children}
         <Toaster
           position='bottom-right'
-          theme='dark'
+          theme='light'
           duration={3000}
           toastOptions={{ className: 'admin-toast' }}
         />

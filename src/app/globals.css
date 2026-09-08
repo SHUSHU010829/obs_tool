@@ -39,12 +39,12 @@
 
     /* E-ink specific tokens */
     --eink-border-strong: #000000;
-    --eink-border-subtle: #CCCCCC;
+    --eink-border-subtle: #cccccc;
     --eink-text-primary: #000000;
     --eink-text-secondary: #333333;
     --eink-text-muted: #666666;
-    --eink-bg-primary: #F5F5F5;
-    --eink-bg-secondary: #FFFFFF;
+    --eink-bg-primary: #f5f5f5;
+    --eink-bg-secondary: #ffffff;
   }
 
   .dark {
@@ -76,13 +76,13 @@
     --input: 0 0% 20%;
     --ring: 0 0% 96%;
 
-    --eink-border-strong: #FFFFFF;
+    --eink-border-strong: #ffffff;
     --eink-border-subtle: #444444;
-    --eink-text-primary: #F5F5F5;
-    --eink-text-secondary: #CCCCCC;
+    --eink-text-primary: #f5f5f5;
+    --eink-text-secondary: #cccccc;
     --eink-text-muted: #999999;
-    --eink-bg-primary: #0A0A0A;
-    --eink-bg-secondary: #1A1A1A;
+    --eink-bg-primary: #0a0a0a;
+    --eink-bg-secondary: #1a1a1a;
   }
 }
 
@@ -306,11 +306,21 @@
 
 /* E-ink stepped animation */
 @keyframes eink-refresh {
-  0% { opacity: 1; }
-  25% { opacity: 0.7; }
-  50% { opacity: 0.4; }
-  75% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .eink-refresh {
@@ -450,55 +460,68 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
-/*=============== ADMIN (Chat-room style, neutral dark) ===============*/
+/*=============== ADMIN (light workspace theme) ===============*/
 
-.admin-shell {
+/* Admin design tokens live on :root so portalled UI (sonner toasts, Radix
+   dialog portals) that renders outside .admin-shell can still resolve them.
+   An unresolved var() makes the whole declaration invalid, which is what made
+   those surfaces render fully transparent. */
+:root {
   /* Surfaces */
-  --admin-bg: #0F1115;
-  --admin-surface: #171A20;
-  --admin-surface-2: #1E222A;
-  --admin-border: rgba(255, 255, 255, 0.08);
-  --admin-border-strong: rgba(255, 255, 255, 0.16);
+  --admin-bg: #f6f6f7;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f1f2f4;
+  --admin-border: rgba(16, 24, 40, 0.09);
+  --admin-border-strong: rgba(16, 24, 40, 0.16);
 
   /* Text */
-  --admin-text: #E6E8EC;
-  --admin-text-muted: #9AA0AA;
-  --admin-text-subtle: #6A7080;
+  --admin-text: #16181d;
+  --admin-text-muted: #646b7a;
+  --admin-text-subtle: #939aa8;
 
-  /* Accent (muted slate blue) */
-  --admin-accent: #7C9AB8;
-  --admin-accent-hover: #95B1CC;
-  --admin-accent-soft: rgba(124, 154, 184, 0.14);
-  --admin-accent-border: rgba(124, 154, 184, 0.32);
+  /* Accent (violet, matches the hero gradient) */
+  --admin-accent: #6250d4;
+  --admin-accent-hover: #4f3fbb;
+  --admin-accent-soft: rgba(98, 80, 212, 0.09);
+  --admin-accent-border: rgba(98, 80, 212, 0.3);
 
-  /* State colors */
-  --admin-state-warn: #D9B36C;
-  --admin-state-warn-soft: rgba(217, 179, 108, 0.12);
-  --admin-state-ok: #7FB08C;
-  --admin-state-ok-soft: rgba(127, 176, 140, 0.12);
-  --admin-state-live: #D76B6B;
-  --admin-state-live-soft: rgba(215, 107, 107, 0.14);
+  /* State colours — darkened so they stay legible on white */
+  --admin-state-warn: #a15c07;
+  --admin-state-warn-soft: rgba(161, 92, 7, 0.1);
+  --admin-state-ok: #15803d;
+  --admin-state-ok-soft: rgba(21, 128, 61, 0.1);
+  --admin-state-live: #d02525;
+  --admin-state-live-soft: rgba(208, 37, 37, 0.1);
+
+  /* Hero gradient */
+  --admin-hero: linear-gradient(
+    108deg,
+    #ded6fb 0%,
+    #e7dcfa 28%,
+    #f4dcf1 58%,
+    #dee6fb 100%
+  );
 
   /* Radii & shadow */
   --admin-radius: 12px;
   --admin-radius-sm: 8px;
-  --admin-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 8px 30px rgba(0, 0, 0, 0.45);
-  --admin-shadow-sm:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 4px 14px rgba(0, 0, 0, 0.35);
+  --admin-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 12px 32px rgba(16, 24, 40, 0.1);
+  --admin-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
 
+.admin-shell {
   font-family: 'Inter', sans-serif;
   background-color: var(--admin-bg);
   color: var(--admin-text);
   min-height: 100vh;
 }
 
+/* Dialog/alert-dialog surfaces sit on top of the overlay, so they use the
+   raised surface colour instead of the page background. */
 .admin-shell[role='dialog'],
 .admin-shell[role='alertdialog'] {
   min-height: 0;
-  background-color: transparent;
+  background-color: var(--admin-surface);
 }
 
 .admin-shell *,
@@ -514,18 +537,18 @@
 
 .admin-section-title {
   font-family: 'Inter', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 650;
   letter-spacing: -0.01em;
   color: var(--admin-text);
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 .admin-section-subtitle {
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--admin-text-muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .admin-nav-group-label {
@@ -543,12 +566,17 @@
   align-items: center;
   width: 100%;
   font-family: 'Inter', sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 10px 18px;
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 1px 8px;
+  border-radius: var(--admin-radius-sm);
   color: var(--admin-text-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   border: none;
   background: transparent;
   text-align: left;
@@ -564,15 +592,10 @@
   color: var(--admin-text);
 }
 
-.admin-nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3px;
-  background-color: var(--admin-accent);
-  border-radius: 0 2px 2px 0;
+.admin-nav-item.active {
+  background-color: var(--admin-accent-soft);
+  color: var(--admin-accent);
+  font-weight: 600;
 }
 
 .admin-card {
@@ -585,7 +608,10 @@
 
 .admin-card--interactive {
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .admin-card--interactive:hover {
@@ -595,11 +621,13 @@
 
 .admin-card--selected {
   border-color: var(--admin-accent-border);
-  box-shadow: 0 0 0 1px var(--admin-accent-border), var(--admin-shadow-sm);
+  box-shadow:
+    0 0 0 1px var(--admin-accent-border),
+    var(--admin-shadow-sm);
 }
 
 .admin-card-header {
-  padding: 14px 18px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
@@ -615,7 +643,7 @@
 }
 
 .admin-card-content {
-  padding: 16px 18px;
+  padding: 12px 14px;
 }
 
 .admin-button {
@@ -626,14 +654,17 @@
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  padding: 8px 14px;
-  min-height: 36px;
+  padding: 6px 12px;
+  min-height: 32px;
   border: 1px solid var(--admin-border-strong);
   border-radius: var(--admin-radius-sm);
   background-color: transparent;
   color: var(--admin-text);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .admin-button:hover {
@@ -654,14 +685,14 @@
 .admin-button-primary {
   background-color: var(--admin-accent);
   border-color: var(--admin-accent);
-  color: #0F1115;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .admin-button-primary:hover {
   background-color: var(--admin-accent-hover);
   border-color: var(--admin-accent-hover);
-  color: #0F1115;
+  color: #ffffff;
 }
 
 .admin-button-ghost {
@@ -688,17 +719,17 @@
 
 .admin-button-sm {
   font-size: 12px;
-  padding: 6px 10px;
-  min-height: 30px;
+  padding: 4px 9px;
+  min-height: 27px;
 }
 
 .admin-input,
 .admin-textarea {
   width: 100%;
   font-family: 'Inter', sans-serif;
-  font-size: 13.5px;
-  padding: 10px 12px;
-  background-color: var(--admin-bg);
+  font-size: 13px;
+  padding: 7px 10px;
+  background-color: var(--admin-surface);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-sm);
   color: var(--admin-text);
@@ -792,7 +823,9 @@
   color: var(--admin-text-muted);
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .admin-segmented button:hover {
@@ -807,7 +840,7 @@
 .admin-divider {
   border: none;
   border-top: 1px solid var(--admin-border);
-  margin: 18px 0;
+  margin: 12px 0;
 }
 
 .admin-message-card {
@@ -868,6 +901,262 @@
   background: var(--admin-border-strong);
   background-clip: padding-box;
   border: 2px solid transparent;
+}
+
+/*--------------- Admin layout: brand, hero, stats, tabs ---------------*/
+
+.admin-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background-color: var(--admin-text);
+  color: var(--admin-surface);
+}
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  color: var(--admin-text-muted);
+}
+
+.admin-breadcrumb .sep {
+  color: var(--admin-text-subtle);
+}
+
+.admin-breadcrumb .current {
+  color: var(--admin-text);
+  font-weight: 550;
+}
+
+.admin-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--admin-radius);
+  border: 1px solid var(--admin-border);
+  background: var(--admin-hero);
+  padding: 14px 16px;
+}
+
+.admin-hero-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+  color: var(--admin-accent);
+}
+
+.admin-hero-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #14141a;
+}
+
+.admin-hero-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #4a4a58;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #33343d;
+  white-space: nowrap;
+}
+
+.admin-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--pill-dot, var(--admin-state-ok));
+}
+
+.admin-pill--ok {
+  --pill-dot: var(--admin-state-ok);
+}
+
+.admin-pill--warn {
+  --pill-dot: var(--admin-state-warn);
+}
+
+.admin-pill--idle {
+  --pill-dot: var(--admin-text-subtle);
+}
+
+/* Stat strip — one bordered card split into equal cells */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background-color: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .admin-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.admin-stat {
+  padding: 10px 14px;
+  border-top: 1px solid var(--admin-border);
+  border-left: 1px solid var(--admin-border);
+  min-width: 0;
+}
+
+/* Kill the outer edges so only the internal grid lines show */
+.admin-stat:nth-child(-n + 2) {
+  border-top: none;
+}
+
+.admin-stat:nth-child(odd) {
+  border-left: none;
+}
+
+@media (min-width: 768px) {
+  .admin-stat {
+    border-top: none;
+  }
+
+  .admin-stat:nth-child(odd) {
+    border-left: 1px solid var(--admin-border);
+  }
+
+  .admin-stat:first-child {
+    border-left: none;
+  }
+}
+
+.admin-stat-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--admin-text);
+}
+
+.admin-stat-value .unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  margin-left: 2px;
+}
+
+.admin-stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  color: var(--admin-text-muted);
+  margin-top: 1px;
+}
+
+/* Underline tabs with count chips */
+.admin-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 10px;
+  margin-bottom: -1px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.admin-tab:hover {
+  color: var(--admin-text);
+}
+
+.admin-tab.active {
+  color: var(--admin-text);
+  font-weight: 650;
+  border-bottom-color: var(--admin-text);
+}
+
+.admin-tab-count {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 5px;
+  background-color: var(--admin-surface-2);
+  color: var(--admin-text-muted);
+}
+
+.admin-tab-count--warn {
+  background-color: var(--admin-state-warn-soft);
+  color: var(--admin-state-warn);
+}
+
+/* Small colour-coded icon tile used by the sidebar quick links */
+.admin-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background-color: var(--admin-accent-soft);
+  color: var(--admin-accent);
+}
+
+.admin-tile--pink {
+  background-color: rgba(198, 68, 158, 0.1);
+  color: #b23c8c;
+}
+
+.admin-tile--blue {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.admin-tile--green {
+  background-color: var(--admin-state-ok-soft);
+  color: var(--admin-state-ok);
 }
 
 /*=============== CHAT ===============*/
@@ -1047,7 +1336,12 @@ hr.gradient {
   height: 34%;
   width: 34%;
   box-shadow: inset 0 0 0 5px rgba(150, 150, 150, 0.1);
-  background: radial-gradient(circle, rgba(30,30,30,1) 0%, rgba(15,15,15,1) 60%, rgba(0,255,135,0.08) 100%);
+  background: radial-gradient(
+    circle,
+    rgba(30, 30, 30, 1) 0%,
+    rgba(15, 15, 15, 1) 60%,
+    rgba(0, 255, 135, 0.08) 100%
+  );
   background-size: cover;
   border-radius: 50%;
 }
@@ -1084,16 +1378,23 @@ hr.gradient {
 
 /* LIVE indicator dot */
 @keyframes pulse-red {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.55; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
 }
 
 .live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #FF4444;
-  box-shadow: 0 0 7px #FF4444;
+  background: #ff4444;
+  box-shadow: 0 0 7px #ff4444;
   flex-shrink: 0;
   animation: pulse-red 1.6s ease-in-out infinite;
 }
@@ -1111,13 +1412,13 @@ hr.gradient {
 
 /* @mention message */
 .chat-msg--mention {
-  border-left-color: #00FF87;
+  border-left-color: #00ff87;
   background: rgba(0, 255, 135, 0.05);
 }
 
 /* First-time chatter */
 .chat-msg--first {
-  border-left-color: #60C8FF;
+  border-left-color: #60c8ff;
   background: rgba(96, 200, 255, 0.035);
 }
 
@@ -1126,7 +1427,7 @@ hr.gradient {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #60C8FF;
+  color: #60c8ff;
   text-transform: uppercase;
   opacity: 0.8;
 }
@@ -1185,31 +1486,31 @@ hr.gradient {
 
 .badge-broadcaster {
   background: rgba(255, 68, 68, 0.16);
-  color: #FF6B6B;
+  color: #ff6b6b;
   border: 1px solid rgba(255, 68, 68, 0.32);
 }
 
 .badge-mod {
   background: rgba(0, 255, 135, 0.12);
-  color: #00FF87;
+  color: #00ff87;
   border: 1px solid rgba(0, 255, 135, 0.28);
 }
 
 .badge-vip {
   background: rgba(255, 107, 255, 0.12);
-  color: #FF6BFF;
+  color: #ff6bff;
   border: 1px solid rgba(255, 107, 255, 0.28);
 }
 
 .badge-sub {
   background: rgba(255, 209, 102, 0.1);
-  color: #FFD166;
+  color: #ffd166;
   border: 1px solid rgba(255, 209, 102, 0.26);
 }
 
 .badge-sub-tier {
   background: rgba(255, 209, 102, 0.07);
-  color: #FFD166;
+  color: #ffd166;
   border: 1px solid rgba(255, 209, 102, 0.18);
   font-size: 7.5px;
 }
@@ -1234,49 +1535,78 @@ hr.gradient {
   right: 12%;
   height: 1px;
 }
-.event-card::before { top: 0;    opacity: 0.6; }
-.event-card::after  { bottom: 0; opacity: 0.22; }
+.event-card::before {
+  top: 0;
+  opacity: 0.6;
+}
+.event-card::after {
+  bottom: 0;
+  opacity: 0.22;
+}
 
 /* Sub / Resub — gold */
 .event-card--sub,
 .event-card--resub {
-  background: linear-gradient(180deg, rgba(255, 209, 102, 0.07) 0%, rgba(0, 15, 8, 0.35) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 209, 102, 0.07) 0%,
+    rgba(0, 15, 8, 0.35) 100%
+  );
   box-shadow: 0 4px 22px rgba(255, 209, 102, 0.14);
 }
 .event-card--sub::before,
 .event-card--sub::after,
 .event-card--resub::before,
 .event-card--resub::after {
-  background: linear-gradient(90deg, transparent, #FFD166, transparent);
+  background: linear-gradient(90deg, transparent, #ffd166, transparent);
 }
 
 /* New subscriber — deeper gold bloom. Top line shimmer is reserved for T2 (see below). */
 .event-card--new-sub {
-  background: linear-gradient(180deg, rgba(255, 209, 102, 0.14) 0%, rgba(0, 15, 8, 0.4) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 209, 102, 0.14) 0%,
+    rgba(0, 15, 8, 0.4) 100%
+  );
   box-shadow: 0 4px 28px rgba(255, 209, 102, 0.28);
 }
 .event-card--new-sub::before {
   height: 2px;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, #FFD166, transparent);
+  background: linear-gradient(90deg, transparent, #ffd166, transparent);
 }
 @keyframes new-sub-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Gift Sub — green, featured with shimmer */
 .event-card--giftsub {
-  background: linear-gradient(180deg, rgba(0, 255, 135, 0.1) 0%, rgba(0, 15, 8, 0.4) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 135, 0.1) 0%,
+    rgba(0, 15, 8, 0.4) 100%
+  );
   box-shadow: 0 4px 26px rgba(0, 255, 135, 0.22);
 }
 .event-card--giftsub::after {
-  background: linear-gradient(90deg, transparent, #00FF87, transparent);
+  background: linear-gradient(90deg, transparent, #00ff87, transparent);
 }
 .event-card--giftsub::before {
   height: 2px;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, #00FF87 40%, #b2ffd8 50%, #00FF87 60%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #00ff87 40%,
+    #b2ffd8 50%,
+    #00ff87 60%,
+    transparent
+  );
   background-size: 200% 100%;
   animation: new-sub-shimmer 2.4s ease-in-out infinite;
 }
@@ -1284,7 +1614,11 @@ hr.gradient {
 /* Gift Sub tiers — progressively richer as the count grows */
 /* Uncommon (5-9) — slightly brighter, gentle pulse on count */
 .event-card--giftsub.giftsub--uncommon {
-  background: linear-gradient(180deg, rgba(0, 255, 135, 0.14) 0%, rgba(0, 15, 8, 0.45) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 135, 0.14) 0%,
+    rgba(0, 15, 8, 0.45) 100%
+  );
   box-shadow: 0 4px 28px rgba(0, 255, 135, 0.3);
 }
 .event-card--giftsub.giftsub--uncommon .giftsub-count-num {
@@ -1293,7 +1627,11 @@ hr.gradient {
 
 /* Rare (10-24) — deeper glow + bigger count + warm teal tint */
 .event-card--giftsub.giftsub--rare {
-  background: linear-gradient(180deg, rgba(0, 255, 170, 0.18) 0%, rgba(0, 15, 8, 0.5) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 170, 0.18) 0%,
+    rgba(0, 15, 8, 0.5) 100%
+  );
   box-shadow: 0 6px 32px rgba(0, 255, 135, 0.38);
 }
 .event-card--giftsub.giftsub--rare .giftsub-count-num {
@@ -1308,25 +1646,38 @@ hr.gradient {
 
 /* Epic (25-49) — gold accents bleed in, dual-color shimmer, even bigger count */
 .event-card--giftsub.giftsub--epic {
-  background: linear-gradient(180deg, rgba(255, 209, 102, 0.12) 0%, rgba(0, 255, 135, 0.14) 55%, rgba(0, 15, 8, 0.55) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 209, 102, 0.12) 0%,
+    rgba(0, 255, 135, 0.14) 55%,
+    rgba(0, 15, 8, 0.55) 100%
+  );
   box-shadow:
     0 6px 36px rgba(0, 255, 135, 0.35),
     0 0 26px rgba(255, 209, 102, 0.28);
   border: 1px solid rgba(255, 209, 102, 0.22);
 }
 .event-card--giftsub.giftsub--epic::before {
-  background: linear-gradient(90deg, transparent, #FFD166 30%, #fff4c2 45%, #b2ffd8 55%, #00FF87 70%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ffd166 30%,
+    #fff4c2 45%,
+    #b2ffd8 55%,
+    #00ff87 70%,
+    transparent
+  );
   background-size: 200% 100%;
   animation: new-sub-shimmer 1.8s ease-in-out infinite;
 }
 .event-card--giftsub.giftsub--epic .giftsub-caption {
-  color: #FFD166;
+  color: #ffd166;
   opacity: 1;
   letter-spacing: 0.32em;
 }
 .event-card--giftsub.giftsub--epic .giftsub-count-num {
   font-size: 40px;
-  background: linear-gradient(135deg, #FFD166 0%, #fff4c2 40%, #00FF87 100%);
+  background: linear-gradient(135deg, #ffd166 0%, #fff4c2 40%, #00ff87 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1335,7 +1686,7 @@ hr.gradient {
   animation: giftsub-count-pulse 1.25s ease-in-out infinite;
 }
 .event-card--giftsub.giftsub--epic .giftsub-count-unit {
-  color: #FFD166;
+  color: #ffd166;
   border-color: rgba(255, 209, 102, 0.4);
   background: rgba(255, 209, 102, 0.12);
 }
@@ -1344,7 +1695,12 @@ hr.gradient {
 .event-card--giftsub.giftsub--legendary {
   background:
     radial-gradient(ellipse at top, rgba(255, 209, 102, 0.22) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(255, 107, 255, 0.12) 0%, rgba(0, 255, 135, 0.16) 50%, rgba(0, 15, 8, 0.6) 100%);
+    linear-gradient(
+      180deg,
+      rgba(255, 107, 255, 0.12) 0%,
+      rgba(0, 255, 135, 0.16) 50%,
+      rgba(0, 15, 8, 0.6) 100%
+    );
   border: 1px solid rgba(255, 209, 102, 0.4);
   animation: giftsub-legendary-aura 2.6s ease-in-out infinite;
 }
@@ -1353,11 +1709,11 @@ hr.gradient {
   background: linear-gradient(
     90deg,
     transparent,
-    #FF6BFF 20%,
-    #FFD166 35%,
+    #ff6bff 20%,
+    #ffd166 35%,
     #fff4c2 50%,
-    #00FF87 65%,
-    #60C8FF 80%,
+    #00ff87 65%,
+    #60c8ff 80%,
     transparent
   );
   background-size: 220% 100%;
@@ -1366,10 +1722,10 @@ hr.gradient {
 .event-card--giftsub.giftsub--legendary::after {
   height: 2px;
   opacity: 0.7;
-  background: linear-gradient(90deg, transparent, #FFD166, transparent);
+  background: linear-gradient(90deg, transparent, #ffd166, transparent);
 }
 .event-card--giftsub.giftsub--legendary .giftsub-caption {
-  color: #FFD166;
+  color: #ffd166;
   letter-spacing: 0.34em;
   font-size: 10px;
   opacity: 1;
@@ -1378,61 +1734,97 @@ hr.gradient {
 .event-card--giftsub.giftsub--legendary .giftsub-count-num {
   font-size: 52px;
   line-height: 1;
-  background: linear-gradient(135deg, #FF6BFF 0%, #FFD166 35%, #fff4c2 55%, #00FF87 85%);
+  background: linear-gradient(135deg, #ff6bff 0%, #ffd166 35%, #fff4c2 55%, #00ff87 85%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   text-shadow: 0 0 28px rgba(255, 209, 102, 0.6);
-  animation: giftsub-legendary-hue 3s ease-in-out infinite, giftsub-count-pulse 1s ease-in-out infinite;
+  animation:
+    giftsub-legendary-hue 3s ease-in-out infinite,
+    giftsub-count-pulse 1s ease-in-out infinite;
 }
 .event-card--giftsub.giftsub--legendary .giftsub-count-unit {
-  color: #FFD166;
+  color: #ffd166;
   border-color: rgba(255, 209, 102, 0.55);
   background: rgba(255, 209, 102, 0.18);
   box-shadow: 0 0 10px rgba(255, 209, 102, 0.35);
 }
 .event-card--giftsub.giftsub--legendary .giftsub-gifter-name {
-  color: #FFD166;
+  color: #ffd166;
   text-shadow: 0 0 8px rgba(255, 209, 102, 0.5);
 }
 
 @keyframes giftsub-count-pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.06); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
 }
 @keyframes giftsub-legendary-aura {
-  0%, 100% { box-shadow: 0 6px 38px rgba(0, 255, 135, 0.35), 0 0 32px rgba(255, 209, 102, 0.38); }
-  50%      { box-shadow: 0 6px 52px rgba(0, 255, 135, 0.55), 0 0 46px rgba(255, 209, 102, 0.6); }
+  0%,
+  100% {
+    box-shadow:
+      0 6px 38px rgba(0, 255, 135, 0.35),
+      0 0 32px rgba(255, 209, 102, 0.38);
+  }
+  50% {
+    box-shadow:
+      0 6px 52px rgba(0, 255, 135, 0.55),
+      0 0 46px rgba(255, 209, 102, 0.6);
+  }
 }
 @keyframes giftsub-legendary-hue {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Cheer/Bits — blue */
 .event-card--cheer {
-  background: linear-gradient(180deg, rgba(96, 200, 255, 0.07) 0%, rgba(0, 8, 18, 0.35) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(96, 200, 255, 0.07) 0%,
+    rgba(0, 8, 18, 0.35) 100%
+  );
   box-shadow: 0 4px 22px rgba(96, 200, 255, 0.14);
 }
 .event-card--cheer::before,
 .event-card--cheer::after {
-  background: linear-gradient(90deg, transparent, #60C8FF, transparent);
+  background: linear-gradient(90deg, transparent, #60c8ff, transparent);
 }
 
 /* Raid — purple, featured with shimmer */
 .event-card--raid {
-  background: linear-gradient(180deg, rgba(192, 132, 252, 0.12) 0%, rgba(5, 0, 15, 0.4) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(192, 132, 252, 0.12) 0%,
+    rgba(5, 0, 15, 0.4) 100%
+  );
   box-shadow: 0 4px 28px rgba(192, 132, 252, 0.26);
 }
 .event-card--raid::after {
-  background: linear-gradient(90deg, transparent, #C084FC, transparent);
+  background: linear-gradient(90deg, transparent, #c084fc, transparent);
 }
 .event-card--raid::before {
   height: 2px;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, #C084FC 40%, #e9d5ff 50%, #C084FC 60%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #c084fc 40%,
+    #e9d5ff 50%,
+    #c084fc 60%,
+    transparent
+  );
   background-size: 200% 100%;
   animation: new-sub-shimmer 2.4s ease-in-out infinite;
 }
@@ -1476,39 +1868,39 @@ hr.gradient {
 .event-card--sub .tag-icon,
 .event-card--resub .tag-icon {
   background: rgba(255, 209, 102, 0.14);
-  color: #FFD166;
+  color: #ffd166;
   border: 1px solid rgba(255, 209, 102, 0.28);
 }
 .event-card--sub .event-type-tag,
 .event-card--resub .event-type-tag {
-  color: #FFD166;
+  color: #ffd166;
 }
 
 .event-card--giftsub .tag-icon {
   background: rgba(0, 255, 135, 0.12);
-  color: #00FF87;
+  color: #00ff87;
   border: 1px solid rgba(0, 255, 135, 0.25);
 }
 .event-card--giftsub .event-type-tag {
-  color: #00FF87;
+  color: #00ff87;
 }
 
 .event-card--cheer .tag-icon {
   background: rgba(96, 200, 255, 0.1);
-  color: #60C8FF;
+  color: #60c8ff;
   border: 1px solid rgba(96, 200, 255, 0.24);
 }
 .event-card--cheer .event-type-tag {
-  color: #60C8FF;
+  color: #60c8ff;
 }
 
 .event-card--raid .tag-icon {
   background: rgba(192, 132, 252, 0.12);
-  color: #C084FC;
+  color: #c084fc;
   border: 1px solid rgba(192, 132, 252, 0.28);
 }
 .event-card--raid .event-type-tag {
-  color: #C084FC;
+  color: #c084fc;
 }
 
 /* Sub tier tag (Tier 1 / Tier 2 / Tier 3 / Prime) */
@@ -1518,7 +1910,7 @@ hr.gradient {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #FFD166;
+  color: #ffd166;
   background: rgba(255, 209, 102, 0.12);
   border: 1px solid rgba(255, 209, 102, 0.28);
   border-radius: 3px;
@@ -1528,39 +1920,53 @@ hr.gradient {
 
 /* Tier 2 sub card — silver-blue palette */
 .event-card--tier-2 .sub-tier-tag {
-  color: #9FD4FF;
+  color: #9fd4ff;
   background: rgba(159, 212, 255, 0.14);
   border-color: rgba(159, 212, 255, 0.34);
 }
 .event-card--tier-2 {
-  background: linear-gradient(180deg, rgba(159, 212, 255, 0.1) 0%, rgba(0, 15, 20, 0.4) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(159, 212, 255, 0.1) 0%,
+    rgba(0, 15, 20, 0.4) 100%
+  );
   box-shadow: 0 4px 24px rgba(159, 212, 255, 0.2);
 }
 .event-card--tier-2.event-card--sub::before,
 .event-card--tier-2.event-card--sub::after,
 .event-card--tier-2.event-card--resub::before,
 .event-card--tier-2.event-card--resub::after {
-  background: linear-gradient(90deg, transparent, #9FD4FF, transparent);
+  background: linear-gradient(90deg, transparent, #9fd4ff, transparent);
 }
 /* T2 first-time sub inherits the shimmering top accent line that T1 used to have. */
 .event-card--tier-2.event-card--new-sub::before {
   height: 2px;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, #9FD4FF 40%, #EAF6FF 50%, #9FD4FF 60%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #9fd4ff 40%,
+    #eaf6ff 50%,
+    #9fd4ff 60%,
+    transparent
+  );
   background-size: 200% 100%;
   animation: new-sub-shimmer 2.4s ease-in-out infinite;
 }
 
 /* Tier 3 sub card — magenta glow + animated aurora border + sparkle overlay */
 .event-card--tier-3 .sub-tier-tag {
-  color: #F5C2FF;
+  color: #f5c2ff;
   background: rgba(232, 121, 249, 0.18);
   border-color: rgba(232, 121, 249, 0.5);
   text-shadow: 0 0 8px rgba(232, 121, 249, 0.7);
 }
 .event-card--tier-3 {
-  background:
-    linear-gradient(180deg, rgba(232, 121, 249, 0.16) 0%, rgba(20, 0, 28, 0.55) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(232, 121, 249, 0.16) 0%,
+    rgba(20, 0, 28, 0.55) 100%
+  );
   box-shadow:
     0 0 0 1px rgba(232, 121, 249, 0.5),
     0 6px 34px rgba(232, 121, 249, 0.42),
@@ -1576,9 +1982,9 @@ hr.gradient {
   background: linear-gradient(
     90deg,
     transparent,
-    #E879F9 35%,
+    #e879f9 35%,
     #fff0ff 50%,
-    #E879F9 65%,
+    #e879f9 65%,
     transparent
   );
   background-size: 200% 100%;
@@ -1586,16 +1992,17 @@ hr.gradient {
 }
 .event-card--tier-3 .new-sub-username,
 .event-card--tier-3 .resub-username {
-  color: #F5C2FF;
+  color: #f5c2ff;
   text-shadow: 0 0 14px rgba(232, 121, 249, 0.9);
 }
 .event-card--tier-3 .new-sub-sparkle {
-  color: #F5C2FF;
+  color: #f5c2ff;
   letter-spacing: 0.22em;
 }
 
 @keyframes t3-aurora {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 1px rgba(232, 121, 249, 0.5),
       0 6px 34px rgba(232, 121, 249, 0.42),
@@ -1622,7 +2029,7 @@ hr.gradient {
   font-family: 'Space Mono', monospace;
   font-size: 20px;
   font-weight: 700;
-  color: #60C8FF;
+  color: #60c8ff;
   line-height: 1;
 }
 
@@ -1665,7 +2072,7 @@ hr.gradient {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.28em;
-  color: #FFD166;
+  color: #ffd166;
   opacity: 0.85;
   text-transform: uppercase;
 }
@@ -1673,7 +2080,7 @@ hr.gradient {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #FFD166;
+  color: #ffd166;
   text-shadow: 0 0 12px rgba(255, 209, 102, 0.55);
   line-height: 1.15;
 }
@@ -1694,7 +2101,7 @@ hr.gradient {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: #FFD166;
+  color: #ffd166;
 }
 .resub-detail {
   font-size: 12px;
@@ -1729,16 +2136,16 @@ hr.gradient {
 
 .event-card--sub .event-msg-quote::before,
 .event-card--resub .event-msg-quote::before {
-  color: #FFD166;
+  color: #ffd166;
 }
 .event-card--giftsub .event-msg-quote::before {
-  color: #00FF87;
+  color: #00ff87;
 }
 .event-card--cheer .event-msg-quote::before {
-  color: #60C8FF;
+  color: #60c8ff;
 }
 .event-card--raid .event-msg-quote::before {
-  color: #C084FC;
+  color: #c084fc;
 }
 
 /* Raid (揪團) body */
@@ -1753,7 +2160,7 @@ hr.gradient {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.28em;
-  color: #C084FC;
+  color: #c084fc;
   opacity: 0.85;
   text-transform: uppercase;
 }
@@ -1761,7 +2168,7 @@ hr.gradient {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #C084FC;
+  color: #c084fc;
   text-shadow: 0 0 12px rgba(192, 132, 252, 0.55);
   line-height: 1.15;
 }
@@ -1774,7 +2181,7 @@ hr.gradient {
 .raid-big-num {
   font-size: 26px;
   font-weight: 700;
-  color: #C084FC;
+  color: #c084fc;
   line-height: 1;
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.45);
 }
@@ -1797,7 +2204,7 @@ hr.gradient {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.28em;
-  color: #00FF87;
+  color: #00ff87;
   opacity: 0.85;
   text-transform: uppercase;
 }
@@ -1810,7 +2217,7 @@ hr.gradient {
   display: inline-block;
   font-size: 28px;
   font-weight: 700;
-  color: #00FF87;
+  color: #00ff87;
   text-shadow: 0 0 14px rgba(0, 255, 135, 0.55);
   line-height: 1;
   letter-spacing: 0.02em;
@@ -1821,7 +2228,7 @@ hr.gradient {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #00FF87;
+  color: #00ff87;
   background: rgba(0, 255, 135, 0.1);
   border: 1px solid rgba(0, 255, 135, 0.28);
   border-radius: 3px;
@@ -1835,7 +2242,7 @@ hr.gradient {
 .giftsub-gifter-name {
   font-weight: 700;
   font-size: 13px;
-  color: #00FF87;
+  color: #00ff87;
   letter-spacing: 0.01em;
 }
 .giftsub-gifter-text {
@@ -1843,8 +2250,12 @@ hr.gradient {
 }
 
 @keyframes arm-settle {
-  from { transform: rotate(-18deg); }
-  to   { transform: rotate(0deg); }
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }
 
 /* ===== Fullscreen Chat overrides ===== */
@@ -1893,8 +2304,10 @@ hr.gradient {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #00FF87;
-  box-shadow: 0 0 6px #00FF87, 0 0 2px #00FF87;
+  background: #00ff87;
+  box-shadow:
+    0 0 6px #00ff87,
+    0 0 2px #00ff87;
   position: relative;
   z-index: 1;
 }
@@ -1905,7 +2318,7 @@ hr.gradient {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px solid #00FF87;
+  border: 1px solid #00ff87;
   opacity: 0;
   animation: live-ping-wave 1.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
 }
@@ -1926,31 +2339,47 @@ hr.gradient {
 }
 
 @keyframes live-ping-wave {
-  0%   { transform: scale(0.3); opacity: 0.85; }
-  100% { transform: scale(1.9); opacity: 0; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
 }
 
 /* ===== Hype Train event card ===== */
 .event-card--hype {
-  background: linear-gradient(180deg, rgba(255, 140, 86, 0.14) 0%, rgba(24, 8, 0, 0.55) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 140, 86, 0.14) 0%,
+    rgba(24, 8, 0, 0.55) 100%
+  );
   box-shadow: 0 4px 26px rgba(255, 140, 86, 0.3);
 }
 .event-card--hype::before,
 .event-card--hype::after {
-  background: linear-gradient(90deg, transparent, #FF8C56, transparent);
+  background: linear-gradient(90deg, transparent, #ff8c56, transparent);
 }
 .event-card--hype .tag-icon {
   background: rgba(255, 140, 86, 0.14);
-  color: #FFB48A;
+  color: #ffb48a;
   border: 1px solid rgba(255, 140, 86, 0.4);
 }
 .event-card--hype .event-type-tag {
-  color: #FFB48A;
+  color: #ffb48a;
 }
 
 .event-card--hype-end {
-  background: linear-gradient(180deg, rgba(255, 86, 140, 0.2) 0%, rgba(24, 0, 12, 0.6) 100%);
-  box-shadow: 0 6px 34px rgba(255, 86, 140, 0.4), 0 0 60px rgba(255, 140, 86, 0.24);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 86, 140, 0.2) 0%,
+    rgba(24, 0, 12, 0.6) 100%
+  );
+  box-shadow:
+    0 6px 34px rgba(255, 86, 140, 0.4),
+    0 0 60px rgba(255, 140, 86, 0.24);
   animation: t3-aurora 2.6s ease-in-out infinite;
 }
 
@@ -1962,7 +2391,7 @@ hr.gradient {
 .hype-caption {
   font-size: 10px;
   letter-spacing: 0.22em;
-  color: #FFB48A;
+  color: #ffb48a;
   opacity: 0.95;
 }
 .hype-level {
@@ -1978,7 +2407,7 @@ hr.gradient {
 .hype-level-num {
   font-size: 30px;
   font-weight: 700;
-  color: #FFD4B3;
+  color: #ffd4b3;
   text-shadow: 0 0 14px rgba(255, 140, 86, 0.85);
   line-height: 1;
 }
@@ -1998,7 +2427,7 @@ hr.gradient {
 }
 .hype-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FF8C56, #FF568C);
+  background: linear-gradient(90deg, #ff8c56, #ff568c);
   box-shadow: 0 0 12px rgba(255, 140, 86, 0.7);
   transition: width 0.4s ease;
 }
@@ -2023,7 +2452,7 @@ hr.gradient {
     rgba(255, 209, 102, 0.04) 70%,
     transparent 100%
   );
-  border-left: 2px solid #FFD166;
+  border-left: 2px solid #ffd166;
   box-shadow:
     inset 0 0 0 1px rgba(255, 209, 102, 0.2),
     0 0 18px rgba(255, 209, 102, 0.18);
@@ -2035,7 +2464,7 @@ hr.gradient {
     rgba(199, 213, 224, 0.03) 70%,
     transparent 100%
   );
-  border-left: 2px solid #C7D5E0;
+  border-left: 2px solid #c7d5e0;
 }
 .top-chatter-row--bronze {
   background: linear-gradient(
@@ -2044,17 +2473,18 @@ hr.gradient {
     rgba(217, 147, 91, 0.03) 70%,
     transparent 100%
   );
-  border-left: 2px solid #D9935B;
+  border-left: 2px solid #d9935b;
 }
 
 .top-chatter-count--gold {
-  color: #FFD166;
+  color: #ffd166;
   text-shadow: 0 0 10px rgba(255, 209, 102, 0.6);
   animation: top-chatter-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes top-chatter-pulse {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 6px rgba(255, 209, 102, 0.45);
     transform: scale(1);
   }
@@ -2065,13 +2495,18 @@ hr.gradient {
 }
 
 .top-chatter-crown {
-  color: #FFD166;
+  color: #ffd166;
   text-shadow: 0 0 10px rgba(255, 209, 102, 0.75);
   animation: top-chatter-crown-sway 3.2s ease-in-out infinite;
   transform-origin: 50% 80%;
   display: inline-block;
 }
 @keyframes top-chatter-crown-sway {
-  0%, 100% { transform: rotate(-6deg); }
-  50%      { transform: rotate(6deg); }
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
 }

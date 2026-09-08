@@ -214,7 +214,7 @@ export default function SongList() {
                       onClick={() => handlePlay(song)}
                       className={`flex h-9 w-11 shrink-0 items-center justify-center rounded-[var(--admin-radius-sm)] border font-[family-name:var(--font-space-mono)] text-sm font-bold transition-colors ${
                         isPlaying
-                          ? 'border-[color:var(--admin-state-live)] bg-[color:var(--admin-state-live)] text-[#0F1115]'
+                          ? 'border-[color:var(--admin-state-live)] bg-[color:var(--admin-state-live)] text-white'
                           : 'border-[color:var(--admin-border-strong)] text-[color:var(--admin-text)] hover:border-[color:var(--admin-accent-border)] hover:bg-[color:var(--admin-accent-soft)]'
                       }`}
                       title={isPlaying ? '停止播放' : '開始播放'}
