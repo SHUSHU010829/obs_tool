@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { getCurrentlyPlaying } from '@/api/spotify'
+import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,5 +1,6 @@
 'use client'
 
+import HudStudio from '@/components/admin/hudStudio'
 import LiveTools from '@/components/admin/liveTools'
 import MessageBoard from '@/components/admin/messageBoard'
 import SongArchive from '@/components/admin/songArchive'
@@ -19,12 +20,13 @@ import {
   MonitorPlay,
   Radio,
   SlidersHorizontal,
+  Waves,
   X,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
-type NavSection = 'songs' | 'messages' | 'livetools'
+type NavSection = 'songs' | 'messages' | 'livetools' | 'hudstudio'
 type SongTab = 'songList' | 'songBook' | 'songRequest' | 'archive'
 type Tone = 'violet' | 'pink' | 'blue' | 'green'
 
@@ -32,6 +34,10 @@ const SECTION_META: Record<NavSection, { label: string; subtitle: string }> = {
   songs: { label: '歌曲管理', subtitle: '' },
   messages: { label: '留言板', subtitle: '查看並管理觀眾留言與回覆' },
   livetools: { label: '直播工具', subtitle: '' },
+  hudstudio: {
+    label: 'Now Playing HUD',
+    subtitle: '調整 Spotify 音樂 HUD 的版面、色彩與視覺化樣式，並產生 OBS 網址',
+  },
 }
 
 const SONG_TAB_META: Record<SongTab, { label: string; subtitle: string }> = {
@@ -127,6 +133,7 @@ export default function Home() {
       badge: stats.unreplied ?? 0,
     },
     { key: 'livetools', label: '直播工具', icon: SlidersHorizontal },
+    { key: 'hudstudio', label: 'Now Playing HUD', icon: Waves },
   ]
 
   const renderNav = () => (
@@ -401,6 +408,8 @@ export default function Home() {
               <LiveTools />
             </>
           )}
+
+          {activeSection === 'hudstudio' && <HudStudio />}
         </div>
       </main>
     </div>

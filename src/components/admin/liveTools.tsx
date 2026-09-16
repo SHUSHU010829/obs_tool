@@ -36,6 +36,15 @@ const OVERLAYS: OverlayEntry[] = [
     hint: '建議 1280 × 720 或更大',
   },
   {
+    id: 'nowplaying',
+    name: 'Spotify Now Playing HUD',
+    description: '科幻風格音樂 HUD：封面取色、動態波形、播放進度。可於「Now Playing HUD」分頁調整。',
+    path: '/nowplaying',
+    category: 'media',
+    recommended: true,
+    hint: '建議寬 920 × 高 200',
+  },
+  {
     id: 'song',
     name: '歌曲資訊',
     description: '旋轉黑膠 + 當前播放歌曲資訊。',
