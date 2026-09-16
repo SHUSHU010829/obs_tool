@@ -19,6 +19,15 @@ Twitch 直播主專用的 OBS 管理工具集，提供聊天顯示、歌曲播�
 - **右側欄**：訂閱 / 禮物 / Raid 等活動串流
 - Spotify 播放區塊：顯示曲名、歌手、播放進度條，換曲時淡入淡出動畫
 
+### Spotify Now Playing HUD (`/nowplaying`)
+- 科幻 / Cyberpunk 風格的音樂 HUD，**不是播放器**，專注於視覺呈現與即時同步
+- 顯示曲名、歌手、專輯封面、播放狀態（Playing / Paused）、播放時間、總長度、進度
+- **封面動態取色**：自動分析專輯封面主色，套用到波形、文字、進度條、邊框、Glow 與背景光暈，換歌即換色（灰階封面自動退回預設色）
+- **動態音訊波形**：播放時持續動畫，暫停時衰減為低幅度待機狀態
+- 四種版面（`bar` / `minimal` / `ticker` / `square`）與三種視覺化樣式（`bars` / `wave` / `radial`）
+- 透明背景，可直接疊在 OBS 畫面上
+- 於後台「Now Playing HUD」分頁可視化調整並產生網址
+
 ### 時鐘顯示 (`/clock`)
 - 多種風格選擇：數位時鐘、簡易時鐘
 - 類比時鐘（時針/分針/秒針）
@@ -147,7 +156,11 @@ obs_tool/
 │   │   ├── layout.tsx          # 根佈局
 │   │   ├── globals.css         # 全域樣式
 │   │   ├── api/
-│   │   │   └── spotify/        # Spotify Now Playing API 路由
+│   │   │   └── spotify/        # playback（正規化播放狀態）、artwork（CORS 代理）、analysis
+│   │   ├── nowplaying/         # Spotify Now Playing HUD overlay
+│   │   │   ├── layouts/        # 版面註冊表（bar / minimal / ticker / square）
+│   │   │   ├── visualizers/    # 視覺化註冊表（bars / wave / radial）
+│   │   │   └── components/     # Artwork、ProgressBar、HUD 外框
 │   │   ├── chat/               # 聊天顯示功能
 │   │   │   ├── page.tsx        # 聊天側欄（/chat）
 │   │   │   ├── full/           # 全螢幕 HUD（/chat/full）
@@ -167,6 +180,7 @@ obs_tool/
 │   │   └── ui/                 # shadcn/ui 組件庫
 │   │
 │   └── lib/                    # 工具函式庫
+│       ├── nowplaying/         # HUD 資料層：playback 同步、封面取色、波形資料、設定 schema
 │       ├── twitch.ts           # Twitch WebSocket 聊天監聽
 │       └── utils.ts            # 通用工具函式
 │
@@ -185,6 +199,7 @@ obs_tool/
    - 聊天顯示（側欄）：`http://localhost:3000/chat`（建議 360 × 680）
    - 聊天室 Full HUD：`http://localhost:3000/chat/full`（建議 1280 × 720 或更大）
    - 時鐘顯示：`http://localhost:3000/clock?style=digital`
+   - Spotify Now Playing HUD：`http://localhost:3000/nowplaying`（建議 920 × 200）
    - 歌曲列表：`http://localhost:3000/song`
    - 獎勵視頻：`http://localhost:3000/video`
 3. 調整寬度和高度以符合需求
@@ -199,6 +214,29 @@ obs_tool/
 /clock?style=simple   # 簡易時鐘
 /clock?style=all      # 全部風格
 ```
+
+### Now Playing HUD 參數
+
+所有參數皆可省略；數值超出範圍會自動夾值，未知的版面／樣式名稱會退回預設，不會讓畫面變成空白。
+
+| 參數 | 值 | 預設 | 說明 |
+|------|-----|------|------|
+| `layout` | `bar` / `minimal` / `ticker` / `square` | `bar` | HUD 版面 |
+| `viz` | `bars` / `wave` / `radial` | `bars` | 視覺化樣式（`radial` 建議搭配 `layout=square`） |
+| `art` | `0` / `1` | `1` | 是否顯示專輯封面（取色不受此開關影響） |
+| `color` | `auto` 或 `#rrggbb` | `auto` | `auto` = 取自專輯封面 |
+| `opacity` | `0.1`–`1` | `1` | 整體透明度 |
+| `glow` | `0`–`2` | `1` | Glow 強度 |
+| `font` | `spaceMono` / `montserrat` / `poppins` / `notoSans` | `spaceMono` | 字體 |
+| `speed` | `0.1`–`3` | `1` | 動畫速度倍率 |
+| `bars` | `8`–`192` | `64` | 波形數量 |
+| `fps` | `15`–`60` | `60` | 動畫 FPS 上限（低階機可調低） |
+| `scanlines` / `grid` / `readout` | `0` / `1` | `1` | 掃描線／格線／技術資訊列 |
+| `demo` | `0` / `1` | `0` | 使用假曲目，沒有在播歌時也能調整外觀 |
+
+範例：`/nowplaying?layout=square&viz=radial&color=%23ff2d95&glow=1.4`
+
+> **關於波形**：Spotify Web API 不提供即時音訊頻譜。預設的波形由歌曲 ID 產生（每首歌固定且獨特，並與播放／暫停狀態同步），但**不對應實際音訊內容**。程式會在背景嘗試呼叫 Spotify 的 audio-analysis 端點，成功即自動升級為真實音訊驅動（HUD 右上角會顯示 `FFT·LIVE` 而非 `FFT·SYN`）；該端點自 2024-11-27 起已對新申請的 app 停用，取不到時會靜默沿用程序化波形。
 
 ## API 端點
 
