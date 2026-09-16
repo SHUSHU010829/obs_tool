@@ -1,5 +1,6 @@
 'use client'
 
+import StandbyHud from './components/StandbyHud'
 import { LAYOUT_IDS, LAYOUTS } from './layouts'
 import { VISUALIZER_IDS } from './visualizers'
 import {
@@ -10,6 +11,7 @@ import {
 import { fontClassName, parseHudConfig } from '@/lib/nowplaying/config'
 import { useArtworkPalette } from '@/lib/nowplaying/palette'
 import { usePlaybackSync } from '@/lib/nowplaying/playback'
+import { isFailureStatus } from '@/lib/nowplaying/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -93,7 +95,18 @@ export default function NowPlaying() {
   }, [])
 
   const Layout = LAYOUTS[config.layout] ?? LAYOUTS.bar
-  const visible = state.isActive && state.track !== null
+  const hasTrack = state.isActive && state.track !== null
+
+  /**
+   * Three states rather than two. Hiding on every non-playing condition made a
+   * credential failure look exactly like a paused Spotify — `standby`/`debug`
+   * make the difference visible without putting anything on stream by default.
+   */
+  const mode: 'hud' | 'standby' | 'hidden' = hasTrack
+    ? 'hud'
+    : config.standby || (config.debug && isFailureStatus(state.status))
+      ? 'standby'
+      : 'hidden'
 
   return (
     <main
@@ -110,22 +123,31 @@ export default function NowPlaying() {
       }}
     >
       <AnimatePresence mode='wait' initial={false}>
-        {visible && (
+        {mode !== 'hidden' && (
           <motion.div
-            key={trackKey}
+            key={mode === 'hud' ? trackKey : 'standby'}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: config.opacity, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
             style={{ width: '100%' }}
           >
-            <Layout
-              state={state}
-              progressMs={progressMs}
-              palette={palette}
-              config={config}
-              source={analysisSource ?? proceduralSource}
-            />
+            {mode === 'hud' ? (
+              <Layout
+                state={state}
+                progressMs={progressMs}
+                palette={palette}
+                config={config}
+                source={analysisSource ?? proceduralSource}
+              />
+            ) : (
+              <StandbyHud
+                state={state}
+                palette={palette}
+                glow={config.glow}
+                debug={config.debug}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

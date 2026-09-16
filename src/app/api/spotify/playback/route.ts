@@ -1,8 +1,5 @@
-import {
-  getPlaybackState,
-  IDLE_PLAYBACK_STATE,
-  SpotifyPlaybackState,
-} from '@/api/spotify'
+import { getPlaybackState } from '@/api/spotify'
+import { IDLE_PLAYBACK_STATE, SpotifyPlaybackState } from '@/lib/nowplaying/types'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -36,15 +33,28 @@ async function loadState(): Promise<SpotifyPlaybackState> {
 }
 
 export async function GET() {
+  let state: SpotifyPlaybackState
+
   try {
-    const state = await loadState()
-    return NextResponse.json(state, { headers: { 'Cache-Control': 'no-store' } })
+    state = await loadState()
   } catch (error) {
+    // getPlaybackState reports failures through `status` rather than throwing,
+    // so reaching here means something unexpected broke.
     console.error('Error fetching spotify playback state:', error)
-    // Overlays must never render an error frame in OBS — report "idle" instead.
-    return NextResponse.json(
-      { ...IDLE_PLAYBACK_STATE, fetchedAt: Date.now() },
-      { headers: { 'Cache-Control': 'no-store' } }
-    )
+    state = {
+      ...IDLE_PLAYBACK_STATE,
+      status: 'upstream_error',
+      detail: error instanceof Error ? error.message : 'unknown error',
+      fetchedAt: Date.now(),
+    }
   }
+
+  if (state.status !== 'ok' && state.status !== 'idle') {
+    console.error(`Spotify playback unavailable (${state.status}): ${state.detail ?? ''}`)
+  }
+
+  // Always HTTP 200: an OBS browser source must never render an error page.
+  // The real outcome travels in `status`, which the overlay keeps silent by
+  // default and the admin studio surfaces.
+  return NextResponse.json(state, { headers: { 'Cache-Control': 'no-store' } })
 }

@@ -8,6 +8,11 @@ import {
   HudConfig,
   serializeHudConfig,
 } from '@/lib/nowplaying/config'
+import {
+  describeStatus,
+  isFailureStatus,
+  type SpotifyPlaybackState,
+} from '@/lib/nowplaying/types'
 import { Copy, ExternalLink, RotateCcw } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -77,6 +82,7 @@ export default function HudStudio() {
   const [config, setConfig] = useState<HudConfig>(HUD_DEFAULTS)
   const [origin, setOrigin] = useState('')
   const [previewWidth, setPreviewWidth] = useState(0)
+  const [playback, setPlayback] = useState<SpotifyPlaybackState | null>(null)
   const previewBoxRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -97,6 +103,32 @@ export default function HudStudio() {
     observer.observe(el)
     return () => observer.disconnect()
   }, [measure])
+
+  /**
+   * Live Spotify connection status. The overlay stays silent on failures so it
+   * never puts an error on stream, which means this panel is where the
+   * operator finds out that (say) the refresh token has expired.
+   */
+  useEffect(() => {
+    let cancelled = false
+
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/spotify/playback', { cache: 'no-store' })
+        const data = (await res.json()) as SpotifyPlaybackState
+        if (!cancelled) setPlayback(data)
+      } catch {
+        if (!cancelled) setPlayback(null)
+      }
+    }
+
+    poll()
+    const id = setInterval(poll, 5000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [])
 
   const set = <K extends keyof HudConfig>(key: K, value: HudConfig[K]) =>
     setConfig(prev => ({ ...prev, [key]: value }))
@@ -283,12 +315,53 @@ export default function HudStudio() {
               checked={config.showTechReadout}
               onChange={v => set('showTechReadout', v)}
             />
+            <Toggle
+              label='沒播放時顯示待機狀態'
+              checked={config.standby}
+              onChange={v => set('standby', v)}
+            />
+            <Toggle
+              label='顯示診斷訊息（勿用於直播）'
+              checked={config.debug}
+              onChange={v => set('debug', v)}
+            />
           </div>
         </div>
       </div>
 
       {/* Preview + URL */}
       <div className='space-y-4'>
+        <div className='admin-card'>
+          <div className='admin-card-header'>
+            <h3 className='admin-card-title'>Spotify 連線狀態</h3>
+            <span
+              className={`admin-pill ${
+                playback === null
+                  ? 'admin-pill--idle'
+                  : isFailureStatus(playback.status)
+                    ? 'admin-pill--warn'
+                    : playback.status === 'ok'
+                      ? 'admin-pill--ok'
+                      : 'admin-pill--idle'
+              }`}
+            >
+              {playback === null ? '檢查中…' : playback.status.toUpperCase()}
+            </span>
+          </div>
+          <div className='admin-card-content'>
+            <p className='text-[13px] text-[var(--admin-text)]'>
+              {playback === null ? '正在讀取播放狀態…' : describeStatus(playback)}
+            </p>
+            {playback !== null && isFailureStatus(playback.status) && (
+              <p className='admin-section-subtitle mt-1'>
+                overlay
+                在這個狀態下預設是空白的（避免直播出現錯誤畫面）。要在畫面上看到原因，
+                可在網址加上 <span className='admin-kbd'>?debug=1</span>。
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className='admin-card'>
           <div className='admin-card-header'>
             <h3 className='admin-card-title'>即時預覽</h3>

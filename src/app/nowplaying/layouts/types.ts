@@ -1,7 +1,7 @@
-import { SpotifyPlaybackState } from '@/api/spotify'
 import { AmplitudeSource } from '@/lib/nowplaying/amplitude'
 import { HudConfig } from '@/lib/nowplaying/config'
 import { HudPalette } from '@/lib/nowplaying/palette'
+import type { SpotifyPlaybackState } from '@/lib/nowplaying/types'
 
 /**
  * What every layout receives. A layout arranges and styles; it never fetches.

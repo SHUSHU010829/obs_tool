@@ -233,8 +233,29 @@ obs_tool/
 | `fps` | `15`–`60` | `60` | 動畫 FPS 上限（低階機可調低） |
 | `scanlines` / `grid` / `readout` | `0` / `1` | `1` | 掃描線／格線／技術資訊列 |
 | `demo` | `0` / `1` | `0` | 使用假曲目，沒有在播歌時也能調整外觀 |
+| `standby` | `0` / `1` | `0` | 沒在播放時顯示暗色待機 HUD（方便在 OBS 裡確認來源還活著） |
+| `debug` | `0` / `1` | `0` | 顯示無法取得播放資料的原因。**勿用於直播** |
 
 範例：`/nowplaying?layout=square&viz=radial&color=%23ff2d95&glow=1.4`
+
+### 排錯：overlay 是空白的
+
+**空白是正常設計**——沒有在播放歌曲時 overlay 會完全隱藏，直播畫面才不會殘留死掉的 HUD。但這也代表「沒在播放」和「憑證壞掉」長得一模一樣。要分辨：
+
+1. 開啟後台的 **Now Playing HUD** 分頁，最上方的「Spotify 連線狀態」會直接寫出原因。
+2. 或在 overlay 網址加上 `?debug=1`，畫面上會顯示狀態。
+3. 或直接開 `/api/spotify/playback`，看回傳 JSON 的 `status` 欄位。
+
+| `status` | 意思 | 怎麼處理 |
+|---|---|---|
+| `ok` | 正在播放或暫停 | 正常 |
+| `idle` | 連線正常，但沒有在播放 | 正常，播首歌就會出現 |
+| `unconfigured` | 環境變數缺漏（`detail` 會列出是哪幾個） | 到部署平台補上 |
+| `auth_failed` | refresh token 被撤銷／過期，或憑證錯誤 | 需重新授權產生新的 refresh token |
+| `rate_limited` | 打太頻繁 | 會自動恢復 |
+| `upstream_error` | Spotify 回應異常 | 看 `detail` |
+
+> 這個端點**永遠回 HTTP 200**，即使失敗也一樣——OBS 的 Browser Source 不該出現錯誤頁面，所以真正的結果放在 `status` 欄位裡。
 
 > **關於波形**：Spotify Web API 不提供即時音訊頻譜。預設的波形由歌曲 ID 產生（每首歌固定且獨特，並與播放／暫停狀態同步），但**不對應實際音訊內容**。程式會在背景嘗試呼叫 Spotify 的 audio-analysis 端點，成功即自動升級為真實音訊驅動（HUD 右上角會顯示 `FFT·LIVE` 而非 `FFT·SYN`）；該端點自 2024-11-27 起已對新申請的 app 停用，取不到時會靜默沿用程序化波形。
 
