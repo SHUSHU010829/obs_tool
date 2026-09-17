@@ -353,11 +353,26 @@ export default function HudStudio() {
               {playback === null ? '正在讀取播放狀態…' : describeStatus(playback)}
             </p>
             {playback !== null && isFailureStatus(playback.status) && (
-              <p className='admin-section-subtitle mt-1'>
-                overlay
-                在這個狀態下預設是空白的（避免直播出現錯誤畫面）。要在畫面上看到原因，
-                可在網址加上 <span className='admin-kbd'>?debug=1</span>。
-              </p>
+              <>
+                <p className='admin-section-subtitle mt-1'>
+                  overlay
+                  在這個狀態下預設是空白的（避免直播出現錯誤畫面）。要在畫面上看到原因，
+                  可在網址加上 <span className='admin-kbd'>?debug=1</span>。
+                </p>
+                {playback.status === 'auth_failed' && (
+                  <p className='admin-section-subtitle mt-2'>
+                    在本機執行 <span className='admin-kbd'>npm run spotify:auth</span>{' '}
+                    重新授權，把新的 refresh token 貼到部署平台的{' '}
+                    <span className='admin-kbd'>SPOTIFY_REFRESH_TOKEN</span>，然後
+                    <strong>重新部署</strong>（只改環境變數不會套用到既有部署）。
+                  </p>
+                )}
+                {playback.status === 'unconfigured' && (
+                  <p className='admin-section-subtitle mt-2'>
+                    在部署平台補上缺少的環境變數後<strong>重新部署</strong>。
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
