@@ -1,36 +1,27 @@
+import {
+  IDLE_PLAYBACK_STATE,
+  PlaybackStatus,
+  SpotifyPlaybackState,
+} from '@/lib/nowplaying/types'
 import axios from 'axios'
+
+// This module holds the OAuth flow and reads the client secret. Importing it
+// from a client component would bundle all of that into the browser, so fail
+// loudly at import time instead of shipping it silently.
+if (typeof window !== 'undefined') {
+  throw new Error(
+    'src/api/spotify.ts is server-only and must not be imported from client code'
+  )
+}
+
+export { IDLE_PLAYBACK_STATE }
+export type { PlaybackStatus, SpotifyPlaybackState }
 
 const TOKEN_URL = 'https://accounts.spotify.com/api/token'
 const PLAYER_URL = 'https://api.spotify.com/v1/me/player?market=from_token'
 const NOW_PLAYING_URL =
   'https://api.spotify.com/v1/me/player/currently-playing?market=from_token'
 const AUDIO_ANALYSIS_URL = 'https://api.spotify.com/v1/audio-analysis'
-
-/**
- * Normalized playback state. This is the single contract the visual layer
- * consumes — it carries no styling concepts, and nothing downstream of it
- * should ever talk to Spotify directly.
- */
-export type SpotifyPlaybackState = {
-  /** A device is connected and has a track loaded (playing OR paused). */
-  isActive: boolean
-  /** true = playing, false = paused. Only meaningful when isActive. */
-  isPlaying: boolean
-  track: {
-    id: string
-    title: string
-    artists: string[]
-    album: string
-    artworkUrl: string | null
-    durationMs: number
-  } | null
-  progressMs: number
-  /** Server clock at fetch time, so clients can correct interpolation drift. */
-  fetchedAt: number
-  device: { name: string; type: string } | null
-  shuffle: boolean
-  repeat: 'off' | 'track' | 'context'
-}
 
 /** Legacy shape kept for the existing /chat/full sidebar block. */
 export type NowPlayingTrack = {
@@ -52,15 +43,21 @@ let cachedToken: { value: string; expiresAt: number } | null = null
  */
 let playerScopeDenied = false
 
-export const IDLE_PLAYBACK_STATE: SpotifyPlaybackState = {
-  isActive: false,
-  isPlaying: false,
-  track: null,
-  progressMs: 0,
-  fetchedAt: 0,
-  device: null,
-  shuffle: false,
-  repeat: 'off',
+/** A failure we can describe to the operator, rather than an opaque throw. */
+class SpotifyFailure extends Error {
+  constructor(
+    readonly status: PlaybackStatus,
+    readonly detail: string
+  ) {
+    super(`${status}: ${detail}`)
+  }
+}
+
+/** Names the missing vars so the operator knows exactly what to set. */
+function missingCredentials(): string[] {
+  return (
+    ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET', 'SPOTIFY_REFRESH_TOKEN'] as const
+  ).filter(key => !process.env[key])
 }
 
 async function getAccessToken(): Promise<string> {
@@ -68,18 +65,17 @@ async function getAccessToken(): Promise<string> {
     return cachedToken.value
   }
 
-  const clientId = process.env.SPOTIFY_CLIENT_ID
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
-  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    throw new Error('Missing Spotify credentials in environment')
+  const missing = missingCredentials()
+  if (missing.length > 0) {
+    throw new SpotifyFailure('unconfigured', missing.join(', '))
   }
 
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+  const basic = Buffer.from(
+    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+  ).toString('base64')
   const body = new URLSearchParams({
     grant_type: 'refresh_token',
-    refresh_token: refreshToken,
+    refresh_token: process.env.SPOTIFY_REFRESH_TOKEN as string,
   })
 
   const res = await axios.post(TOKEN_URL, body.toString(), {
@@ -87,11 +83,24 @@ async function getAccessToken(): Promise<string> {
       Authorization: `Basic ${basic}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
+    // Read the error body instead of throwing, so `invalid_grant` (a revoked
+    // or rotated refresh token) can be reported precisely.
+    validateStatus: (status: number) => status < 600,
   })
+
+  if (res.status !== 200) {
+    const code = String(res.data?.error ?? `HTTP ${res.status}`)
+    throw new SpotifyFailure(
+      res.status === 400 || res.status === 401 ? 'auth_failed' : 'upstream_error',
+      code
+    )
+  }
 
   const accessToken = res.data?.access_token as string | undefined
   const expiresIn = (res.data?.expires_in as number | undefined) ?? 3600
-  if (!accessToken) throw new Error('Spotify token response missing access_token')
+  if (!accessToken) {
+    throw new SpotifyFailure('auth_failed', 'token response missing access_token')
+  }
 
   cachedToken = {
     value: accessToken,
@@ -149,6 +158,8 @@ function buildState(
   const track = normalizeTrack(data.item)
 
   return {
+    status: track ? 'ok' : 'idle',
+    detail: null,
     isActive: Boolean(track),
     isPlaying: Boolean(data.is_playing),
     track,
@@ -163,34 +174,96 @@ function buildState(
   }
 }
 
+/** Every status we expect to handle, so axios never throws on a known case. */
+const acceptAllStatuses = (status: number) => status < 600
+
+function failureState(status: PlaybackStatus, detail: string): SpotifyPlaybackState {
+  return { ...IDLE_PLAYBACK_STATE, status, detail, fetchedAt: Date.now() }
+}
+
+function idleState(): SpotifyPlaybackState {
+  return { ...IDLE_PLAYBACK_STATE, status: 'idle', fetchedAt: Date.now() }
+}
+
+/** Maps a non-2xx Spotify response onto a described failure. */
+function classify(status: number, data: unknown): SpotifyFailure {
+  const message =
+    typeof data === 'object' && data !== null
+      ? ((data as { error?: { message?: string } }).error?.message ?? '')
+      : ''
+
+  if (status === 401)
+    return new SpotifyFailure('auth_failed', message || 'access token rejected')
+  if (status === 403)
+    return new SpotifyFailure('auth_failed', message || 'insufficient scope')
+  if (status === 429) return new SpotifyFailure('rate_limited', 'too many requests')
+  return new SpotifyFailure('upstream_error', message || `HTTP ${status}`)
+}
+
 /**
  * Full playback state, including paused tracks. Prefers /v1/me/player (which
  * also yields device / shuffle / repeat for the HUD's technical readout) and
  * degrades to /currently-playing when that scope is unavailable.
+ *
+ * Never throws: every outcome is reported through `status` so the overlay can
+ * stay silent on stream while the operator can still see what went wrong.
  */
 export async function getPlaybackState(): Promise<SpotifyPlaybackState> {
+  try {
+    return await fetchPlaybackState(false)
+  } catch (error) {
+    if (error instanceof SpotifyFailure) {
+      return failureState(error.status, error.detail)
+    }
+    const detail = error instanceof Error ? error.message : 'unknown error'
+    return failureState('upstream_error', detail)
+  }
+}
+
+async function fetchPlaybackState(isRetry: boolean): Promise<SpotifyPlaybackState> {
   const token = await getAccessToken()
   const headers = { Authorization: `Bearer ${token}` }
-  // 204 = no active device; 403 = missing scope. Both are handled, not thrown.
-  const validateStatus = (status: number) =>
-    (status >= 200 && status < 300) || status === 204 || status === 403
+
+  /**
+   * A 401 means the cached access token died early (clock skew, revoked
+   * session). Drop it and try once more before calling it an auth failure.
+   */
+  const retryOnce = async (): Promise<SpotifyPlaybackState> => {
+    if (isRetry)
+      throw new SpotifyFailure('auth_failed', 'access token rejected after refresh')
+    cachedToken = null
+    return fetchPlaybackState(true)
+  }
 
   if (!playerScopeDenied) {
-    const res = await axios.get(PLAYER_URL, { headers, validateStatus })
+    const res = await axios.get(PLAYER_URL, {
+      headers,
+      validateStatus: acceptAllStatuses,
+    })
 
+    if (res.status === 401) return retryOnce()
+    // 403 here is almost always a refresh token issued without the
+    // user-read-playback-state scope, which /currently-playing does not need.
     if (res.status === 403) {
       playerScopeDenied = true
-    } else if (res.status === 204 || !res.data) {
-      return { ...IDLE_PLAYBACK_STATE, fetchedAt: Date.now() }
-    } else {
+    } else if (res.status === 204) {
+      return idleState()
+    } else if (res.status === 200 && res.data) {
       return buildState(res.data, { withDevice: true })
+    } else if (res.status !== 200) {
+      throw classify(res.status, res.data)
     }
   }
 
-  const res = await axios.get(NOW_PLAYING_URL, { headers, validateStatus })
-  if (res.status !== 200 || !res.data) {
-    return { ...IDLE_PLAYBACK_STATE, fetchedAt: Date.now() }
-  }
+  const res = await axios.get(NOW_PLAYING_URL, {
+    headers,
+    validateStatus: acceptAllStatuses,
+  })
+  if (res.status === 401) return retryOnce()
+  if (res.status === 204) return idleState()
+  if (res.status !== 200) throw classify(res.status, res.data)
+  if (!res.data) return idleState()
+
   return buildState(res.data, { withDevice: false })
 }
 

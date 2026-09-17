@@ -24,6 +24,10 @@ export type HudConfig = {
   showTechReadout: boolean
   /** Renders a synthetic track so the HUD can be styled without Spotify. */
   demo: boolean
+  /** Show a dim standby HUD when nothing is playing, instead of hiding. */
+  standby: boolean
+  /** Show why there is no playback data. Never enable this on stream. */
+  debug: boolean
 }
 
 export const HUD_DEFAULTS: HudConfig = {
@@ -41,6 +45,8 @@ export const HUD_DEFAULTS: HudConfig = {
   showGrid: true,
   showTechReadout: true,
   demo: false,
+  standby: false,
+  debug: false,
 }
 
 export const HUD_FONTS: { value: HudFont; label: string; className: string }[] = [
@@ -127,6 +133,8 @@ export function parseHudConfig(
     showGrid: bool(params, 'grid', HUD_DEFAULTS.showGrid),
     showTechReadout: bool(params, 'readout', HUD_DEFAULTS.showTechReadout),
     demo: bool(params, 'demo', HUD_DEFAULTS.demo),
+    standby: bool(params, 'standby', HUD_DEFAULTS.standby),
+    debug: bool(params, 'debug', HUD_DEFAULTS.debug),
   }
 }
 
@@ -163,6 +171,8 @@ export function serializeHudConfig(config: HudConfig): string {
     config.showTechReadout === HUD_DEFAULTS.showTechReadout
   )
   put('demo', '1', !config.demo)
+  put('standby', '1', !config.standby)
+  put('debug', '1', !config.debug)
 
   return params.toString()
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { IDLE_PLAYBACK_STATE, SpotifyPlaybackState } from '@/api/spotify'
+import { IDLE_PLAYBACK_STATE, SpotifyPlaybackState } from './types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /** Normal cadence while a track plays. */
@@ -61,6 +61,8 @@ function demoState(elapsedMs: number): SpotifyPlaybackState {
   const t = DEMO_TRACKS[index]
 
   return {
+    status: 'ok',
+    detail: null,
     isActive: true,
     isPlaying: true,
     track: {
@@ -152,7 +154,14 @@ export function usePlaybackSync(opts: { demo: boolean }): PlaybackSync {
         }
       } catch {
         if (cancelled) return
-        applyState({ ...IDLE_PLAYBACK_STATE, fetchedAt: Date.now() })
+        // The request itself failed (offline, deploy in progress). That is a
+        // different condition from Spotify reporting nothing playing.
+        applyState({
+          ...IDLE_PLAYBACK_STATE,
+          status: 'upstream_error',
+          detail: '無法連線到 /api/spotify/playback',
+          fetchedAt: Date.now(),
+        })
       } finally {
         if (!cancelled) {
           timer = setTimeout(poll, nextDelay(stateRef.current))

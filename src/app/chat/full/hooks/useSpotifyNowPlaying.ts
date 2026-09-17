@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import type { NowPlayingTrack } from '@/api/spotify'
+import { useEffect, useRef, useState } from 'react'
 
 const POLL_INTERVAL_MS = 10_000
 const TICK_INTERVAL_MS = 1_000
@@ -21,8 +21,11 @@ export function useSpotifyNowPlaying(): { track: NowPlayingTrack | null } {
         if (cancelled) return
         lastFetchAtRef.current = Date.now()
         setTrack(data)
-      } catch {
+      } catch (error) {
         if (cancelled) return
+        // Was silent, which made an expired refresh token indistinguishable
+        // from "nothing is playing" — both just emptied the sidebar block.
+        console.warn('[spotify] now-playing fetch failed:', error)
         setTrack(null)
       }
     }
