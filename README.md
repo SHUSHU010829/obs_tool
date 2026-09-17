@@ -184,6 +184,8 @@ obs_tool/
 │       ├── twitch.ts           # Twitch WebSocket 聊天監聽
 │       └── utils.ts            # 通用工具函式
 │
+├── scripts/
+│   └── spotify-auth.mjs        # 重新授權取得 Spotify refresh token
 ├── public/                     # 靜態資源（獎勵視頻）
 ├── tailwind.config.ts          # Tailwind 配置
 ├── next.config.mjs             # Next.js 配置
@@ -254,6 +256,53 @@ obs_tool/
 | `auth_failed` | refresh token 被撤銷／過期，或憑證錯誤 | 需重新授權產生新的 refresh token |
 | `rate_limited` | 打太頻繁 | 會自動恢復 |
 | `upstream_error` | Spotify 回應異常 | 看 `detail` |
+
+### 重新授權：拿一組新的 refresh token
+
+看到 `auth_failed` / `invalid_grant` 時用這個流程。
+
+> **`invalid_grant` 不是「過期」。** Spotify 的 refresh token 沒有時效，不會自己失效。會拿到這個錯誤通常是：
+> 1. 在 Spotify 帳號設定把這個 app 的授權移除了
+> 2. **Dashboard 重新產生過 client secret** — 一旦輪替，舊的 refresh token 全部作廢
+> 3. 目前的 `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` 跟當初簽發 token 的 app 不是同一個
+> 4. app 被刪掉重建
+>
+> 如果是第 2、3 種，**只換 token 而沒有對齊 client id/secret，新的一樣會壞**。
+
+步驟：
+
+1. 到 [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → 你的 app → Settings → Redirect URIs，加入並儲存：
+
+   ```
+   http://127.0.0.1:8888/callback
+   ```
+
+   必須逐字相符。Spotify 自 2025 年起不接受 `localhost`，loopback 要寫成明確的 IP。
+
+2. 在專案根目錄的 `.env.local` 放入**跟部署平台同一組**的憑證：
+
+   ```bash
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   ```
+
+3. 執行授權工具，用你自己的 Spotify 帳號登入：
+
+   ```bash
+   npm run spotify:auth
+   ```
+
+   它會在 `127.0.0.1:8888` 起一個只用一次的本機伺服器、開啟授權頁，完成後把新的 refresh token 印在**終端機**（不會顯示在網頁上，避免留在瀏覽器歷史或截圖裡）。
+
+4. 把印出來的值貼到部署平台的 `SPOTIFY_REFRESH_TOKEN`。
+
+5. **重新部署** — 只改環境變數不會套用到既有的部署。
+
+6. 回到後台「Now Playing HUD」分頁，狀態應該變成 `OK`。
+
+工具申請的 scope 是 `user-read-currently-playing` 與 `user-read-playback-state`。後者讓 `/v1/me/player` 可用，HUD 的技術資訊列才會出現 device / shuffle / repeat；少了它程式會自動降級到較窄的 `/currently-playing`。
+
+> 印出來的 refresh token 是長期有效的密鑰，別貼進 issue、截圖或聊天室。
 
 > 這個端點**永遠回 HTTP 200**，即使失敗也一樣——OBS 的 Browser Source 不該出現錯誤頁面，所以真正的結果放在 `status` 欄位裡。
 
