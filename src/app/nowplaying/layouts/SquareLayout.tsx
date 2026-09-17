@@ -7,15 +7,18 @@ import { HudLayoutProps } from './types'
 
 const SIZE = 260
 /**
- * Artwork sits inside the ring, so it must clear the visualizer's inner radius
- * (0.22 x the square's short side) or it masks the spokes.
+ * Sized so cover + waveform + text fit the square exactly:
+ * 260 - 2px border - 28px padding = 230 usable, and 108 + 8 + 34 + 8 + 68 = 226.
  */
-const ART_SIZE = 76
+const ART_SIZE = 108
+/** Fixed rather than per-visualizer: the square has no room to spare. */
+const VIZ_HEIGHT = 34
 
 /**
- * Square widget built around the ring visualizer: the waveform encircles the
- * artwork rather than sitting beside it. Suits `viz=radial` best, but any
- * renderer works — they all just fill the square.
+ * Square widget: cover on top, waveform band beneath it, then identity and
+ * transport. Stacked rather than layered — a square cover centred over a
+ * full-width visualizer would mask its middle and leave bars poking out either
+ * side.
  */
 export default function SquareLayout({
   state,
@@ -38,10 +41,10 @@ export default function SquareLayout({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        gap: 8,
         padding: 14,
         background:
-          'radial-gradient(circle at 50% 42%, rgba(8,12,17,0.9), rgba(6,10,14,0.62))',
+          'radial-gradient(circle at 50% 30%, rgba(8,12,17,0.9), rgba(6,10,14,0.62))',
         border: `1px solid ${palette.dim}`,
         boxShadow: `0 0 ${30 * config.glow}px ${palette.glow}`,
       }}
@@ -62,15 +65,25 @@ export default function SquareLayout({
 
       <CornerMarks palette={palette} size={12} />
 
-      {/* The visualizer is the backdrop; everything else sits on top of it. */}
+      {config.showArtwork && (
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <Artwork
+            url={track.artworkUrl}
+            palette={palette}
+            glow={config.glow * 0.6}
+            size={ART_SIZE}
+            isPlaying={state.isPlaying}
+          />
+        </div>
+      )}
+
       <div
         style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: SIZE - 62,
-          pointerEvents: 'none',
+          position: 'relative',
+          width: '100%',
+          height: VIZ_HEIGHT,
+          flexShrink: 0,
+          minHeight: 0,
         }}
       >
         <Visualizer
@@ -82,29 +95,15 @@ export default function SquareLayout({
         />
       </div>
 
-      {config.showArtwork && (
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: (SIZE - 62) / 2,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <Artwork
-            url={track.artworkUrl}
-            palette={palette}
-            glow={config.glow * 0.6}
-            size={ART_SIZE}
-            isPlaying={state.isPlaying}
-            round
-          />
-        </div>
-      )}
-
-      {/* Identity block pinned to the bottom, clear of the ring. */}
+      {/* Identity block pinned to the bottom. */}
       <div
-        style={{ position: 'relative', width: '100%', textAlign: 'center', minWidth: 0 }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          marginTop: 'auto',
+          textAlign: 'center',
+          minWidth: 0,
+        }}
       >
         <div
           style={{

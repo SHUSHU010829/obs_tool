@@ -9,23 +9,13 @@ type Props = {
   glow: number
   size: number
   isPlaying: boolean
-  /** Circular crop — used when the artwork sits inside the ring visualizer. */
-  round?: boolean
 }
 
 /**
  * Album artwork framed as an instrument readout. Routed through our proxy for
  * the same reason the palette extractor is — one cached fetch serves both.
  */
-export default function Artwork({
-  url,
-  palette,
-  glow,
-  size,
-  isPlaying,
-  round = false,
-}: Props) {
-  const radius = round ? '50%' : 0
+export default function Artwork({ url, palette, glow, size, isPlaying }: Props) {
   return (
     <div
       style={{
@@ -34,7 +24,6 @@ export default function Artwork({
         height: size,
         flexShrink: 0,
         border: `1px solid ${palette.dim}`,
-        borderRadius: radius,
         boxShadow: `0 0 ${18 * glow}px ${palette.glow}`,
         overflow: 'hidden',
         background: 'rgba(0,0,0,0.35)',
@@ -84,7 +73,6 @@ export default function Artwork({
           position: 'absolute',
           inset: 0,
           border: `1px solid ${palette.primary}`,
-          borderRadius: radius,
           opacity: 0.45,
           pointerEvents: 'none',
         }}

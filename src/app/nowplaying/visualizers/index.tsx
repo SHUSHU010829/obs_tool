@@ -1,6 +1,6 @@
 'use client'
 
-import { drawRadial, drawBars, drawWave } from './renderers'
+import { drawBars, drawWave } from './renderers'
 import { VisualizerDraw, VisualizerProps } from './types'
 import { smoothBars } from '@/lib/nowplaying/amplitude'
 import { useEffect, useRef } from 'react'
@@ -8,17 +8,13 @@ import { useEffect, useRef } from 'react'
 type VisualizerEntry = {
   draw: VisualizerDraw
   label: string
-  /**
-   * Height the visualizer wants inside a layout. A radial needs vertical room
-   * to read as a ring; bars and waves are happy in a thin band.
-   */
+  /** Height the visualizer wants inside a layout. */
   preferredHeight: number
 }
 
 export const VISUALIZERS: Record<string, VisualizerEntry> = {
   bars: { draw: drawBars, label: 'Bars', preferredHeight: 40 },
   wave: { draw: drawWave, label: 'Wave', preferredHeight: 44 },
-  radial: { draw: drawRadial, label: 'Radial', preferredHeight: 92 },
 }
 
 export const VISUALIZER_IDS = Object.keys(VISUALIZERS)

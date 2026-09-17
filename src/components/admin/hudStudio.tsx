@@ -311,11 +311,6 @@ export default function HudStudio() {
               onChange={v => set('showGrid', v)}
             />
             <Toggle
-              label='技術資訊列'
-              checked={config.showTechReadout}
-              onChange={v => set('showTechReadout', v)}
-            />
-            <Toggle
               label='沒播放時顯示待機狀態'
               checked={config.standby}
               onChange={v => set('standby', v)}

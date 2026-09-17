@@ -21,7 +21,6 @@ export type HudConfig = {
   fps: number
   showScanlines: boolean
   showGrid: boolean
-  showTechReadout: boolean
   /** Renders a synthetic track so the HUD can be styled without Spotify. */
   demo: boolean
   /** Show a dim standby HUD when nothing is playing, instead of hiding. */
@@ -43,7 +42,6 @@ export const HUD_DEFAULTS: HudConfig = {
   fps: 60,
   showScanlines: true,
   showGrid: true,
-  showTechReadout: true,
   demo: false,
   standby: false,
   debug: false,
@@ -131,7 +129,6 @@ export function parseHudConfig(
     fps: Math.round(num(params, 'fps', HUD_DEFAULTS.fps, 15, 60)),
     showScanlines: bool(params, 'scanlines', HUD_DEFAULTS.showScanlines),
     showGrid: bool(params, 'grid', HUD_DEFAULTS.showGrid),
-    showTechReadout: bool(params, 'readout', HUD_DEFAULTS.showTechReadout),
     demo: bool(params, 'demo', HUD_DEFAULTS.demo),
     standby: bool(params, 'standby', HUD_DEFAULTS.standby),
     debug: bool(params, 'debug', HUD_DEFAULTS.debug),
@@ -165,11 +162,6 @@ export function serializeHudConfig(config: HudConfig): string {
     config.showScanlines === HUD_DEFAULTS.showScanlines
   )
   put('grid', config.showGrid ? '1' : '0', config.showGrid === HUD_DEFAULTS.showGrid)
-  put(
-    'readout',
-    config.showTechReadout ? '1' : '0',
-    config.showTechReadout === HUD_DEFAULTS.showTechReadout
-  )
   put('demo', '1', !config.demo)
   put('standby', '1', !config.standby)
   put('debug', '1', !config.debug)
