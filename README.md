@@ -24,7 +24,7 @@ Twitch 直播主專用的 OBS 管理工具集，提供聊天顯示、歌曲播�
 - 顯示曲名、歌手、專輯封面、播放狀態（Playing / Paused）、播放時間、總長度、進度
 - **封面動態取色**：自動分析專輯封面主色，套用到波形、文字、進度條、邊框、Glow 與背景光暈，換歌即換色（灰階封面自動退回預設色）
 - **動態音訊波形**：播放時持續動畫，暫停時衰減為低幅度待機狀態
-- 四種版面（`bar` / `minimal` / `ticker` / `square`）與三種視覺化樣式（`bars` / `wave` / `radial`）
+- 四種版面（`bar` / `minimal` / `ticker` / `square`）與兩種視覺化樣式（`bars` / `wave`）
 - 透明背景，可直接疊在 OBS 畫面上
 - 於後台「Now Playing HUD」分頁可視化調整並產生網址
 
@@ -159,7 +159,7 @@ obs_tool/
 │   │   │   └── spotify/        # playback（正規化播放狀態）、artwork（CORS 代理）、analysis
 │   │   ├── nowplaying/         # Spotify Now Playing HUD overlay
 │   │   │   ├── layouts/        # 版面註冊表（bar / minimal / ticker / square）
-│   │   │   ├── visualizers/    # 視覺化註冊表（bars / wave / radial）
+│   │   │   ├── visualizers/    # 視覺化註冊表（bars / wave）
 │   │   │   └── components/     # Artwork、ProgressBar、HUD 外框
 │   │   ├── chat/               # 聊天顯示功能
 │   │   │   ├── page.tsx        # 聊天側欄（/chat）
@@ -224,7 +224,7 @@ obs_tool/
 | 參數 | 值 | 預設 | 說明 |
 |------|-----|------|------|
 | `layout` | `bar` / `minimal` / `ticker` / `square` | `bar` | HUD 版面 |
-| `viz` | `bars` / `wave` / `radial` | `bars` | 視覺化樣式（`radial` 建議搭配 `layout=square`） |
+| `viz` | `bars` / `wave` | `bars` | 視覺化樣式 |
 | `art` | `0` / `1` | `1` | 是否顯示專輯封面（取色不受此開關影響） |
 | `color` | `auto` 或 `#rrggbb` | `auto` | `auto` = 取自專輯封面 |
 | `opacity` | `0.1`–`1` | `1` | 整體透明度 |
@@ -233,12 +233,12 @@ obs_tool/
 | `speed` | `0.1`–`3` | `1` | 動畫速度倍率 |
 | `bars` | `8`–`192` | `64` | 波形數量 |
 | `fps` | `15`–`60` | `60` | 動畫 FPS 上限（低階機可調低） |
-| `scanlines` / `grid` / `readout` | `0` / `1` | `1` | 掃描線／格線／技術資訊列 |
+| `scanlines` / `grid` | `0` / `1` | `1` | 掃描線／格線 |
 | `demo` | `0` / `1` | `0` | 使用假曲目，沒有在播歌時也能調整外觀 |
 | `standby` | `0` / `1` | `0` | 沒在播放時顯示暗色待機 HUD（方便在 OBS 裡確認來源還活著） |
 | `debug` | `0` / `1` | `0` | 顯示無法取得播放資料的原因。**勿用於直播** |
 
-範例：`/nowplaying?layout=square&viz=radial&color=%23ff2d95&glow=1.4`
+範例：`/nowplaying?layout=square&viz=wave&color=%23ff2d95&glow=1.4`
 
 ### 排錯：overlay 是空白的
 

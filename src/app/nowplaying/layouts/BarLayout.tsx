@@ -88,28 +88,9 @@ export default function BarLayout({
           gap: 8,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <MicroLabel palette={palette} accent>
-            {state.isPlaying ? '▶ Playing' : '❚❚ Paused'}
-          </MicroLabel>
-
-          {config.showTechReadout && (
-            <div style={{ display: 'flex', gap: 14, overflow: 'hidden' }}>
-              {state.device && (
-                <MicroLabel palette={palette}>{state.device.name}</MicroLabel>
-              )}
-              {state.shuffle && <MicroLabel palette={palette}>SHF</MicroLabel>}
-              {state.repeat !== 'off' && (
-                <MicroLabel palette={palette}>
-                  RPT·{state.repeat === 'track' ? '1' : 'ALL'}
-                </MicroLabel>
-              )}
-              <MicroLabel palette={palette}>
-                {source.kind === 'analysis' ? 'FFT·LIVE' : 'FFT·SYN'}
-              </MicroLabel>
-            </div>
-          )}
-        </div>
+        <MicroLabel palette={palette} accent>
+          {state.isPlaying ? '▶ Playing' : '❚❚ Paused'}
+        </MicroLabel>
 
         <div style={{ minWidth: 0 }}>
           <div
